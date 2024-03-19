@@ -7,11 +7,12 @@ import uuid
 app = Flask(__name__)
 dbConn = init_db.connect_to_db()
 
+
 @app.route('/users')
 def users():
     users = crud_ops.get_users(dbConn)
 
-    return "Welcome " + str(users)
+    return users
 
 @app.route('/shows')
 def shows():
@@ -27,7 +28,7 @@ def index():
 @app.route('/register', methods=['POST'])
 def register_user():
     # Get data from the request
-    data = request.json()
+    data = request.json
 
     # extract parameters from the data
     # NIF is used for unique identification
@@ -42,14 +43,33 @@ def register_user():
 
     # TODO: Decide if validation is going to be done by the server or in the client
 
-    # Add the user to the database
-    crud_ops.add_user(dbConn, name, nif, card, public_key)
+    # Generate a unique user_id
+    user_id = uuid.uuid4()
 
-    # Generate unique UUID for the user (16bytes)
-    user_id = uuid.uuid4().bytes[:16]
+    # Add the user to the database
+    sucess = crud_ops.add_user(dbConn, user_id, name, nif, card, public_key)
+
+    if not sucess:
+        return jsonify({'error': 'Error adding user to the database'}), 500
+    else:
+        print('User added successfully')
+
 
     # Return the user_id with success message
-    return jsonify({'user_id': user_id.hex(), 'message': 'User added successfully'}), 201
+    return jsonify({'user_id': user_id, 'message': 'User added successfully'}), 201
+
+
+# TODO @app.route('/login', methods=['POST'])
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
