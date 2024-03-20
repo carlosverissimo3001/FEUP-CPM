@@ -12,13 +12,25 @@ dbConn = init_db.connect_to_db()
 def users():
     users = crud_ops.get_users(dbConn)
 
-    return users
+    return {'users' : users}
 
 @app.route('/shows')
 def shows():
     shows = crud_ops.get_shows(dbConn)
 
-    return shows
+    return {'shows' : shows}
+
+# given a show_id, return the show details and dates available
+@app.route('/shows/<show_id>')
+def show_details(show_id):
+    show = crud_ops.get_show(dbConn, show_id)[0]
+
+    dates = crud_ops.get_show_dates(dbConn, show_id)
+
+    show["dates"] = dates
+
+    return {'show' : show }
+
 
 @app.route('/')
 def index():

@@ -14,10 +14,24 @@ def get_users(conn: psycopg2.extensions.connection):
     cur = conn.cursor()
 
     cur.execute('''
-        SELECT * FROM users
+        SELECT json_build_object(
+            'userid', userid,
+            'name', name,
+            'nif', nif,
+            'creditcardtype', creditcardtype,
+            'creditcardnumber', creditcardnumber,
+            'creditcardvalidity', creditcardvalidity,
+            'publickey', publickey
+        ) FROM users
     ''')
 
-    return cur.fetchall()
+    rows = cur.fetchall()
+    data = []
+
+    for row in rows:
+        data.append(row[0])
+
+    return data
 
 def get_shows(conn: psycopg2.extensions.connection):
     """
@@ -30,10 +44,23 @@ def get_shows(conn: psycopg2.extensions.connection):
     cur = conn.cursor()
 
     cur.execute('''
-        SELECT * FROM shows
+        SELECT json_build_object(
+            'showid', showid,
+            'name', name,
+            'description', description,
+            'picture', picture,
+            'price', price
+        ) FROM shows
     ''')
 
-    return cur.fetchall()
+    rows = cur.fetchall()
+
+    data = []
+
+    for row in rows:
+        data.append(row[0])
+
+    return data
 
 ## CHECK IF USER EXISTS
 def check_user_exists(conn: psycopg2.extensions.connection, nif: str):
@@ -84,3 +111,57 @@ def add_user(conn: psycopg2.extensions.connection, user_id, name, nif, card, pub
         return False
 
 
+## GET SHOW DETAILS BY ID
+def get_show(conn: psycopg2.extensions.connection, show_id: str):
+    """
+    Get the details of a show given its id
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str show_id: show's id
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    cur.execute('''
+        SELECT json_build_object(
+            'showid', showid,
+            'name', name,
+            'description', description,
+            'picture', picture,
+            'price', price
+        ) FROM shows WHERE showid = %s
+    ''', (show_id,))
+
+    row = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row
+
+def get_show_dates(conn, show_id: str):
+    """
+    Get the dates available for a show given its id
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str show_id: show's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    cur.execute('''
+        SELECT json_build_object(
+            'date', date,
+            'availableseats', availableseats
+        ) FROM showdates WHERE showid = %s
+    ''', (show_id,))
+
+    rows = cur.fetchall()
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
