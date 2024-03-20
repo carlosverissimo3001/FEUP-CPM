@@ -26,6 +26,7 @@
             android:padding="24dp"
             android:background="@drawable/custom_edittext">
 
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,7 +48,7 @@
                 android:padding="8dp"
                 android:hint="@string/name"
                 android:drawableStart="@drawable/ic_baseline_person_24"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="15sp"
                 android:drawablePadding="8dp"
                 android:autofillHints="" />
@@ -63,19 +64,59 @@
                 android:padding="8dp"
                 android:hint="@string/nif"
                 android:drawableStart="@drawable/ic_baseline_numbers_24"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="15sp"
                 android:drawablePadding="8dp"
                 android:autofillHints="" />
-            
-            <com.braintreepayments.cardform.view.CardForm
-                android:id="@+id/card_form"
+
+            <EditText
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="50dp"
+                android:id="@+id/credit_card_number"
+                android:inputType="number"
+                android:maxLength="16"
+                android:background="@drawable/custom_edittext"
+                android:layout_marginTop="40dp"
+                android:padding="8dp"
+                android:hint="@string/credit_card_number"
+                android:drawableStart="@drawable/baseline_credit_card_24"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:drawablePadding="8dp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:id="@+id/credit_card_validity_month"
+                android:inputType="number"
+                android:maxLength="2"
+                android:background="@drawable/custom_edittext"
+                android:layout_marginTop="40dp"
+                android:padding="8dp"
+                android:hint="Month (01-12)"
+                android:drawableStart="@drawable/baseline_calendar_month_24"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:drawablePadding="8dp"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:id="@+id/credit_card_validity_year"
+                android:inputType="number"
+                android:maxLength="2"
+                android:background="@drawable/custom_edittext"
+                android:layout_marginTop="40dp"
+                android:padding="8dp"
+                android:hint="Year (00-99)"
+                android:drawableStart="@drawable/baseline_calendar_month_24"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:drawablePadding="8dp"/>
 
 
             <Button
-                android:id="@+id/loginButton"
+                android:id="@+id/registerButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"

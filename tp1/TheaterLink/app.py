@@ -40,7 +40,6 @@ def index():
 def pre_register_user():
     # Get data from the request
     data = request.json
-
     nif = data.get('nif')
 
     row = crud_ops.check_user_exists(dbConn, nif)
@@ -62,9 +61,6 @@ def register_user():
     # NIF is used for unique identification
     nif = data.get('nif')
 
-    if crud_ops.check_user_exists(dbConn, nif):
-        return jsonify({'error': 'User already exists'}), 400
-
     name = data.get('name')
     public_key = data.get('public_key')     #
     card = data.get('card')                 # assum card is a dictionary with the following keys: number, expiration_date, cvv
@@ -85,18 +81,6 @@ def register_user():
 
     # Return the user_id with success message
     return jsonify({'user_id': user_id, 'message': 'User added successfully'}), 201
-
-
-# TODO @app.route('/login', methods=['POST'])
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

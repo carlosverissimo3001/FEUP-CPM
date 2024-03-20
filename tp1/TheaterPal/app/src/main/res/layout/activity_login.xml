@@ -47,7 +47,7 @@
                 android:padding="8dp"
                 android:hint="@string/nif"
                 android:drawableStart="@drawable/ic_baseline_person_24"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="15sp"
                 android:drawablePadding="8dp"/>
 
