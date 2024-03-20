@@ -75,10 +75,18 @@ def check_user_exists(conn: psycopg2.extensions.connection, nif: str):
     cur = conn.cursor()
 
     cur.execute('''
-        SELECT * FROM users WHERE nif = %s
+        SELECT json_build_object(
+            'userid', userid,
+            'name', name,
+            'nif', nif,
+            'creditcardtype', creditcardtype,
+            'creditcardnumber', creditcardnumber,
+            'creditcardvalidity', creditcardvalidity,
+            'publickey', publickey
+        ) FROM users WHERE nif = %s
     ''', (nif,))
 
-    return cur.fetchone() is not None
+    return cur.fetchone()
 
 ## ADD USER
 def add_user(conn: psycopg2.extensions.connection, user_id, name, nif, card, public_key):

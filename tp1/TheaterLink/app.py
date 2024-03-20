@@ -36,6 +36,22 @@ def show_details(show_id):
 def index():
     return 'Welcome to the Ticketing Server!'
 
+@app.route('/pre-register', methods=['POST'])
+def pre_register_user():
+    # Get data from the request
+    data = request.json
+
+    nif = data.get('nif')
+
+    row = crud_ops.check_user_exists(dbConn, nif)
+
+    if row is not None:
+        user = row[0]
+        user_id = user["userid"]
+        return jsonify({'user_id': user_id, 'message': 'User already exists'}), 200
+
+    else:
+         return jsonify({'message': 'New user'}), 204
 
 @app.route('/register', methods=['POST'])
 def register_user():

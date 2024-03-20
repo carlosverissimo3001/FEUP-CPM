@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TheaterPal</string>
+    <string name="login">Login</string>
+    <string name="name">Name</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="nif"> Fiscal Identification Number</string>
+    <string name="get_started">Get Started</string>
+    <string name="register">Register</string>
+    <string name="credit_card_number">Credit Card Number</string>
+    <string name="add_card">Add Card</string>
 </resources>
