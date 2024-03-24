@@ -82,6 +82,21 @@ def register_user():
     # Return the user_id with success message
     return jsonify({'user_id': user_id, 'message': 'User added successfully'}), 201
 
+# given a user id, return the user details
+@app.route('/get_user', methods=['POST'])
+def get_name():
+    data = request.json
+
+    user_id = data.get('user_id')
+
+    user = crud_ops.get_user_by_user_id(dbConn, user_id)
+
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
+    else:
+        user = user[0]
+
+    return jsonify({'name': user["name"]}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

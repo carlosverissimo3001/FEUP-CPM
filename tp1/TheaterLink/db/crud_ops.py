@@ -173,3 +173,33 @@ def get_show_dates(conn, show_id: str):
         data.append(row[0])
 
     return data
+
+def get_user_by_user_id(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get a user by its user_id
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    cur.execute('''
+        SELECT json_build_object(
+            'userid', userid,
+            'name', name,
+            'nif', nif,
+            'creditcardtype', creditcardtype,
+            'creditcardnumber', creditcardnumber,
+            'creditcardvalidity', creditcardvalidity,
+            'publickey', publickey
+        ) FROM users WHERE userid = %s
+    ''', (user_id,))
+
+    row = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row
