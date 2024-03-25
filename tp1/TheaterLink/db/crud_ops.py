@@ -89,29 +89,29 @@ def check_user_exists(conn: psycopg2.extensions.connection, nif: str):
     return cur.fetchone()
 
 ## ADD USER
-def add_user(conn: psycopg2.extensions.connection, user_id, name, nif, card, public_key):
+def add_user(conn: psycopg2.extensions.connection, name, nif, card, public_key):
     """
     Add a user to the database
 
     :param psycopg2.extensions.connection conn: connection to the database
     :param user.User user: user to be added to the database
     """
-    print(f"user_id: {user_id}")
     card_type = card.get('type')
     card_number = card.get('number')
     card_expiration_date = card.get('expiration_date')
 
-    user_id_str = str(user_id)
 
     cur = conn.cursor()
 
     try:
         cur.execute('''
-            INSERT INTO users (userid, name, nif, creditcardtype, creditcardnumber, creditcardvalidity, publickey)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ''', (user_id_str, name, nif, card_type, card_number, card_expiration_date, public_key))
+            INSERT INTO users (name, nif, creditcardtype, creditcardnumber, creditcardvalidity, publickey)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING *
+        ''', (name, nif, card_type, card_number, card_expiration_date, public_key))
         conn.commit()
-        return True
+
+        return cur.fetchone()
 
     except psycopg2.Error as e:
         print("Error inserting user: ", e)
@@ -295,26 +295,28 @@ def get_ticket_by_ticket_id(conn: psycopg2.extensions.connection, ticket_id: int
 
     return row
 
-def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_type: str):
+def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_type: str, gen_trans_id: str):
     """
     Create a voucher for a ticket
 
     :param psycopg2.extensions.connection conn: connection to the database
     :param str user_id: user's id
     :param str voucher_type: voucher's type (FIVE_PERCENT, FREE_COFFEE, FREE_POPCORN)
+    :param gen_trans_id: transaction id that generated the voucher
     """
     cur = conn.cursor()
 
     try:
         cur.execute('''
-            INSERT INTO vouchers (userid, vouchertype)
-            VALUES (%s, %s)
+            INSERT INTO vouchers (userid, vouchertype, TransactionIDGenerated)
+            VALUES (%s, %s, %s)
             RETURNING json_build_object(
                 'voucherid', voucherid,
                 'userid', userid,
                 'vouchertype', vouchertype
+
             )
-        ''', (user_id, voucher_type))
+        ''', (user_id, voucher_type, gen_trans_id))
         conn.commit()
 
         return cur.fetchone()
@@ -373,3 +375,60 @@ def get_user_vouchers(conn: psycopg2.extensions.connection, user_id: str):
         data.append(row[0])
 
     return data
+
+def create_transaction(conn: psycopg2.extensions.connection, user_id: str, transaction_type: str, total_cost: float):
+    """
+    Create a transaction
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str type: transaction's type
+    :param str user_id: user's id
+    :param float total_cost: total cost of the transaction
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            INSERT INTO transactions (TransactionType, Total, UserID)
+            VALUES (%s, %s, %s)
+            RETURNING *
+        ''', (transaction_type, total_cost, user_id))
+        conn.commit()
+
+        return cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error inserting transaction: ", e)
+        conn.rollback() # Rollback the transaction
+        return None
+
+def create_ticket_transaction(conn: psycopg2.extensions.connection, transaction_id: str, ticket_id: str, number_of_tickets: int):
+    """
+    Create a transaction for ticket purchases
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str transaction_id: transaction's id
+    :param str ticket_id: ticket's id (if multiple tickets, the first ticket's id)
+    :param int number_of_tickets: number of tickets purchased
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            INSERT INTO tickettransactions (TransactionID, TicketID, NumberOfTickets)
+            VALUES (%s, %s, %s)
+            RETURNING *
+        ''', (transaction_id, ticket_id, number_of_tickets))
+        conn.commit()
+
+        return cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error inserting ticket transaction: ", e)
+        conn.rollback()
+        return None
+

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from routes import shows, users, tickets, vouchers
+from routes import shows, users, tickets, vouchers, transactions
 
 import db.init_db as init_db
 
@@ -14,6 +14,7 @@ app.register_blueprint(shows.construct_blueprint(dbConn))
 app.register_blueprint(users.construct_blueprint(dbConn))
 app.register_blueprint(tickets.construct_blueprint(dbConn))
 app.register_blueprint(vouchers.construct_blueprint(dbConn))
+app.register_blueprint(transactions.construct_blueprint(dbConn))
 
 @app.route('/')
 def index():

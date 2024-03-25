@@ -1,4 +1,5 @@
 CREATE TYPE voucher_type AS ENUM ('FIVE_PERCENT', 'FREE_COFFEE', 'FREE_POPCORN');
+CREATE TYPE transaction_type AS ENUM ('TICKET_PURCHASE', 'CAFETERIA_ORDER');
 
 -- Users Table
 CREATE TABLE Users (
@@ -37,23 +38,47 @@ CREATE TABLE Tickets (
     IsUsed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
--- Vouchers Table
-CREATE TABLE Vouchers (
-    VoucherID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the voucher
-    UserID UUID REFERENCES Users(UserID),                   -- User that owns the voucher
-    VoucherType voucher_type NOT NULL,                      -- Type of voucher
-    IsUsed BOOLEAN DEFAULT FALSE
+-- Transactions Table
+CREATE TABLE Transactions (
+    TransactionID UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- Unique identifier for the transaction
+    TransactionType transaction_type NOT NULL,                 -- Type of transaction
+    UserID UUID REFERENCES Users(UserID),                      -- User that made the transaction
+    Total INT NOT NULL                              -- Total amount of the transaction
 );
 
--- Transactions Table
+-- Ticket Transaction Table
 CREATE TABLE TicketTransactions (
-    TransactionID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the transaction
-    UserID UUID REFERENCES Users(UserID),                      -- User that made the transaction
-    ShowDateID INT REFERENCES ShowDates(ShowDateID),           -- Reference to the show date
-    TicketAmount INT NOT NULL,                                 -- Number of tickets bought
-    TotalPrice INT NOT NULL,                                   -- Total price of the transaction
-    Date TIMESTAMP NOT NULL,                                  -- Date of the transaction
-)
+    TransactionID UUID REFERENCES Transactions(TransactionID),  -- Transaction that generated the ticket
+    TicketID UUID REFERENCES Tickets(TicketID),
+    NumberOfTickets INT NOT NULL
+);
+
+-- Cafeteria Order Transaction Table
+CREATE TABLE CafeteriaTransactions (
+    RedundantOrderID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the cafeteria order (only needed bc cafeteriaorderitem needs to reference this a primary key)
+    TransactionID UUID REFERENCES Transactions(TransactionID),   -- Transaction that generated the cafeteria order
+    OrderNumber INT NOT NULL, -- To be used by the user and the cafeteria to identify the order in a screen
+    NUMBEROFITEMS INT NOT NULL -- Number of items in the order
+);
+
+-- Cafeteria Order Items Table
+CREATE TABLE CafeteriaOrderItem (
+    CafeteriaTransactionID UUID REFERENCES CafeteriaTransactions(RedundantOrderID), -- Cafeteria order that generated the item
+    ItemName VARCHAR(255) NOT NULL,                            -- Name of the item
+    Price INT NOT NULL,                              -- Price of the item
+    Quantity INT NOT NULL                                      -- Quantity of the item
+);
+
+
+-- Vouchers Table
+CREATE TABLE Vouchers (
+    VoucherID UUID PRIMARY KEY DEFAULT gen_random_uuid(),               -- Unique identifier for the voucher
+    UserID UUID REFERENCES Users(UserID),                               -- User that owns the voucher
+    TransactionIDGenerated UUID REFERENCES Transactions(TransactionID),  -- Transaction that generated the voucher
+    TransactionIDUsed UUID REFERENCES Transactions(TransactionID),       -- Transaction that used the voucher
+    VoucherType voucher_type NOT NULL,                                  -- Type of voucher
+    IsUsed BOOLEAN DEFAULT FALSE
+);
 
 
 -- INSERTING DATA
@@ -68,8 +93,7 @@ VALUES
     ('The Book of Mormon', 'Musical comedy about Mormon missionaries', 'book_of_mormon.jpg', 27),
     ('Chicago', 'Musical set in the Roaring Twenties', 'chicago.jpg', 19),
     ('Mamma Mia!', 'Musical featuring the music of ABBA', 'mamma_mia.jpg', 40),
-    ('Cats', 'Musical composed by Andrew Lloyd Webber', 'cats.jpg', 16),
-    ('The Phantom of the Opera', 'Classic musical about a mysterious masked man', 'phantom_of_the_opera_2.jpg', 18);
+    ('Cats', 'Musical composed by Andrew Lloyd Webber', 'cats.jpg', 16);
 
 -- Insert random dates for showid 1 (Hamilton)
 INSERT INTO ShowDates (showid, date, availableseats)
@@ -134,9 +158,3 @@ VALUES
     (9, '2024-05-10', 750),
     (9, '2024-05-20', 750);
 
--- Insert random dates for showid 10 (The Phantom of the Opera)
-INSERT INTO ShowDates (showid, date, availableseats)
-VALUES
-    (10, '2024-05-10', 500),
-    (10, '2024-05-20', 500),
-    (10, '2024-06-01', 500);

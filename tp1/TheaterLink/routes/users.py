@@ -26,17 +26,13 @@ def construct_blueprint(dbConn):
 
         # TODO: Decide if validation is going to be done by the server or in the client
 
-        # Generate a unique user_id
-        user_id = uuid.uuid4()
-
         # Add the user to the database
-        sucess = crud_ops.add_user(dbConn, user_id, name, nif, card, public_key)
+        row = crud_ops.add_user(dbConn, name, nif, card, public_key)
 
-        if not sucess:
+        if row is None:
             return jsonify({'error': 'Error adding user to the database'}), 500
         else:
-            print('User added successfully')
-
+            user_id = row[0]
 
         # Return the user_id with success message
         return jsonify({'user_id': user_id, 'message': 'User added successfully'}), 201

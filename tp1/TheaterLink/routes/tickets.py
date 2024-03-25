@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Blueprint
 from db import crud_ops
 from utils import utils
+from routes import transactions
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -13,6 +14,7 @@ VOUCHER_TYPE = ["FIVE_PERCENT", "FREE_COFFEE", "FREE_POPCORN"]
 
 def construct_blueprint(dbConn: psycopg2.extensions.connection):
     ticket_page = Blueprint('ticket_page', __name__)
+
 
     @ticket_page.route('/purchase_tickets', methods=['POST'])
     def purchase_tickets():
@@ -34,6 +36,11 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         # for each ticket purchased, a voucher is also created
         ticket_data = []
         voucher_data = []
+
+        # Add a row to the transactions table
+        # Don't distinguish between different types of transactions for now
+        trans_id = transactions.put_transaction('TICKET_PURCHASE', user_id, total_cost)
+
         for _ in range(num_tickets):
             ## TICKET LOGIC ##
             ticket_row = crud_ops.create_ticket(dbConn, user_id, show_date_id)
@@ -45,7 +52,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
             ## VOUCHER LOGIC ##
             vc_type = random.choice(VOUCHER_TYPE[1:])
-            voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type)
+            voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type, trans_id)
 
             if voucher_row is None:
                 return jsonify({'message': 'Error purchasing tickets! Error creating voucher!'})
@@ -55,14 +62,19 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         # if the total cost is greater than 200, give a 5% discount
         if total_cost >= 200:
             vc_type = VOUCHER_TYPE[0]
-            voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type)
+            voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type, trans_id)
 
             if voucher_row is None:
                 return jsonify({'message': 'Error purchasing tickets! Error creating voucher!'})
 
             voucher_data.append(voucher_row[0])
 
+        ## HANDLE TICKET TRANSACTION ##
+        if transactions.handle_ticket_purchase(trans_id, ticket_data) is None:
+            return jsonify({'message': 'Error purchasing tickets! Error creating ticket transaction!'})
+
         return jsonify({'message': 'Tickets purchased successfully!', 'tickets': ticket_data, 'vouchers': voucher_data})
+
 
     @ticket_page.route('/get_user_tickets', methods=['GET'])
     def get_user_tickets():
@@ -84,7 +96,3 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         return jsonify({'message': 'Ticket marked as used!'})
 
     return ticket_page
-
-
-
-
