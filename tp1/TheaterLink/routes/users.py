@@ -9,7 +9,7 @@ def construct_blueprint(dbConn):
     def users():
         users = crud_ops.get_users(dbConn)
 
-        return {'users' : users}
+        return jsonify(users)
 
     @user_page.route('/register', methods=['POST'])
     def register_user():

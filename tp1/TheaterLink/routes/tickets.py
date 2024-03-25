@@ -72,6 +72,17 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         return jsonify(tickets)
 
+
+    @ticket_page.route('/set_ticket_as_used', methods=['POST'])
+    def mark_ticket_as_used():
+        data = request.json
+
+        ticket_id = data.get('ticket_id')
+
+        crud_ops.mark_ticket_as_used(dbConn, ticket_id)
+
+        return jsonify({'message': 'Ticket marked as used!'})
+
     return ticket_page
 
 

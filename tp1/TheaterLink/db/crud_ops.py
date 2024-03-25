@@ -323,3 +323,53 @@ def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_t
         print("Error inserting voucher: ", e)
         conn.rollback() # Rollback the transaction
         return None
+
+def mark_ticket_as_used(conn: psycopg2.extensions.connection, ticket_id: int):
+    """
+    Mark a ticket as used
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param int ticket_id: ticket's id
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            UPDATE tickets SET isUsed = TRUE WHERE ticketid = %s
+        ''', (ticket_id,))
+        conn.commit()
+
+        return True
+
+    except psycopg2.Error as e:
+        print("Error marking ticket as used: ", e)
+        conn.rollback() # Rollback the transaction
+        return False
+
+def get_user_vouchers(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get all vouchers for a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    # select the vouchers for the user
+    cur.execute('''
+        SELECT json_build_object(
+            'voucherid', voucherid,
+            'userid', userid,
+            'vouchertype', vouchertype
+        ) FROM vouchers WHERE userid = %s
+    ''', (user_id,))
+
+    rows = cur.fetchall()
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
