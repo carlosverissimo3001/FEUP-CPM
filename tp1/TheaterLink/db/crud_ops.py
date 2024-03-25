@@ -1,5 +1,5 @@
 import psycopg2
-import sys
+import random, string
 
 ## GETTERS, no filters
 
@@ -118,7 +118,6 @@ def add_user(conn: psycopg2.extensions.connection, user_id, name, nif, card, pub
         conn.rollback() # Rollback the transaction
         return False
 
-
 ## GET SHOW DETAILS BY ID
 def get_show(conn: psycopg2.extensions.connection, show_id: str):
     """
@@ -203,3 +202,124 @@ def get_user_by_user_id(conn: psycopg2.extensions.connection, user_id: str):
         return None
 
     return row
+
+def create_ticket(conn: psycopg2.extensions.connection, user_id: str, show_date_id: int):
+    """
+    Create a ticket for a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+    :param str show_date_id: show date's id
+    """
+    cur = conn.cursor()
+
+    # 30 seats per row
+    seat_number = random.randint(1, 30)
+
+    # 15 rows
+    seat_row = random.choice(string.ascii_uppercase[:15])
+
+    seat = f"{seat_number}{seat_row}"
+
+    try:
+        cur.execute('''
+            INSERT INTO tickets (userid, showdateid, seat)
+            VALUES (%s, %s, %s)
+            RETURNING *
+        ''', (user_id, show_date_id, seat))
+        conn.commit()
+
+        return cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error inserting ticket: ", e)
+        conn.rollback() # Rollback the transaction
+        return None
+
+def get_user_tickets(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get all tickets for a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    # select the tickets for the user
+    cur.execute('''
+        SELECT json_build_object(
+            'ticketid', tickets.ticketid,
+            'userid', tickets.userid,
+            'showName', shows.name,
+            'seat', tickets.seat,
+            'date', showdates.date
+        ) FROM tickets join showdates on tickets.showdateid = showdates.showdateid join shows on showdates.showid = shows.showid WHERE userid = %s
+    ''', (user_id,))
+
+    rows = cur.fetchall()
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
+
+def get_ticket_by_ticket_id(conn: psycopg2.extensions.connection, ticket_id: int):
+    """
+    Get all tickets for a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    # select the tickets for the user
+    cur.execute('''
+        SELECT json_build_object(
+            'ticketid', tickets.ticketid,
+            'userid', tickets.userid,
+            'showName', shows.name,
+            'seat', tickets.seat,
+            'date', showdates.date
+        ) FROM tickets join showdates on tickets.showdateid = showdates.showdateid join shows on showdates.showid = shows.showid WHERE ticketid = %s
+    ''', (ticket_id,))
+
+    row = cur.fetchone()
+
+    if row is None:
+        return None
+
+    return row
+
+def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_type: str):
+    """
+    Create a voucher for a ticket
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+    :param str voucher_type: voucher's type (FIVE_PERCENT, FREE_COFFEE, FREE_POPCORN)
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            INSERT INTO vouchers (userid, vouchertype)
+            VALUES (%s, %s)
+            RETURNING json_build_object(
+                'voucherid', voucherid,
+                'userid', userid,
+                'vouchertype', vouchertype
+            )
+        ''', (user_id, voucher_type))
+        conn.commit()
+
+        return cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error inserting voucher: ", e)
+        conn.rollback() # Rollback the transaction
+        return None

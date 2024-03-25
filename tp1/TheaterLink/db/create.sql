@@ -1,3 +1,5 @@
+CREATE TYPE voucher_type AS ENUM ('FIVE_PERCENT', 'FREE_COFFEE', 'FREE_POPCORN');
+
 -- Users Table
 CREATE TABLE Users (
     UserID UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -20,7 +22,7 @@ CREATE TABLE Shows (
 
 -- ShowsDates Table
 CREATE TABLE ShowDates (
-    ShowDateID SERIAL PRIMARY KEY,
+    ShowDateID SERIAL PRIMARY KEY,       -- Unique identifier for the show date
     ShowID INT REFERENCES Shows(ShowID),
     Date DATE NOT NULL,
     AvailableSeats INT NOT NULL
@@ -28,29 +30,30 @@ CREATE TABLE ShowDates (
 
 -- Tickets Table
 CREATE TABLE Tickets (
-    TicketID SERIAL PRIMARY KEY,
-    UserID UUID REFERENCES Users(UserID),
-    ShowID INT REFERENCES Shows(ShowID),
-    SeatNumber INT,
-    IsUsed BOOLEAN DEFAULT FALSE
+    TicketID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the ticket
+    UserID UUID REFERENCES Users(UserID),                -- User that bought the ticket
+    ShowDateID INT REFERENCES ShowDates(ShowDateID),     -- Reference to the show date
+    Seat VARCHAR(3) NOT NULL,                            -- Seat
+    IsUsed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Vouchers Table
 CREATE TABLE Vouchers (
-    VoucherID SERIAL PRIMARY KEY,
-    UserID UUID REFERENCES Users(UserID),
-    VoucherType VARCHAR(50) NOT NULL,
+    VoucherID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the voucher
+    UserID UUID REFERENCES Users(UserID),                   -- User that owns the voucher
+    VoucherType voucher_type NOT NULL,                      -- Type of voucher
     IsUsed BOOLEAN DEFAULT FALSE
 );
 
 -- Transactions Table
-CREATE TABLE Transactions (
-    TransactionID SERIAL PRIMARY KEY,
-    UserID UUID REFERENCES Users(UserID),
-    TransactionType VARCHAR(50) NOT NULL,
-    Date DATE NOT NULL,
-    TotalAmount DECIMAL(10, 2) NOT NULL
-);
+CREATE TABLE TicketTransactions (
+    TransactionID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the transaction
+    UserID UUID REFERENCES Users(UserID),                      -- User that made the transaction
+    ShowDateID INT REFERENCES ShowDates(ShowDateID),           -- Reference to the show date
+    TicketAmount INT NOT NULL,                                 -- Number of tickets bought
+    TotalPrice INT NOT NULL,                                   -- Total price of the transaction
+    Date TIMESTAMP NOT NULL,                                  -- Date of the transaction
+)
 
 
 -- INSERTING DATA
