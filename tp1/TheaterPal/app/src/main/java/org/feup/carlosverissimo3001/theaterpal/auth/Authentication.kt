@@ -13,11 +13,12 @@ class Authentication (private val context: Context){
         try {
             val spec = KeyGenParameterSpec.Builder(
                 Crypto.KEY_NAME,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
             )
                 .setKeySize(Crypto.KEY_SIZE)
                 .setDigests(KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_SHA256)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
                 // the other fields in the demo crypto project are also for signing
                 // but we only need encryption here (i think)
                 .build()
@@ -37,7 +38,7 @@ class Authentication (private val context: Context){
      * @return the public key in Base64
      */
     fun getPublicKey(): String {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
+        val keyStore = KeyStore.getInstance(Crypto.ANDROID_KEYSTORE)
         keyStore.load(null)
         val publicKey = keyStore.getCertificate(Crypto.KEY_NAME).publicKey
 
@@ -48,13 +49,13 @@ class Authentication (private val context: Context){
 
     // Receive the user_id from the server and store it in the Android KeyStore
     // The user ID is a uuid with 16 bytes (6-2-2-2-6)
-    fun storeUserID(user_id: String) {
+    fun storeUserID(userId: String) {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
 
 
         val editor = context.getSharedPreferences("user", Context.MODE_PRIVATE).edit()
-        editor.putString("user_id", user_id)
+        editor.putString("user_id", userId)
         editor.apply()
     }
     

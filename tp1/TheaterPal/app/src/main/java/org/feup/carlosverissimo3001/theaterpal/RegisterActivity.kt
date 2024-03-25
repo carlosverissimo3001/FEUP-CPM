@@ -2,11 +2,8 @@ package org.feup.carlosverissimo3001.theaterpal
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -43,13 +40,12 @@ class RegisterActivity : AppCompatActivity(){
         registerButton.setOnClickListener {
             // Get the fields
             val name = findViewById<EditText>(R.id.name).text.toString()
-            val credit_card_number = findViewById<EditText>(R.id.credit_card_number).text.toString()
+            val creditCardNumber = findViewById<EditText>(R.id.credit_card_number).text.toString()
             val nif = findViewById<EditText>(R.id.nif).text.toString()
-            val credit_card_validity_month =
-                findViewById<EditText>(R.id.credit_card_validity_month).text.toString()
-            val credit_card_validity_year =
-                findViewById<EditText>(R.id.credit_card_validity_year).text.toString()
-            val date = "$credit_card_validity_month-$credit_card_validity_year"
+            val creditCardValidityMonth = findViewById<EditText>(R.id.credit_card_validity_month).text.toString()
+            val creditCardValidityYear = findViewById<EditText>(R.id.credit_card_validity_year).text.toString()
+
+            val date = "$creditCardValidityMonth-$creditCardValidityYear"
 
             // authenticate the user and store the public key
             auth.generateRSAKeyPair()
@@ -57,14 +53,14 @@ class RegisterActivity : AppCompatActivity(){
             // retrieve the public key
             val publicKey = auth.getPublicKey()
 
-            println("Public key: $publicKey")
+            // println("Public key: $publicKey")
 
             val userdata = mapOf(
                 "nif" to nif,
                 "name" to name,
                 "card" to mapOf(
                     "type" to "Visa", // for now keep it hardcoded
-                    "number" to credit_card_number,
+                    "number" to creditCardNumber,
                     "expiration_date" to date
                 ),
                 "public_key" to publicKey
