@@ -8,9 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.ConfirmationNumber
+import androidx.compose.material.icons.outlined.LocalCafe
+import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.Storefront
+import androidx.compose.material.icons.outlined.TheaterComedy
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +41,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 sealed class NavRoutes(val route: String) {
-    data object Home : NavRoutes("home")
-    data object Contacts : NavRoutes("contacts")
-    data object Favorites : NavRoutes("favorites")
+    data object Shows : NavRoutes("shows")
+    data object Cafeteria : NavRoutes("cafeteria")
+    data object Transactions : NavRoutes("transactions")
 }
 
 data class BarItem(
@@ -49,19 +55,19 @@ data class BarItem(
 object NavBarItems {
     val BarItems = listOf(
         BarItem(
-            title = "Home",
-            image = Icons.Filled.Home,
-            route = "home"
+            title = "Cafeteria",
+            image = Icons.Outlined.LocalCafe,
+            route = "cafeteria"
         ),
         BarItem(
-            title = "Contacts",
-            image = Icons.Filled.Face,
-            route = "contacts"
+            title = "Shows",
+            image = Icons.Outlined.TheaterComedy,
+            route = "shows"
         ),
         BarItem(
-            title = "Favorites",
-            image = Icons.Filled.Favorite,
-            route = "favorites"
+            title = "My Tickets",
+            image = Icons.Outlined.ConfirmationNumber,
+            route = "transactions"
         )
     )
 }
@@ -114,14 +120,14 @@ fun Favorites() {
 // The Navigator to be included as a Scaffold content, defining three possible destination routes
 @Composable
 fun Navigator(navController: NavHostController) {
-    NavHost(navController=navController, startDestination=NavRoutes.Home.route) {
-        composable(NavRoutes.Home.route) {
+    NavHost(navController=navController, startDestination=NavRoutes.Shows.route) {
+        composable(NavRoutes.Shows.route) {
             Home()
         }
-        composable(NavRoutes.Contacts.route) {
+        composable(NavRoutes.Cafeteria.route) {
             Contacts()
         }
-        composable(NavRoutes.Favorites.route) {
+        composable(NavRoutes.Transactions.route) {
             Favorites()
         }
     }
@@ -160,15 +166,6 @@ fun MainScreen() {
     val navController = rememberNavController()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Bottom Navigation Demo") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-        },
         bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(Modifier.padding(it)) {

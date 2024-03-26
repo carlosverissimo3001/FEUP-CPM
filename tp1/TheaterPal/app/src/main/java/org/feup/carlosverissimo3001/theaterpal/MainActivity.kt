@@ -27,11 +27,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import org.feup.carlosverissimo3001.theaterpal.databinding.ActivityMainBinding
-import org.feup.carlosverissimo3001.theaterpal.screens.Home
 import org.feup.carlosverissimo3001.theaterpal.screens.MainScreen
 import org.feup.carlosverissimo3001.theaterpal.ui.theme.*
 
@@ -89,7 +85,6 @@ val Typography = Typography(
 @Composable
 fun BottomBarTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -98,7 +93,6 @@ fun BottomBarTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
