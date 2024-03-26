@@ -19,7 +19,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Check if the user has authenticated before
-        val rsaPairExists = Authentication(this).doesRSAKeyPairExist()
+        var rsaPairExists = Authentication(this).doesRSAKeyPairExist()
 
         // next activity
         var intent = Intent(this, RegisterActivity::class.java)
@@ -27,6 +27,7 @@ class LauncherActivity : AppCompatActivity() {
 
         println("RSA Pair Exists: $rsaPairExists")
 
+        rsaPairExists = true;
         if (rsaPairExists) {
             // already authenticated, instead of RegisterActivity, start MainActivity
             intent = Intent(this, MainActivity::class.java)
