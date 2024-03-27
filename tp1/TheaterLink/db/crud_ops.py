@@ -254,7 +254,8 @@ def get_user_tickets(conn: psycopg2.extensions.connection, user_id: str):
             'userid', tickets.userid,
             'showName', shows.name,
             'seat', tickets.seat,
-            'date', showdates.date
+            'date', showdates.date,
+            'isUsed', tickets.isUsed
         ) FROM tickets join showdates on tickets.showdateid = showdates.showdateid join shows on showdates.showid = shows.showid WHERE userid = %s
     ''', (user_id,))
 

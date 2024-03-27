@@ -76,15 +76,26 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         return jsonify({'message': 'Tickets purchased successfully!', 'tickets': ticket_data, 'vouchers': voucher_data})
 
 
-    @ticket_page.route('/get_user_tickets', methods=['GET'])
+    @ticket_page.route('/get_tickets', methods=['GET'])
     def get_user_tickets():
         user_id = request.args.get('user_id')
 
         tickets = crud_ops.get_user_tickets(dbConn, user_id)
+        active = request.args.get('active') == 'true'
+
+        if active:
+            tickets = [t for t in tickets if not t['isUsed']]
 
         return jsonify(tickets)
 
+    # Will be called by the validation terminal app after the ticket is scanned
+    @ticket_page.route('/validate_ticket', methods=['POST'])
+    def validate_ticket():
+        return NotImplementedError
 
+    # Will be called by the validation terminal app after the ticket is validated
+    # Might not have to be an actual endpoint, could be handled by the validate_ticket endpoint
+    # TODO: Decide on the implementation
     @ticket_page.route('/set_ticket_as_used', methods=['POST'])
     def mark_ticket_as_used():
         data = request.json
@@ -94,5 +105,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         crud_ops.mark_ticket_as_used(dbConn, ticket_id)
 
         return jsonify({'message': 'Ticket marked as used!'})
+
+
 
     return ticket_page
