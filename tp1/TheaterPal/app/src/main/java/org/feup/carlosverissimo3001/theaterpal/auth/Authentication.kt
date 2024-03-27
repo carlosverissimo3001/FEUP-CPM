@@ -50,18 +50,18 @@ class Authentication (private val context: Context){
     // Receive the user_id from the server and store it in the Android KeyStore
     // The user ID is a uuid with 16 bytes (6-2-2-2-6)
     fun storeUserID(userId: String) {
-        val keyStore = KeyStore.getInstance("AndroidKeyStore")
-        keyStore.load(null)
-
-
-        val editor = context.getSharedPreferences("user", Context.MODE_PRIVATE).edit()
-        editor.putString("user_id", userId)
-        editor.apply()
+        context.openFileOutput("user_id", Context.MODE_PRIVATE).use {
+            it.write(userId.toByteArray())
+        }
     }
     
     fun getUserID(): String {
-        val sharedPref = context.getSharedPreferences("user", Context.MODE_PRIVATE)
-        return sharedPref.getString("user_id", "")!!
+        val file = context.getFileStreamPath("user_id")
+        if (file.exists()) {
+            return file.readText()
+        }
+
+        return ""
     }
 
     fun doesRSAKeyPairExist(): Boolean {

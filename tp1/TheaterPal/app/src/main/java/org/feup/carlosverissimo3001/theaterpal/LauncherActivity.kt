@@ -21,14 +21,19 @@ class LauncherActivity : AppCompatActivity() {
         // Check if the user has authenticated before
         var rsaPairExists = Authentication(this).doesRSAKeyPairExist()
 
+        // If the userid exists in the phone, it has been created by the server
+        var serverACK = Authentication(this).getUserID() != ""
+
         // next activity
         var intent = Intent(this, RegisterActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-        println("RSA Pair Exists: $rsaPairExists")
+        // ** TO NOT HAVE TO WRITE EVERY FIELD WHEN DEVELOPING **
+        rsaPairExists = true
+        serverACK = true
+        // ** TO NOT HAVE TO WRITE EVERY FIELD WHEN DEVELOPING **
 
-        rsaPairExists = true;
-        if (rsaPairExists) {
+        if (rsaPairExists && serverACK) {
             // already authenticated, instead of RegisterActivity, start MainActivity
             intent = Intent(this, MainActivity::class.java)
 
