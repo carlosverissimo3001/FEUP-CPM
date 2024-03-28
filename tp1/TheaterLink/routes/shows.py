@@ -13,18 +13,24 @@ def construct_blueprint(dbConn):
     def shows():
         shows = crud_ops.get_shows(dbConn)
 
-        for show in shows:
-            img_path = IMAGES_PATH + show['picture']
+        # Does the client needs the base64 encoded image? Or is the image path enough, i.e, client has cached the image
+        needs_image = request.args.get('images')
 
-            with open(img_path, 'rb') as f:
-                img_data = f.read()
+        shows = crud_ops.get_shows(dbConn)
 
-            # encode the image data to base64
-            image_base64 = base64.b64encode(img_data).decode('utf-8')
+        if needs_image == 'true':
+            for show in shows:
+                img_path = IMAGES_PATH + show['picture']
 
-            show['picture'] = image_base64
+                with open(img_path, 'rb') as f:
+                    img_data = f.read()
 
-        return jsonify(shows)
+                # encode the image data to base64
+                image_base64 = base64.b64encode(img_data).decode('utf-8')
+
+                show['picture'] = image_base64
+
+        return {"shows": shows}
 
     # given a show_id, return the show details and dates available
     @show_page.route('/shows/<show_id>')
