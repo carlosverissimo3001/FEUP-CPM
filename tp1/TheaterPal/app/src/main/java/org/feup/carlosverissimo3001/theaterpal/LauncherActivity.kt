@@ -29,8 +29,8 @@ class LauncherActivity : AppCompatActivity() {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         // ** TO NOT HAVE TO WRITE EVERY FIELD WHEN DEVELOPING **
-        rsaPairExists = true
-        serverACK = true
+        //rsaPairExists = true
+       // serverACK = true
         // ** TO NOT HAVE TO WRITE EVERY FIELD WHEN DEVELOPING **
 
         if (rsaPairExists && serverACK) {
