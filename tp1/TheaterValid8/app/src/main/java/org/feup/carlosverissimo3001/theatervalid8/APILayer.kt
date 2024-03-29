@@ -3,8 +3,6 @@ package org.feup.carlosverissimo3001.theatervalid8
 import android.content.Context
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
-import org.feup.carlosverissimo3001.theatervalid8.File.areImagesStoreInCache
-import org.feup.carlosverissimo3001.theatervalid8.File.saveImageToCache
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
 import org.json.JSONArray
 import org.json.JSONObject

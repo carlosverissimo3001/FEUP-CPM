@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theatervalid8
 
 import android.content.Intent
+import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
@@ -8,15 +9,17 @@ import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcIsScanningFragment
+import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcValidatorFragment
 import org.feup.carlosverissimo3001.theatervalid8.models.*
-import org.feup.carlosverissimo3001.theatervalid8.screens.NfcValidatorFragment
 import org.feup.carlosverissimo3001.theatervalid8.screens.ValidatorScreen
+
+const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
@@ -27,6 +30,10 @@ inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
 class ValidatorActivity : AppCompatActivity() {
     private lateinit var show : Show
     private lateinit var showDate : ShowDate
+    private var validationStatus: Boolean = false
+    private var isScanning: Boolean = false
+    //private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
+    //private val nfcReader by lazy { NFCReader(::nfcReceived) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,17 +43,60 @@ class ValidatorActivity : AppCompatActivity() {
 
         setContent(
             content = {
-                ValidatorScreen(
-                    applicationContext,
-                    show,
-                    showDate,
-                    onBackButtonClick = {
-                        // Finish the activity
-                        finish()
+                val (isScanning, setIsScanning) = remember { mutableStateOf(false) }
+
+                Column {
+                    ValidatorScreen(
+                        applicationContext,
+                        show,
+                        showDate,
+                        onBackButtonClick = {
+                            // Finish the activity
+                            finish()
+                        },
+                        onValidate = {
+                            // Validate the ticket
+                            // validateTicket(ticket)
+                        }
+                    )
+                    if (isScanning){
+                        NfcIsScanningFragment(
+                            onCancel = {
+                                // Stop scanning
+                                setIsScanning(false)
+                            }
+                        )
                     }
-                )
+                    else{
+                        NfcValidatorFragment(
+                            onScanButtonClick = {
+                                // Start scanning
+                                setIsScanning(true)
+
+                                // TODO : ACTIVATE NFC
+                            }
+                        )
+                    }
+                }
             }
         )
+    }
+
+    /*override fun onResume() {
+        super.onResume()
+        nfc.enableReaderMode(this, nfcReader, READER_FLAGS, null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        nfc.disableReaderMode(this)
+    }*/
+
+    // callback to receive a key or product list from the NFC reader
+    private fun nfcReceived(type: Int, content: ByteArray) {
+        runOnUiThread {
+            //
+        }
     }
 }
 

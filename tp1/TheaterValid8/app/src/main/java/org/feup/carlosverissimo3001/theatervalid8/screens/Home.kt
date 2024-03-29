@@ -120,6 +120,7 @@ fun ShowDatesDropDownMenu(
     if (selectedShow != null && showDate != "") {
         // Show changed, reset selected date
         if (!isDateInArray(showDate, selectedShow.dates)) {
+            println("Old date: $showDate")
             showDate = ""
         }
     }

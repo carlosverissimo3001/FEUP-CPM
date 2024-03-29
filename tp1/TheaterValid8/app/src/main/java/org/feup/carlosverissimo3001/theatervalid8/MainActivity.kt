@@ -72,9 +72,11 @@ class MainActivity : AppCompatActivity() {
                                 shows = shows,
                                 selectedShow = selectedShow,
                                 onShowSelected = {
-                                    selectedDate?.let { setSelectedDate(null) }
-                                    setSelectedShow(it)
-                                    setAvailableDates(it.dates)
+                                    if (selectedShow != it) {
+                                        selectedDate?.let { setSelectedDate(null) }
+                                        setSelectedShow(it)
+                                        setAvailableDates(it.dates)
+                                    }
                                 }
                             )
 

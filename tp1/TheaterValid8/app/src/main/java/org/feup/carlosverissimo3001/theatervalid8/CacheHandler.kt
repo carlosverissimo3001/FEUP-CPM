@@ -1,6 +1,5 @@
-package org.feup.carlosverissimo3001.theatervalid8.File
+package org.feup.carlosverissimo3001.theatervalid8
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
