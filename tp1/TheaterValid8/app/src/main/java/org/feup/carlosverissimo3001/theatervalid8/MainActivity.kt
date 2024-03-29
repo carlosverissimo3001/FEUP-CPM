@@ -101,7 +101,7 @@ fun CenteredContent(content: @Composable () -> Unit) {
 fun LoadingSpinner() {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(
-            color = Color.Black,
+            color = Color.White,
             strokeWidth = 2.dp
         )
     }

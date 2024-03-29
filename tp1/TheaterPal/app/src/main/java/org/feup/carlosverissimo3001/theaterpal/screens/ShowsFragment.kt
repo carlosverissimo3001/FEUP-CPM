@@ -89,6 +89,9 @@ fun Shows(ctx: Context) {
                     val description = show.getString("description")
                     val imagename = show.getString("picture")
                     val imageb64 = show.getString("picture_b64")
+
+                    var showDates = show.getJSONArray("dates")x
+
                     val bitmap: Bitmap?
 
                     if (imageb64 == ""){
