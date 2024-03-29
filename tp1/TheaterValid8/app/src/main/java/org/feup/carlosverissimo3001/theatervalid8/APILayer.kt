@@ -2,6 +2,7 @@ package org.feup.carlosverissimo3001.theatervalid8
 
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
+import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -64,6 +65,17 @@ class APILayer {
 
         for (i in 0 until jsonArray.length()) {
             val show = jsonArray.getJSONObject(i)
+            val dates = show.getJSONArray("dates")
+            val showDates = mutableListOf<ShowDate>()
+
+            for (j in 0 until dates.length()) {
+                val date = dates.getJSONObject(j)
+                val dateString = date.getString("date")
+                val availableSeats = date.getInt("availableseats")
+
+                showDates.add(ShowDate(dateString, availableSeats))
+            }
+
             shows.add(
                 Show(
                     show.getInt("showid"),
@@ -75,7 +87,7 @@ class APILayer {
                     "",
 
                     show.getInt("price"),
-                    emptyList() // The dates are only fetched when the validator selects this show
+                    showDates
                 )
             )
         }

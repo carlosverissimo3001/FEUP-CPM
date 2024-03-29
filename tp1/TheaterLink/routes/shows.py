@@ -18,8 +18,10 @@ def construct_blueprint(dbConn):
 
         shows = crud_ops.get_shows(dbConn)
 
-        if needs_image == 'true':
-            for show in shows:
+        for show in shows:
+            show["dates"] = crud_ops.get_show_dates(dbConn, show['showid'])
+
+            if needs_image == 'true':
                 img_path = IMAGES_PATH + show['picture']
 
                 with open(img_path, 'rb') as f:
