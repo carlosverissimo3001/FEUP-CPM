@@ -90,7 +90,7 @@ fun Shows(ctx: Context) {
                     val imagename = show.getString("picture")
                     val imageb64 = show.getString("picture_b64")
 
-                    var showDates = show.getJSONArray("dates")x
+                    var showDates = show.getJSONArray("dates")
 
                     val bitmap: Bitmap?
 

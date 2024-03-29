@@ -1,18 +1,26 @@
 package org.feup.carlosverissimo3001.theatervalid8
 
-import android.app.Activity
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,11 +38,21 @@ import org.feup.carlosverissimo3001.theatervalid8.screens.ValidateButton
 
 class MainActivity : AppCompatActivity() {
     private var shows: List<Show> = emptyList()
-    private var apiLayer = APILayer()
+    private var apiLayer = APILayer(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+        val supportToolAc = supportActionBar
+        supportToolAc?.title = "TheaterValid8"
+
+        setContent {
+            CenteredContent {
+                Topbar()
+                LoadingSpinner()
+            }
+        }
 
         // Fetch the shows
         apiLayer.fetchShows { shows ->
@@ -46,9 +64,11 @@ class MainActivity : AppCompatActivity() {
                     val (availableDates, setAvailableDates) = remember { mutableStateOf<List<ShowDate>>(emptyList()) }
                     val (selectedDate, setSelectedDate) = remember { mutableStateOf<ShowDate?>(null) }
 
+                    Topbar()
+
                     CenteredContent {
                         if (shows.isNotEmpty()) {
-                              ShowDropdownMenu(
+                            ShowDropdownMenu(
                                 shows = shows,
                                 selectedShow = selectedShow,
                                 onShowSelected = {
@@ -70,9 +90,10 @@ class MainActivity : AppCompatActivity() {
                                 selectedShow = selectedShow,
                                 selectedShowDate = selectedDate,
                                 onClick = {
-                                    println("Entering validation screen")
-                                    println("Selected show: ${selectedShow?.name}")
-                                    println("Selected date: ${selectedDate?.date}")
+                                    intent = Intent(this, ValidatorActivity::class.java)
+                                    intent.putExtra("show", selectedShow)
+                                    intent.putExtra("showDate", selectedDate)
+                                    startActivity(intent)
                                 }
                             )
                         } else {
@@ -86,16 +107,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-@Composable
-fun CenteredContent(content: @Composable () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        content()
-    }
-}
+
 
 @Composable
 fun LoadingSpinner() {
@@ -107,4 +119,21 @@ fun LoadingSpinner() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Topbar() {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
+        rememberTopAppBarState()
+    )
 
+    CenterAlignedTopAppBar(
+        title = {
+            Text("TheaterValid8")
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        scrollBehavior = scrollBehavior,
+    )
+}
