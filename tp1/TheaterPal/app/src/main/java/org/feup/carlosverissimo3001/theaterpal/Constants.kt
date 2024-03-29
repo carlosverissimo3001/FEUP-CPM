@@ -8,5 +8,5 @@ object Crypto {
 }
 
 object Server {
-    const val URL = "https://6b86-62-48-185-10.ngrok-free.app"
+    const val URL = "https://13d1-161-230-86-77.ngrok-free.app"
 }

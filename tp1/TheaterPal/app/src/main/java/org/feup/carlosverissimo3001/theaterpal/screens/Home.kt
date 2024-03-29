@@ -1,6 +1,7 @@
 
 package org.feup.carlosverissimo3001.theaterpal.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -58,10 +59,10 @@ object NavBarItems {
 
 // The Navigator to be included as a Scaffold content, defining three possible destination routes
 @Composable
-fun Navigator(navController: NavHostController) {
+fun Navigator(navController: NavHostController, ctx: Context) {
     NavHost(navController=navController, startDestination=NavRoutes.Shows.route) {
         composable(NavRoutes.Shows.route) {
-            Shows()
+            Shows(ctx)
         }
         composable(NavRoutes.Cafeteria.route) {
             Contacts()
@@ -101,14 +102,14 @@ fun BottomNavigationBar(navController: NavHostController) {
 }
 
 @Composable
-fun MainScreen() {
+fun MainScreen(ctx: Context) {
     val navController = rememberNavController()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column(Modifier.padding(it)) {
-            Navigator(navController)
+            Navigator(navController, ctx)
         }
     }
 }
