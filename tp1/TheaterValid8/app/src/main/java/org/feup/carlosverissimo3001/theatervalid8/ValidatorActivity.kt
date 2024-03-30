@@ -14,7 +14,9 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcFailureFragment
 import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcIsScanningFragment
+import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcSuccessFragment
 import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcValidatorFragment
 import org.feup.carlosverissimo3001.theatervalid8.models.*
 import org.feup.carlosverissimo3001.theatervalid8.screens.ValidatorScreen
@@ -57,7 +59,8 @@ class ValidatorActivity : AppCompatActivity() {
                         onValidate = {
                             // Validate the ticket
                             // validateTicket(ticket)
-                        }
+                        },
+                        isScanning = isScanning
                     )
                     if (isScanning){
                         NfcIsScanningFragment(

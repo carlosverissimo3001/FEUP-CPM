@@ -25,24 +25,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import okhttp3.internal.parseCookie
 import org.feup.carlosverissimo3001.theatervalid8.R
+import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 @Composable
-fun NfcIsScanningFragment(
+fun NfcSuccessFragment(
     onCancel: () -> Unit = {}
 ) {
+    val numTicketsValidated = 1
+
     Box (
         modifier = Modifier
-/*            .fillMaxSize()
+            .fillMaxSize()
             .padding(12.dp)
             .border(
                 width = 2.dp,
                 color = androidx.compose.ui.graphics.Color.Gray,
                 shape = RoundedCornerShape(15.dp)
-            )*/
-            .background(Color(parseColor("#302c2c")), RoundedCornerShape(15.dp))
+            )
+            .background(Color(android.graphics.Color.parseColor("#302c2c")), RoundedCornerShape(15.dp))
     ){
         Spacer(modifier = Modifier.size(10.dp))
         Column (
@@ -51,36 +56,34 @@ fun NfcIsScanningFragment(
             modifier = Modifier.fillMaxSize()
         ){
             Image(
-                painter = painterResource(id = R.drawable.nfc_scanning),
-                contentDescription = "NFC action",
+                painter = painterResource(id = R.drawable.nfc_success),
+                contentDescription = "NFC Success",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(150.dp)
             )
 
             Text(
-                text = "Scanning for your tickets...",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = androidx.compose.ui.graphics.Color.White,
+                text = "Success",
+                style = TextStyle(
+                    fontFamily = poppinsFontFamily,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = androidx.compose.ui.graphics.Color.White,
+                ),
             )
 
             Text(
-                text = "(Make sure to turn on NFC on your device)",
-                style = MaterialTheme.typography.bodySmall,
-                color = androidx.compose.ui.graphics.Color.White,
+                text = if (numTicketsValidated == 1)
+                    "1 ticket was validated successfully!" else
+                        "$numTicketsValidated tickets were validated!",
+                style = TextStyle(
+                    fontFamily = poppinsFontFamily,
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                    fontWeight = FontWeight.Normal,
+                    color = androidx.compose.ui.graphics.Color.White,
+                ),
+                color = Color.White
             )
-
-            Button(
-                onClick = { onCancel() },
-                modifier = Modifier
-                    .fillMaxWidth(0.8f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = androidx.compose.ui.graphics.Color.Gray,
-                    contentColor = androidx.compose.ui.graphics.Color.White
-                )
-            ) {
-                Text("Cancel")
-            }
         }
     }
 }

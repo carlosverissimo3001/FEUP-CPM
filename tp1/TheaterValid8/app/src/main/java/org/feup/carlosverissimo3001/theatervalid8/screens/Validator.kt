@@ -50,7 +50,8 @@ fun ValidatorScreen(
     show: Show,
     showDate: ShowDate,
     onBackButtonClick: () -> Unit,
-    onValidate: () -> Unit)
+    onValidate: () -> Unit,
+    isScanning: Boolean)
 {
     val sampleActors = arrayOf("Jane Doe", "John Doe", "Alice Doe", "Bob Doe")
 
@@ -69,7 +70,9 @@ fun ValidatorScreen(
         bitmap = decodeBase64ToBitmap(imageb64)
     }
 
-    Column {
+    Column (
+        modifier = if (isScanning) Modifier.alpha(0.3f) else Modifier.alpha(1.0f)
+    ) {
         CenterAlignedTopAppBar(
             title = {
                 Column(

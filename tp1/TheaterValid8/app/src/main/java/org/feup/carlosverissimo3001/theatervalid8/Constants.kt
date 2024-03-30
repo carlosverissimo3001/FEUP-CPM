@@ -6,12 +6,16 @@ import android.util.Base64
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 
 object Server {
-    const val URL = "https://1b66-161-230-86-77.ngrok-free.app"
+    const val URL = "https://33c7-193-136-4-54.ngrok-free.app"
 }
 
 @Composable
@@ -35,6 +39,16 @@ fun TopCenteredContent(content: @Composable () -> Unit) {
         content()
     }
 }
+
+val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
+    Font(R.font.poppins_light, FontWeight.W300),
+    Font(R.font.poppins_regular, FontWeight.W400),
+    Font(R.font.poppins_medium, FontWeight.W500),
+    Font(R.font.poppins_semibold, FontWeight.W600),
+    Font(R.font.poppins_bold, FontWeight.W700),
+    Font(R.font.poppins_black, FontWeight.W900),
+)
+
 
 /* Utility top-level function */
 fun byteArrayToHex(ba: ByteArray): String {
