@@ -54,7 +54,7 @@ fun NfcFailureFragment(
                 painter = painterResource(id = R.drawable.nfc_failure),
                 contentDescription = "NFC Error",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(125.dp)
             )
 
             Text(

@@ -10,16 +10,11 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcFailureFragment
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcIsScanningFragment
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcSuccessFragment
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcValidatorFragment
+import org.feup.carlosverissimo3001.theatervalid8.fragments.*
 import org.feup.carlosverissimo3001.theatervalid8.models.*
-import org.feup.carlosverissimo3001.theatervalid8.screens.ValidatorScreen
+import org.feup.carlosverissimo3001.theatervalid8.screens.*
 
 const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
@@ -62,15 +57,16 @@ class ValidatorActivity : AppCompatActivity() {
                         },
                         isScanning = isScanning
                     )
-                    if (isScanning){
-                        NfcIsScanningFragment(
-                            onCancel = {
-                                // Stop scanning
-                                setIsScanning(false)
-                            }
-                        )
-                    }
-                    else{
+
+                    NfcIsScanningFragment(
+                        isScanning = isScanning,
+                        onCancel = {
+                            // Stop scanning
+                            setIsScanning(false)
+                        }
+                    )
+
+                    if (!isScanning){
                         NfcValidatorFragment(
                             onScanButtonClick = {
                                 // Start scanning

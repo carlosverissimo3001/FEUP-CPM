@@ -3,6 +3,7 @@ package org.feup.carlosverissimo3001.theatervalid8.fragments
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +40,7 @@ fun NfcValidatorFragment(
             .padding(12.dp)
             .border(
                 width = 2.dp,
-                color = androidx.compose.ui.graphics.Color.Gray,
+                color = Color.Gray,
                 shape = RoundedCornerShape(15.dp)
             )
             .background(Color(android.graphics.Color.parseColor("#302c2c")), RoundedCornerShape(15.dp))

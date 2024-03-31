@@ -59,7 +59,7 @@ fun NfcSuccessFragment(
                 painter = painterResource(id = R.drawable.nfc_success),
                 contentDescription = "NFC Success",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(125.dp)
             )
 
             Text(
