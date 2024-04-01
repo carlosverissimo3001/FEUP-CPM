@@ -253,6 +253,7 @@ def get_user_tickets(conn: psycopg2.extensions.connection, user_id: str):
             'ticketid', tickets.ticketid,
             'userid', tickets.userid,
             'showName', shows.name,
+            'imagePath', shows.picture,
             'seat', tickets.seat,
             'date', showdates.date,
             'isUsed', tickets.isUsed

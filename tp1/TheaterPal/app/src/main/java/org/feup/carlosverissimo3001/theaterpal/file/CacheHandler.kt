@@ -41,6 +41,8 @@ fun areImagesStoreInCache(context: Context): Boolean {
 }
 
 fun loadImageFromCache(filename: String, context: Context): Bitmap? {
+    println("Loading image $filename from cache")
+
     val cacheDir = context.cacheDir
     val imagesCacheDir = File(cacheDir, "images")
 

@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Contacts() {
+fun Cafeteria() {
     Box(modifier = Modifier.fillMaxSize()) {
         Icon(
             imageVector = Icons.Filled.Face,
