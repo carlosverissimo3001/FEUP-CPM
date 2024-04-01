@@ -1,5 +1,7 @@
 package org.feup.carlosverissimo3001.theatervalid8.screens
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -118,6 +120,7 @@ fun ShowDatesDropDownMenu(
     if (selectedShow != null && showDate != "") {
         // Show changed, reset selected date
         if (!isDateInArray(showDate, selectedShow.dates)) {
+            println("Old date: $showDate")
             showDate = ""
         }
     }
@@ -180,9 +183,15 @@ fun ShowDatesDropDownMenu(
 }
 
 @Composable
-fun ValidateButton(onClick: () -> Unit, selectedShow: Show?, selectedShowDate: ShowDate?) {
+fun ValidateButton(
+    selectedShowDate: ShowDate?,
+    selectedShow: Show?,
+    onClick: () -> Unit,
+) {
     Button(
-        onClick = { onClick() },
+        onClick = {
+            onClick()
+        },
         enabled = selectedShowDate != null && selectedShow != null,
         modifier = Modifier
             .padding(top = 40.dp)

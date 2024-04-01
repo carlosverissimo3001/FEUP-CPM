@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theatervalid8
 
+import android.content.Context
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
@@ -7,14 +8,25 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 // Handles the API calls
-class APILayer {
+class APILayer (private val ctx: Context){
     private val client = OkHttpClient()
 
     fun fetchShows(callback: (List<Show>) -> Unit) {
-        val request = okhttp3.Request.Builder()
+        val areImagesCached = areImagesStoreInCache(ctx)
+
+        println("Are images cached: $areImagesCached")
+
+        var request = okhttp3.Request.Builder()
             .url("${Server.URL}/shows")
             .get()
             .build()
+
+        if (!areImagesCached){
+            request = okhttp3.Request.Builder()
+                .url("${Server.URL}/shows?images=true")
+                .get()
+                .build()
+        }
 
 
         client.newCall(request).enqueue(object : okhttp3.Callback {
@@ -34,6 +46,24 @@ class APILayer {
                     // get the shows array
                     val shows = jsonResponse?.getJSONArray("shows")
 
+                    if (!areImagesCached) {
+                        shows?.let {
+                            for (i in 0 until it.length()) {
+                                val show = it.getJSONObject(i)
+                                val imageName = show.getString("picture")
+                                val imageB64 = show.getString("picture_b64")
+
+                                saveImageToCache(imageB64, imageName, ctx) { success ->
+                                    if (!success) {
+                                        println("Error saving $imageName to cache")
+                                    } else {
+                                        println("Saved $imageName to cache")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // convert the shows array to a list of Show objects
                     val showsList = shows?.let { setShows(it) }
 
@@ -51,13 +81,6 @@ class APILayer {
                 }
             }
         })
-    }
-
-    fun fetchShowDetails(showId: Int)  {
-        var request = okhttp3.Request.Builder()
-            .url("${Server.URL}/shows/$showId")
-            .get()
-            .build()
     }
 
     private fun setShows(jsonArray: JSONArray) : List<Show>{
@@ -82,10 +105,7 @@ class APILayer {
                     show.getString("name"),
                     show.getString("description"),
                     show.getString("picture"),
-
-                    // show.getString("pictureBase64"), // TODO: Does the validator need the show image?
-                    "",
-
+                    show.getString("picture_b64"),
                     show.getInt("price"),
                     showDates
                 )
