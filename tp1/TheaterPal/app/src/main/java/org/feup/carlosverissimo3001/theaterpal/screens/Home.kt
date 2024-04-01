@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ConfirmationNumber
+import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.material.icons.outlined.LocalCafe
 import androidx.compose.material.icons.outlined.TheaterComedy
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,6 +25,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.Cafeteria
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Orders.Orders
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.Shows
 
 sealed class NavRoutes(val route: String) {
     data object Shows : NavRoutes("shows")
@@ -41,7 +45,7 @@ object NavBarItems {
     val BarItems = listOf(
         BarItem(
             title = "Cafeteria",
-            image = Icons.Outlined.LocalCafe,
+            image = Icons.Outlined.Fastfood,
             route = "cafeteria"
         ),
         BarItem(
@@ -50,8 +54,8 @@ object NavBarItems {
             route = "shows"
         ),
         BarItem(
-            title = "My Tickets",
-            image = Icons.Outlined.ConfirmationNumber,
+            title = "Wallet",
+            image = Icons.Outlined.Wallet,
             route = "transactions"
         )
     )
@@ -61,14 +65,14 @@ object NavBarItems {
 @Composable
 fun Navigator(navController: NavHostController, ctx: Context) {
     NavHost(navController=navController, startDestination=NavRoutes.Shows.route) {
+        composable(NavRoutes.Cafeteria.route) {
+            Cafeteria()
+        }
         composable(NavRoutes.Shows.route) {
             Shows(ctx)
         }
-        composable(NavRoutes.Cafeteria.route) {
-            Contacts()
-        }
         composable(NavRoutes.Transactions.route) {
-            Favorites()
+            Orders(ctx)
         }
     }
 }

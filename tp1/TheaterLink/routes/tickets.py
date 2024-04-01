@@ -76,7 +76,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         return jsonify({'message': 'Tickets purchased successfully!', 'tickets': ticket_data, 'vouchers': voucher_data})
 
 
-    @ticket_page.route('/get_tickets', methods=['GET'])
+    @ticket_page.route('/tickets', methods=['GET'])
     def get_user_tickets():
         user_id = request.args.get('user_id')
 
@@ -86,7 +86,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         if active:
             tickets = [t for t in tickets if not t['isUsed']]
 
-        return jsonify(tickets)
+        return {"tickets" : tickets}
 
     # Will be called by the validation terminal app after the ticket is scanned
     @ticket_page.route('/validate_ticket', methods=['POST'])
