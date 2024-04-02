@@ -46,18 +46,18 @@ import org.json.JSONArray
 @Composable
 fun Shows(ctx: Context) {
     val showsState = remember { mutableStateOf<JSONArray?>(null) }
+    val areShowsCached = remember { mutableStateOf(false)}
 
-    if (!areShowsStoreInCache(ctx)) {
+    if (!areShowsCached.value) {
         LaunchedEffect(Unit) {
             getShows(ctx) { shows ->
                 showsState.value = shows
 
                 saveShowsToCache(shows, ctx){success ->
                     if (!success){
-                        println("Error saving shows to cache")
                     }
                     else{
-                        println("Saved shows to cache")
+                        areShowsCached.value = true
                     }
                 }
             }
@@ -66,7 +66,13 @@ fun Shows(ctx: Context) {
     else {
         LaunchedEffect(Unit) {
             loadShowsFromCache(ctx) { shows ->
-                showsState.value = shows
+                // The file exists, but is still empty
+                if (shows == JSONArray()){
+                    showsState.value = null
+                }
+                else {
+                    showsState.value = shows
+                }
             }
         }
     }

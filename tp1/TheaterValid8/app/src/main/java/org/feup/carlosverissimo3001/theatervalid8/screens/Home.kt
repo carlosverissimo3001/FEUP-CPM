@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -57,14 +58,23 @@ fun ShowDropdownMenu(shows: List<Show> = emptyList(), selectedShow: Show?, onSho
             textStyle = TextStyle(
                 color = MaterialTheme.colors.onSurface,
                 fontSize = MaterialTheme.typography.h6.fontSize,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                fontFamily = poppinsFontFamily,
             ),
             readOnly = true,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
             },
             placeholder = {
-                Text(text = "Please select the show to validate")
+                Text(
+                    text = "Please select the show to validate",
+                    style = TextStyle (
+                        color = MaterialTheme.colors.onSurface,
+                        fontSize = MaterialTheme.typography.body1.fontSize,
+                        textAlign = TextAlign.Center,
+                        fontFamily = poppinsFontFamily
+                    )
+                )
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 backgroundColor = (if (isSystemInDarkTheme())
@@ -91,7 +101,8 @@ fun ShowDropdownMenu(shows: List<Show> = emptyList(), selectedShow: Show?, onSho
                     Text(
                         text = selectionOption,
                         fontSize = MaterialTheme.typography.subtitle1.fontSize,
-                        fontWeight = if (selectedShow?.name == selectionOption) FontWeight.Black else FontWeight.Light
+                        fontWeight = if (selectedShow?.name == selectionOption) FontWeight.Black else FontWeight.Light,
+                        fontFamily = poppinsFontFamily
                     )
                 }
             }
@@ -135,8 +146,9 @@ fun ShowDatesDropDownMenu(
             onValueChange = {},
             textStyle = TextStyle(
                 color = MaterialTheme.colors.onSurface,
-                fontSize = MaterialTheme.typography.h6.fontSize,
-                textAlign = TextAlign.Center
+                fontSize = MaterialTheme.typography.body1.fontSize,
+                textAlign = TextAlign.Center,
+                fontFamily = poppinsFontFamily
             ),
             readOnly = true,
             trailingIcon = {
@@ -146,6 +158,12 @@ fun ShowDatesDropDownMenu(
                 Text(
                     text = (if (availableDates.isEmpty()) "No show is selected"
                     else "Please select the show date to validate"),
+                    style = TextStyle(
+                        color = MaterialTheme.colors.onSurface,
+                        fontSize = MaterialTheme.typography.body2.fontSize,
+                        textAlign = TextAlign.Center,
+                        fontFamily = poppinsFontFamily
+                    )
                 )
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -174,7 +192,8 @@ fun ShowDatesDropDownMenu(
                     Text(
                         text = selectionOption,
                         fontSize = MaterialTheme.typography.subtitle1.fontSize,
-                        fontWeight = if (selectedShowDate?.date == selectionOption) FontWeight.Black else FontWeight.Light
+                        fontWeight = if (selectedShowDate?.date == selectionOption) FontWeight.Black else FontWeight.Light,
+                        fontFamily = poppinsFontFamily
                     )
                 }
             }
@@ -195,14 +214,21 @@ fun ValidateButton(
         enabled = selectedShowDate != null && selectedShow != null,
         modifier = Modifier
             .padding(top = 40.dp)
-            .padding(horizontal = 16.dp), // Add horizontal padding
+            .padding(horizontal = 16.dp),
         colors = ButtonDefaults.buttonColors( // Custom colors
             backgroundColor = MaterialTheme.colors.primary,
             contentColor = MaterialTheme.colors.onPrimary
         ),
         shape = MaterialTheme.shapes.large, // Add rounded corners
     ) {
-        Text("Start Validation", style = MaterialTheme.typography.h6)
+        Text(
+            "Start Validation",
+            style = TextStyle(
+                color = MaterialTheme.colors.onPrimary,
+                fontSize = MaterialTheme.typography.h6.fontSize,
+                fontFamily = poppinsFontFamily
+            )
+        )
     }
 }
 

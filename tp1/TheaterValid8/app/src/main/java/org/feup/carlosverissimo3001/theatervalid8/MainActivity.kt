@@ -28,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
@@ -130,7 +132,14 @@ fun Topbar() {
 
     CenterAlignedTopAppBar(
         title = {
-            Text("TheaterValid8")
+            Text("TheaterValid8",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.W700
+                )
+            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,

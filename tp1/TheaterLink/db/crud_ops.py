@@ -366,7 +366,8 @@ def get_user_vouchers(conn: psycopg2.extensions.connection, user_id: str):
         SELECT json_build_object(
             'voucherid', voucherid,
             'userid', userid,
-            'vouchertype', vouchertype
+            'vouchertype', vouchertype,
+            'isUsed', isUsed
         ) FROM vouchers WHERE userid = %s
     ''', (user_id,))
 

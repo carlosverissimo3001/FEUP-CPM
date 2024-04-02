@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -20,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,16 +38,16 @@ import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.TicketsT
 
 @Composable
 fun Wallet(ctx: Context) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val ticketsState = remember { mutableStateOf(emptyList<Ticket>()) }
-    val loadedTickets = remember { mutableStateOf(false) }
+    val areTicketsLoaded = remember { mutableStateOf(false) }
     val viewingPastTickets = remember { mutableStateOf(false) }
     val viewingPastOrders = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
             ticketsState.value = tickets
-            loadedTickets.value = true
+            areTicketsLoaded.value = true
         }
     }
 
@@ -116,7 +113,7 @@ fun Wallet(ctx: Context) {
             ) {
                 if (selectedTabIndex == 0) {
                     // Hasn't loaded, display loading spinner
-                    if (!loadedTickets.value) {
+                    if (!areTicketsLoaded.value) {
                         LoadingSpinner()
                     } else if (unusedTicketArray.isEmpty()) {
                         // Display no tickets

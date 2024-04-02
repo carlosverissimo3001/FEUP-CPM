@@ -66,6 +66,10 @@ fun loadShowsFromCache(context: Context, callback: (JSONArray) -> Unit) {
     val showsFile = File(showsCacheDir, "shows.json")
     val showsString = showsFile.readText()
 
+    if (showsString == "") {
+        callback(JSONArray())
+    }
+
     callback(JSONArray(showsString))
 }
 
