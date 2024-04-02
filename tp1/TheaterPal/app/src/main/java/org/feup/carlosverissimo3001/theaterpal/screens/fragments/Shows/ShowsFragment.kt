@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-//import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -31,9 +31,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
+import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.loadShowsFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
+import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.json.JSONArray
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,15 +47,35 @@ import org.json.JSONArray
 fun Shows(ctx: Context) {
     val showsState = remember { mutableStateOf<JSONArray?>(null) }
 
-    LaunchedEffect(Unit) {
-        getShows(ctx) { shows ->
-            showsState.value = shows
+    if (!areShowsStoreInCache(ctx)) {
+        LaunchedEffect(Unit) {
+            getShows(ctx) { shows ->
+                showsState.value = shows
+
+                saveShowsToCache(shows, ctx){success ->
+                    if (!success){
+                        println("Error saving shows to cache")
+                    }
+                    else{
+                        println("Saved shows to cache")
+                    }
+                }
+            }
+        }
+    }
+    else {
+        LaunchedEffect(Unit) {
+            loadShowsFromCache(ctx) { shows ->
+                showsState.value = shows
+            }
         }
     }
 
     val showsArray = showsState.value
+
     if (showsArray == null)
         LoadingSpinner()
+
     else {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -87,6 +113,11 @@ fun Shows(ctx: Context) {
                         modifier = Modifier
                             .size(width = 160.dp, height = 240.dp)
                             .padding(8.dp)
+                            .clickable(
+                                onClick = {
+                                    println("Show clicked: $title")
+                                }
+                            )
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -104,14 +135,19 @@ fun Shows(ctx: Context) {
                             // Spacer(modifier = Modifier.weight(1f))
 
                             Text(
-                                text = title,
-                                style = MaterialTheme.typography.h6,
+                                title,
+                                style = TextStyle(
+                                    fontFamily = marcherFontFamily,
+                                    color = Color.White,
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 modifier = Modifier
                                     .background(
                                         brush = Brush.verticalGradient(
                                             colors = listOf(
-                                                MaterialTheme.colors.primary,
-                                                MaterialTheme.colors.primaryVariant
+                                                MaterialTheme.colorScheme.primary,
+                                                MaterialTheme.colorScheme.primaryContainer
                                             )
                                         )
                                     )

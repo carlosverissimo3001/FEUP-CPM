@@ -1,57 +1,41 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Orders
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet
 
 import android.graphics.Bitmap
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.Dp
 import org.feup.carlosverissimo3001.theaterpal.R
-import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
+import org.feup.carlosverissimo3001.theaterpal.formatDate
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import java.text.DateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Locale
 
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
@@ -65,6 +49,9 @@ fun Ticket(ticket: Ticket, image: Bitmap?) {
                 color = Color(parseColor("#36363e")),
                 shape = RoundedCornerShape(16.dp)
             )
+            .clickable(
+                onClick = { println("Clicked on ticket") }
+            )
     ) {
         Row (
             modifier = Modifier
@@ -73,7 +60,9 @@ fun Ticket(ticket: Ticket, image: Bitmap?) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.padding(12.dp).fillMaxWidth(0.65f)
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(0.65f)
             ) {
                 Row (
                     verticalAlignment = Alignment.CenterVertically
@@ -157,38 +146,6 @@ fun Ticket(ticket: Ticket, image: Bitmap?) {
                     )
                 }
             }
-
         }
     }
-}
-
-fun formatDate(inputDate: String): String {
-    // Parse the input date string
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val date = LocalDate.parse(inputDate, formatter)
-
-    var dayOfWeek = date.dayOfWeek.toString().lowercase()
-    dayOfWeek = toTitleCase(dayOfWeek)
-    
-    println("Day of week: $dayOfWeek")
-
-    val day = date.dayOfMonth.toString()
-
-    var month = date.month.toString().lowercase()
-    month = toTitleCase(month)
-
-    val daySuffix = when {
-        day.toInt() in 11..13 -> "th"
-        day.last() == '1' -> "st"
-        day.last() == '2' -> "nd"
-        day.last() == '3' -> "rd"
-        else -> "th"
-    }
-
-    // Format the output string
-    return "$dayOfWeek · $day$daySuffix of $month · 21:30h"
-}
-
-fun toTitleCase(input: String): String {
-    return input.replaceFirstChar { it.titlecase() }
 }
