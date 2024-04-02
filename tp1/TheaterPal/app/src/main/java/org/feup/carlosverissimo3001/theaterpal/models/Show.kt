@@ -11,7 +11,7 @@ data class Show (
 	val picture_b64: String,
 	val price: Int,
 	val id: Int
-) {
+) : java.io.Serializable {
 	fun debug(): String {
 		return "Show '$name', ID $id"
 	}

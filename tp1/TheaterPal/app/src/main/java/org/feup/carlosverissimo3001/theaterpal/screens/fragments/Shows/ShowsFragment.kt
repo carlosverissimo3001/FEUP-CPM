@@ -32,12 +32,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.models.Show
+import org.feup.carlosverissimo3001.theaterpal.screens.NavRoutes
 
 @Composable
-fun Shows(ctx: Context) {
+fun Shows(ctx: Context, navController: NavController) {
     val showsState = remember { mutableStateOf<List<Show>?>(null) }
 
     LaunchedEffect(Unit) {
@@ -66,7 +69,7 @@ fun Shows(ctx: Context) {
                     else
                         decodeBase64ToBitmap(show.picture_b64)
 
-                    ShowCard(show, bitmap)
+                    ShowCard(show, bitmap, navController)
                 }
             }
         }
@@ -74,14 +77,26 @@ fun Shows(ctx: Context) {
 }
 
 @Composable
-fun ShowCard(show: Show, bitmap: Bitmap?)  {
+fun ShowCard(show: Show, bitmap: Bitmap?, navController: NavController)  {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         modifier = Modifier
             .size(width = 160.dp, height = 240.dp)
-            .padding(8.dp)
+            .padding(8.dp),
+        onClick = {
+            navController.currentBackStackEntry?.savedStateHandle?.set("show", show)
+            navController.navigate(NavRoutes.ShowDetails.route) {
+                launchSingleTop = true
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+            }
+
+
+
+        }
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),

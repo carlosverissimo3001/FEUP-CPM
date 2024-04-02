@@ -27,12 +27,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.Cafeteria
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Orders.Orders
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.ShowDetails
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.Shows
 
 sealed class NavRoutes(val route: String) {
     data object Shows : NavRoutes("shows")
     data object Cafeteria : NavRoutes("cafeteria")
     data object Transactions : NavRoutes("transactions")
+    data object ShowDetails : NavRoutes("showDetails")
 }
 
 data class BarItem(
@@ -69,10 +71,13 @@ fun Navigator(navController: NavHostController, ctx: Context) {
             Cafeteria()
         }
         composable(NavRoutes.Shows.route) {
-            Shows(ctx)
+            Shows(ctx, navController)
         }
         composable(NavRoutes.Transactions.route) {
             Orders(ctx)
+        }
+        composable(NavRoutes.ShowDetails.route) {
+            ShowDetails(ctx, navController)
         }
     }
 }
