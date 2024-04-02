@@ -37,16 +37,4 @@ def construct_blueprint(dbConn):
 
         return {"shows": shows}
 
-
-    # given a show_id, return the show details and dates available
-    @show_page.route('/shows/<show_id>')
-    def show_details(show_id):
-        show = crud_ops.get_show(dbConn, show_id)[0]
-
-        dates = crud_ops.get_show_dates(dbConn, show_id)
-
-        show["dates"] = dates
-
-        return jsonify(show)
-
     return show_page

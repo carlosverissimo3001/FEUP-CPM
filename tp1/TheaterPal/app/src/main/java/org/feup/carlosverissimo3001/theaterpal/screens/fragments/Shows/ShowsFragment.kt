@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-//import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -31,27 +31,64 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
+import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.screens.NavRoutes
+import org.feup.carlosverissimo3001.theaterpal.file.loadShowsFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
+import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.json.JSONArray
 
 @Composable
 fun Shows(ctx: Context, navController: NavController) {
     val showsState = remember { mutableStateOf<List<Show>?>(null) }
+    val areShowsCached = remember { mutableStateOf(false)}
 
     LaunchedEffect(Unit) {
         getShows(ctx) { shows ->
             showsState.value = shows
         }
     }
+//    if (!areShowsCached.value) {
+//        LaunchedEffect(Unit) {
+//            getShows(ctx) { shows ->
+//                showsState.value = shows
+//
+//                saveShowsToCache(shows, ctx){success ->
+//                    if (!success){
+//                    }
+//                    else{
+//                        areShowsCached.value = true
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    else {
+//        LaunchedEffect(Unit) {
+//            loadShowsFromCache(ctx) { shows ->
+//                // The file exists, but is still empty
+//                if (shows == emptyList<Show>()){
+//                    showsState.value = null
+//                }
+//                else {
+//                    showsState.value = shows
+//                }
+//            }
+//        }
+//    }
 
     val showList = showsState.value
     if (showList == null)
         LoadingSpinner()
+
     else {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -110,7 +147,12 @@ fun ShowCard(show: Show, bitmap: Bitmap?, navController: NavController)  {
             )
             Text(
                 text = show.name,
-                style = MaterialTheme.typography.h6,
+                style = TextStyle(
+                    color = Color.White,
+                    fontFamily = marcherFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = MaterialTheme.typography.bodySmall.fontSize
+                ),
                 modifier = Modifier
                     .background(
                         brush = Brush.verticalGradient(

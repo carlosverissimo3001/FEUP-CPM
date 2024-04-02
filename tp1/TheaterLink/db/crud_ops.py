@@ -160,8 +160,7 @@ def get_show_dates(conn, show_id: str):
 
     cur.execute('''
         SELECT json_build_object(
-            'date', date,
-            'availableseats', availableseats
+            'date', date
         ) FROM showdates WHERE showid = %s
     ''', (show_id,))
 
@@ -169,7 +168,7 @@ def get_show_dates(conn, show_id: str):
 
     data = []
     for row in rows:
-        data.append(row[0])
+        data.append(row[0]['date'])
 
     return data
 
@@ -366,7 +365,8 @@ def get_user_vouchers(conn: psycopg2.extensions.connection, user_id: str):
         SELECT json_build_object(
             'voucherid', voucherid,
             'userid', userid,
-            'vouchertype', vouchertype
+            'vouchertype', vouchertype,
+            'isUsed', isUsed
         ) FROM vouchers WHERE userid = %s
     ''', (user_id,))
 

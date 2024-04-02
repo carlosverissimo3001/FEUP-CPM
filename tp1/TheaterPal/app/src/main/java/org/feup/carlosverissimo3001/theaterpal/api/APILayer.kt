@@ -8,7 +8,9 @@ import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.models.parseShow
+import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseTicket
+import org.feup.carlosverissimo3001.theaterpal.models.parseVoucher
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -46,6 +48,46 @@ fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
                 }
                 else -> {
                     print("Error getting tickets")
+                }
+            }
+        }
+    })
+}
+
+fun getUserVouchers(user_id: String, callback: (List<Voucher>) -> Unit){
+    var request = okhttp3.Request.Builder()
+        .url("${Server.URL}/vouchers?user_id=$user_id")
+        .build()
+
+    val client = OkHttpClient()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(emptyList())
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val vouchers = jsonResponse?.getJSONArray("vouchers")
+
+                    if (vouchers != null){
+                        var vouchersList = mutableListOf<Voucher>()
+                        for (i in 0 until vouchers.length()) {
+                            // get the voucher object
+                            val voucher = vouchers.getJSONObject(i)
+
+                            // parse the voucher object to a Voucher object
+                            vouchersList.add(parseVoucher(voucher))
+                        }
+                        callback(vouchersList)
+                    }
+                }
+                else -> {
+                    print("Error getting vouchers")
                 }
             }
         }

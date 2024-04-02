@@ -5,9 +5,7 @@ import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ConfirmationNumber
 import androidx.compose.material.icons.outlined.Fastfood
-import androidx.compose.material.icons.outlined.LocalCafe
 import androidx.compose.material.icons.outlined.TheaterComedy
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.Icon
@@ -19,22 +17,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.Cafeteria
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Orders.Orders
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.ShowDetails
+import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.Shows
 
 sealed class NavRoutes(val route: String) {
     data object Shows : NavRoutes("shows")
     data object Cafeteria : NavRoutes("cafeteria")
-    data object Transactions : NavRoutes("transactions")
     data object ShowDetails : NavRoutes("showDetails")
+    data object Wallet : NavRoutes("wallet")
 }
 
 data class BarItem(
@@ -58,7 +56,7 @@ object NavBarItems {
         BarItem(
             title = "Wallet",
             image = Icons.Outlined.Wallet,
-            route = "transactions"
+            route = "wallet"
         )
     )
 }
@@ -68,13 +66,13 @@ object NavBarItems {
 fun Navigator(navController: NavHostController, ctx: Context) {
     NavHost(navController=navController, startDestination=NavRoutes.Shows.route) {
         composable(NavRoutes.Cafeteria.route) {
-            Cafeteria()
+            Cafeteria(ctx)
         }
         composable(NavRoutes.Shows.route) {
             Shows(ctx, navController)
         }
-        composable(NavRoutes.Transactions.route) {
-            Orders(ctx)
+        composable(NavRoutes.Wallet.route) {
+            Wallet(ctx)
         }
         composable(NavRoutes.ShowDetails.route) {
             ShowDetails(ctx, navController)
@@ -104,7 +102,11 @@ fun BottomNavigationBar(navController: NavHostController) {
                         contentDescription = navItem.title
                     )
                 },
-                label = { Text(navItem.title) }
+                label = { Text(navItem.title,
+                    style = TextStyle(
+                        fontFamily = marcherFontFamily,
+                    )
+                ) }
             )
         }
     }
