@@ -20,6 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,9 +32,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
+import org.w3c.dom.Text
 
 @Composable
 fun Voucher(voucher: Voucher) {
+    val (isSelected, setSelected) = remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .padding(10.dp)
@@ -40,7 +46,9 @@ fun Voucher(voucher: Voucher) {
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable(
-                onClick = { println("Clicked on voucher") }
+                onClick = {
+                    setSelected(!isSelected)
+                }
             )
     ) {
         Row (
@@ -57,16 +65,12 @@ fun Voucher(voucher: Voucher) {
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    /*Icon(
-
-                    )*/
-
                     Text(
                         text = parseType(voucher.voucherType),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = TextStyle(
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             fontFamily = marcherFontFamily
@@ -76,14 +80,7 @@ fun Voucher(voucher: Voucher) {
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                    text = "Casa da Música",
-                    style = TextStyle(
-                        color = androidx.compose.ui.graphics.Color.LightGray,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        fontFamily = marcherFontFamily
-                    )
-                )
+                parseIsUsed(voucher.isUsed)
 
                 Spacer(modifier = Modifier.height(3.dp))
             }
@@ -92,10 +89,30 @@ fun Voucher(voucher: Voucher) {
 }
 
 fun parseType (type: String) : String {
-    if (type == "FREE_COFFEE")
-        return "Coffee"
-    else if (type == "FREE_POPCORN")
-        return "Popcorn"
+    return when (type) {
+        "FREE_COFFEE" -> "Coffee"
+        "FREE_POPCORN" -> "Popcorn"
+        else -> "5% Discount"
+    }
+}
+@Composable
+fun parseIsUsed (isUsed: Boolean) {
+    return if (isUsed)
+        Text (
+            text = "Used",
+            style = TextStyle(
+                color = Color.Red,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontFamily = marcherFontFamily
+            )
+        )
     else
-        return "5% Discount"
+        Text (
+            text = "Active",
+            style = TextStyle(
+                color = Color.Green,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                fontFamily = marcherFontFamily
+            )
+        )
 }

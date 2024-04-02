@@ -7,17 +7,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,12 +36,31 @@ import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Ticket
 
 @Composable
-fun VouchersTab(ctx: Context, vouchers: List<Voucher>, onViewPastVouchersClick: () -> Unit){
+fun VouchersTab(ctx: Context, vouchers: List<Voucher>, onFilterChanged: (Boolean) -> Unit){
+    val (isChecked, setChecked) = remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Spacer(modifier = Modifier.size(8.dp))
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = {
+                    setChecked(it)
+                    onFilterChanged(it)
+                },
+            )
+            Text(text = "View only active vouchers", style = TextStyle(
+                fontFamily = marcherFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+            ))
+        }
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             contentPadding = PaddingValues(10.dp)
@@ -45,39 +68,6 @@ fun VouchersTab(ctx: Context, vouchers: List<Voucher>, onViewPastVouchersClick: 
             items(vouchers.size) { index ->
                 Voucher(
                     voucher = vouchers[index]
-                )
-            }
-        }
-    }
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        FloatingActionButton(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(8.dp),
-            onClick = { onViewPastVouchersClick()}
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.tickets_icon),
-                    contentDescription = "View Used Vouchers",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .padding(end = 8.dp)
-                )
-                Text(
-                    text = "View Used Vouchers",
-                    style = TextStyle(
-                        fontFamily = marcherFontFamily,
-                        color = Color.White,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontWeight = FontWeight.Bold
-                    )
                 )
             }
         }

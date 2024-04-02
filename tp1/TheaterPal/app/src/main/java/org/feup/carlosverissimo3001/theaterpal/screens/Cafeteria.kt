@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,25 +36,20 @@ import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTick
 
 @Composable
 fun Cafeteria(ctx: Context) {
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-    var vouchersState = remember { mutableStateOf(emptyList<Voucher>()) }
     var areVouchersLoaded = remember { mutableStateOf(false) }
 
-    val viewingPastVouchers = remember { mutableStateOf(false) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var vouchersState by remember { mutableStateOf(emptyList<Voucher>()) }
+    var filteredVouchers by remember { mutableStateOf(emptyList<Voucher>()) }
 
     LaunchedEffect(Unit) {
         getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
-            vouchersState.value = vouchers
+            vouchersState = vouchers
             areVouchersLoaded.value = true
+            filteredVouchers = vouchers.filter { !it.isUsed }
         }
     }
 
-    val vouchersArray = vouchersState.value
-    val usedVouchersArray = vouchersArray.filter { it.isUsed }
-    val unusedVouchersArray = vouchersArray.filter { !it.isUsed }
-
-    if (!viewingPastVouchers.value) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -96,42 +92,60 @@ fun Cafeteria(ctx: Context) {
             )
         }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        // Handle swipe gestures to change tabs
-                        detectHorizontalDragGestures { change, dragAmount ->
-                            if (dragAmount > 30) {
-                                selectedTabIndex = 0
-                            } else if (dragAmount < -30) {
-                                selectedTabIndex = 1
-                            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    // Handle swipe gestures to change tabs
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (dragAmount > 30) {
+                            selectedTabIndex = 0
+                        } else if (dragAmount < -30) {
+                            selectedTabIndex = 1
                         }
                     }
-            ) {
-                if (selectedTabIndex == 0) {
-                    BarTab(ctx)
-                } else {
+                }
+        ) {
+            if (selectedTabIndex == 0) {
+                BarTab(ctx)
+            } else {
+                if (!areVouchersLoaded.value) {
+                    LoadingSpinner()
+                }
+                // No vouchers
+                else if (vouchersState.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("No vouchers available",
+                            style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                color = Color.White,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+                else {
                     VouchersTab(
                         ctx = ctx,
-                        vouchers = unusedVouchersArray,
-                        onViewPastVouchersClick = {
-                            viewingPastVouchers.value = true
-                        },
+                        vouchers = filteredVouchers, // Use filtered vouchers instead of vouchersArray
+                        onFilterChanged = { isChecked ->
+                            println("Filter changed to $isChecked")
+                            // if checked, shows only active vouchers, else shows all vouchers
+                            filteredVouchers = if (isChecked) {
+                                vouchersState.filter { !it.isUsed }
+                            } else {
+                                vouchersState
+                            }
+                        }
                     )
                 }
             }
         }
     }
-    else {
-        AnimatedVisibility(
-            visible = viewingPastVouchers.value,
-            enter = slideInVertically { it },
-        ) {
-            PastVouchers(ctx = ctx, pastVouchers = usedVouchersArray, onBackButtonClick = {
-                viewingPastVouchers.value = false
-            })
-        }
-    }
 }
+
