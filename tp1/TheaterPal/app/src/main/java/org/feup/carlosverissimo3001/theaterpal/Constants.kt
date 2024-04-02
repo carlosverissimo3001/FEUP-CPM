@@ -12,7 +12,7 @@ object Crypto {
 }
 
 object Server {
-    const val URL = "https://44f4-161-230-86-77.ngrok-free.app"
+    const val URL = "https://a7ae-2001-818-ebf3-7200-289-7a7e-42df-174c.ngrok-free.app"
 }
 
 val marcherFontFamily: FontFamily = FontFamily(

@@ -19,7 +19,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,15 +30,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
-import org.json.JSONArray
+import org.feup.carlosverissimo3001.theaterpal.models.Show
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Shows(ctx: Context) {
-    val showsState = remember { mutableStateOf<JSONArray?>(null) }
+    val showsState = remember { mutableStateOf<List<Show>?>(null) }
 
     LaunchedEffect(Unit) {
         getShows(ctx) { shows ->
@@ -47,81 +46,75 @@ fun Shows(ctx: Context) {
         }
     }
 
-    val showsArray = showsState.value
-    if (showsArray == null)
+    val showList = showsState.value
+    if (showList == null)
         LoadingSpinner()
     else {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            //Grid of 2 x N show cards
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(16.dp),
             ){
-                items(showsArray.length()) { index ->
-                    val show = showsArray.getJSONObject(index)
-                    val title = show.getString("name")
-                    val description = show.getString("description")
-                    val imagename = show.getString("picture")
-                    val imageb64 = show.getString("picture_b64")
-                    val bitmap: Bitmap?
+                items(showList.size) { index ->
+                    val show = showList[index]
 
-                    if (imageb64 == ""){
-                        bitmap = loadImageFromCache(imagename, ctx)
-                    }
+                    val bitmap: Bitmap? = if (show.picture_b64 == "")
+                        loadImageFromCache(show.picture, ctx)
+                    else
+                        decodeBase64ToBitmap(show.picture_b64)
 
-                    else {
-                        bitmap = decodeBase64ToBitmap(imageb64)
-                    }
-
-
-                    ElevatedCard(
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 6.dp
-                        ),
-                        modifier = Modifier
-                            .size(width = 160.dp, height = 240.dp)
-                            .padding(8.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.BottomCenter
-                        ){
-                            bitmap?.asImageBitmap()?.let {
-                                Image(
-                                    bitmap = it,
-                                    contentDescription = null,
-                                    // keep the same size for all images
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            }
-                            // Spacer(modifier = Modifier.weight(1f))
-
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.h6,
-                                modifier = Modifier
-                                    .background(
-                                        brush = Brush.verticalGradient(
-                                            colors = listOf(
-                                                MaterialTheme.colors.primary,
-                                                MaterialTheme.colors.primaryVariant
-                                            )
-                                        )
-                                    )
-                                    .padding(8.dp)
-                                    .fillMaxWidth()
-                            )
-                        }
-                    }
+                    ShowCard(show, bitmap)
                 }
             }
         }
     }
 }
+
+@Composable
+fun ShowCard(show: Show, bitmap: Bitmap?)  {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            .size(width = 160.dp, height = 240.dp)
+            .padding(8.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ){
+            Image(
+                bitmap = bitmap!!.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Text(
+                text = show.name,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier
+                    .background(
+                        brush = Brush.verticalGradient(
+                            startY = 10f,
+                            endY = 90f,
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black
+                            )
+                        )
+                    )
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
 
 @Composable
 fun LoadingSpinner() {
