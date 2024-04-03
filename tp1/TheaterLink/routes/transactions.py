@@ -74,6 +74,7 @@ def handle_cafeteria_order(trans_id, order):
         return jsonify({'message': 'Error creating cafeteria transaction!'})
 
     redundant_id = order_row[0] # used for FK constraint below
+    order_no = order_row[2] # order_no
 
     for item,qnt in items.items():
         # add to the cafeteria_orders table
@@ -81,4 +82,4 @@ def handle_cafeteria_order(trans_id, order):
         if order_row is None:
             return jsonify({'message': 'Error creating cafeteria order item!'})
 
-    return True
+    return order_no

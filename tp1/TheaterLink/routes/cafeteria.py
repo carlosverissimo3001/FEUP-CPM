@@ -38,11 +38,19 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
             """ voucher_data.append(voucher_row[0]) """
 
         ## HANDLE CAFETERIA ORDER ##
-        if transactions.handle_cafeteria_order(transaction_id, order) is None:
+        order_no =  transactions.handle_cafeteria_order(transaction_id, order)
+        if order_no is None:
             return jsonify({'message': 'Error submitting order!'})
 
-        return jsonify({'message': 'Order submitted successfully!'}), 201
+        return jsonify({'message': 'Order submitted successfully!', 'order_no': order_no}), 200
 
+
+    @cafeteria_page.route('/orders', methods=['GET'])
+    def get_user_orders():
+        user_id = request.args.get('user_id')
+        """ orders = crud_ops.get_user_orders(dbConn, user_id) """
+
+        return jsonify({'message': 'Orders retrieved successfully!', 'orders': []}), 200
 
     def mark_voucher_as_used(voucher_id):
         crud_ops.mark_voucher_as_used(dbConn, voucher_id)
