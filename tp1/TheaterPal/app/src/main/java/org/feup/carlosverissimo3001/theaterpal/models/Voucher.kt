@@ -21,3 +21,11 @@ fun parseVoucher (jsonObject: JSONObject): Voucher {
         jsonObject.getString("userid"),
     )
 }
+
+fun parseVoucherType (type: String) : String {
+    return when (type) {
+        "FREE_COFFEE" -> "Free Coffee"
+        "FREE_POPCORN" -> "Free Popcorn"
+        else -> "5% Discount"
+    }
+}

@@ -1,14 +1,12 @@
 package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria
 
 import android.content.Context
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,7 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,16 +31,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.CafeteriaItem
+import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.getCafeteriaItems
 
 
 @Composable
-fun BarTab(ctx: Context) {
+fun BarTab(ctx: Context, onNextStepClick : (BarOrder) -> Unit){
     var barItems : List<CafeteriaItem> = getCafeteriaItems()
     var total by remember { mutableDoubleStateOf(0.0) }
-    var order by remember { mutableStateOf("") }
+
+    var order by remember { mutableStateOf(emptyMap<String, Int>()) }
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -56,12 +58,21 @@ fun BarTab(ctx: Context) {
                     item = barItems[index],
                     onIncrement = { item ->
                         total += item.price
+                        order = order.toMutableMap().apply {
+                            this[item.name] = (this[item.name] ?: 0) + 1
+                        }
                     },
                     onDecrement = { item ->
                         total -= item.price
+                        order = order.toMutableMap().apply {
+                            this[item.name] = (this[item.name] ?: 0) - 1
+                        }
                     },
                     onRemove = { item, quantity ->
                         total -= item.price * quantity
+                        order = order.toMutableMap().apply {
+                            this[item.name] = 0
+                        }
                     }
                 )
             }
@@ -116,11 +127,17 @@ fun BarTab(ctx: Context) {
             }
 
             // NEXT STEP
-            FloatingActionButton(
-                onClick = { /*TODO*/ },
+            Button(
+                enabled = total > 0,
+                onClick = {
+                    onNextStepClick(BarOrder(items = order, total = total))
+                },
                 modifier = Modifier
                     .width(200.dp),
-                containerColor = Color(0xFF43A047),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF43A047),
+                    contentColor = Color.White
+                ),
             ) {
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -148,4 +165,8 @@ fun BarTab(ctx: Context) {
             }
         }
     }
+}
+
+class CafeteriaViewModel : ViewModel() {
+    var itemQuantities by mutableStateOf(mapOf<CafeteriaItem, Int>())
 }

@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import org.feup.carlosverissimo3001.theaterpal.Server
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
+import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.models.parseShow
@@ -154,4 +155,8 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
             }
         }
     })
+}
+
+fun sumbitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
+    // TODO: Implement submitOrder
 }

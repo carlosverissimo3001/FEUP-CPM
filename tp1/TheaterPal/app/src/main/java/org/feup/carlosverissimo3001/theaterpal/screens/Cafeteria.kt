@@ -26,11 +26,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
+import org.feup.carlosverissimo3001.theaterpal.api.sumbitOrder
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
+import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
+import org.feup.carlosverissimo3001.theaterpal.models.printBarOrder
+import org.feup.carlosverissimo3001.theaterpal.models.printOrder
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.PastVouchers
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTickets
 
@@ -41,6 +45,10 @@ fun Cafeteria(ctx: Context) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var vouchersState by remember { mutableStateOf(emptyList<Voucher>()) }
     var filteredVouchers by remember { mutableStateOf(emptyList<Voucher>()) }
+
+    var isChoosingVoucher by remember { mutableStateOf(false) }
+
+    var barOrder by remember { mutableStateOf<BarOrder?>(null) }
 
     LaunchedEffect(Unit) {
         getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
@@ -107,7 +115,16 @@ fun Cafeteria(ctx: Context) {
                 }
         ) {
             if (selectedTabIndex == 0) {
-                BarTab(ctx)
+                isChoosingVoucher = false
+                BarTab(
+                    ctx,
+                    onNextStepClick = { order ->
+                        // Navigate to next step
+                        barOrder = order
+                        isChoosingVoucher = true
+                        selectedTabIndex = 1
+                    },
+                )
             } else {
                 if (!areVouchersLoaded.value) {
                     LoadingSpinner()
@@ -131,17 +148,32 @@ fun Cafeteria(ctx: Context) {
                 }
                 else {
                     VouchersTab(
-                        ctx = ctx,
+                        ctx,
                         vouchers = filteredVouchers, // Use filtered vouchers instead of vouchersArray
                         onFilterChanged = { isChecked ->
-                            println("Filter changed to $isChecked")
                             // if checked, shows only active vouchers, else shows all vouchers
                             filteredVouchers = if (isChecked) {
                                 vouchersState.filter { !it.isUsed }
                             } else {
                                 vouchersState
                             }
-                        }
+                        },
+                        isChoosingVoucher,
+                        onSubmitted = { selectedVouchers ->
+                            val order = barOrder?.let {
+                                Order(
+                                    barOrder = it,
+                                    vouchersUsed = selectedVouchers
+                                )
+                            }
+
+                            sendOrder(ctx, order!!)
+
+                            // Navigate to next step
+                            isChoosingVoucher = false
+                            selectedTabIndex = 0
+                        },
+                        total = barOrder?.total ?: 0.0
                     )
                 }
             }
@@ -149,3 +181,13 @@ fun Cafeteria(ctx: Context) {
     }
 }
 
+fun sendOrder(ctx: Context, order: Order) {
+    // API Request to send order
+    sumbitOrder(ctx, order) { success ->
+        if (success) {
+            printOrder(order)
+        } else {
+            print("Error sending order")
+        }
+    }
+}
