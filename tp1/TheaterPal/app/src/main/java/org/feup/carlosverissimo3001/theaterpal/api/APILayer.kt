@@ -1,8 +1,12 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
+import okhttp3.Authenticator
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.Server
+import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
 import org.feup.carlosverissimo3001.theaterpal.models.Order
@@ -158,5 +162,43 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
 }
 
 fun sumbitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
-    // TODO: Implement submitOrder
+    val client = OkHttpClient()
+
+    val jsonOrder = JSONObject()
+    jsonOrder.put("vouchers_used", JSONArray(order.vouchersUsed.map { it.voucherid }))
+    val barOrder = JSONObject()
+    val items = JSONObject()
+    for ((item, quantity) in order.barOrder.items) {
+        items.put(item, quantity)
+    }
+    barOrder.put("items", items)
+    barOrder.put("total", order.barOrder.total)
+    jsonOrder.put("order", barOrder)
+    jsonOrder.put("user_id", Authentication(ctx).getUserID())
+
+    val requestBody = jsonOrder.toString()
+        .toRequestBody("application/json".toMediaTypeOrNull())
+
+    val request = okhttp3.Request.Builder()
+        .url("${Server.URL}/submit_order")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(false)
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200, 201 -> {
+                    callback(true)
+                }
+                else -> {
+                    callback(false)
+                }
+            }
+        }
+    })
 }

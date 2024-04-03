@@ -29,7 +29,14 @@ import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucherType
 
 @Composable
-fun Voucher(voucher: Voucher, selectionMode : Boolean = false, onSelected: (Voucher) -> Unit = {}) {
+fun Voucher(
+    voucher: Voucher,
+    canSelect: Boolean = true,
+    selectionMode : Boolean = false,
+    onSelected: (Voucher, Boolean) -> Unit = { _, _ -> },
+    isDiscountAlreadyApplied: Boolean = false
+) {
+
     val (isSelected, setSelected) = remember { mutableStateOf(false) }
 
     Box(
@@ -37,9 +44,18 @@ fun Voucher(voucher: Voucher, selectionMode : Boolean = false, onSelected: (Vouc
             .padding(10.dp)
             .clickable(
                 onClick = {
+                    if (isDiscountAlreadyApplied && parseVoucherType(voucher.voucherType) == "5% Discount") {
+                        return@clickable
+                    }
+
                     if (selectionMode){
-                        setSelected(!isSelected)
-                        onSelected(voucher)
+                        if (canSelect){
+                            setSelected(!isSelected)
+                            onSelected(voucher, true)
+                        }
+                        else{
+                            onSelected(voucher, false)
+                        }
                     }
                 }
             )

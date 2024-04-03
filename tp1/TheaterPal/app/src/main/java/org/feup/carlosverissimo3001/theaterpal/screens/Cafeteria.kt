@@ -34,6 +34,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.printBarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.printOrder
+import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTickets
@@ -159,7 +160,10 @@ fun Cafeteria(ctx: Context) {
                             }
                         },
                         isChoosingVoucher,
-                        onSubmitted = { selectedVouchers ->
+                        onSubmitted = { selectedVouchers, updatedTotal ->
+                            // update total, user might have selected vouchers for discount
+                            setTotal(barOrder!!, updatedTotal)
+
                             val order = barOrder?.let {
                                 Order(
                                     barOrder = it,
@@ -185,9 +189,9 @@ fun sendOrder(ctx: Context, order: Order) {
     // API Request to send order
     sumbitOrder(ctx, order) { success ->
         if (success) {
-            printOrder(order)
+            println("Order sent successfully")
         } else {
-            print("Error sending order")
+            println("Error sending order")
         }
     }
 }

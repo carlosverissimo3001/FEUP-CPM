@@ -55,15 +55,30 @@ def handle_ticket_purchase(trans_id: str, tickets: list):
     else:
         return ticket_trans_row[0] # transaction_id, same as trans_id in this case
 
-def handle_cafeteria_order(data, vouchers, total_cost: float):
+def handle_cafeteria_order(trans_id, order):
     '''
     Handler for cafeteria orders
 
     Parameters:
-        data (dict): data for the transaction (cafeteria items)
-        vouchers (list): list of vouchers generated during the transaction
-        total_cost (float): total cost of the transaction
+        trans_id (str): transaction id
+        order (dict): order details
     '''
-    print('Handling cafeteria orders...')
 
-    return None
+    # add to the cafeteria_orders table
+    items = order["items"]
+    num_items = sum(quantity for _, quantity in items.items())
+
+    ## add to the cafeteria transactions table
+    order_row = crud_ops.create_cafeteria_transaction(DB_CONN, trans_id, num_items)
+    if order_row is None:
+        return jsonify({'message': 'Error creating cafeteria transaction!'})
+
+    redundant_id = order_row[0] # used for FK constraint below
+
+    for item,qnt in items.items():
+        # add to the cafeteria_orders table
+        order_row = crud_ops.add_cafeteria_order_item(DB_CONN, redundant_id, item, qnt)
+        if order_row is None:
+            return jsonify({'message': 'Error creating cafeteria order item!'})
+
+    return True

@@ -58,7 +58,7 @@ CREATE TABLE CafeteriaTransactions (
     RedundantOrderID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the cafeteria order (only needed bc cafeteriaorderitem needs to reference this a primary key)
     TransactionID UUID REFERENCES Transactions(TransactionID),   -- Transaction that generated the cafeteria order
     OrderNumber INT NOT NULL, -- To be used by the user and the cafeteria to identify the order in a screen
-    NUMBEROFITEMS INT NOT NULL -- Number of items in the order
+    NumberOfItems INT NOT NULL -- Number of items in the order
 );
 
 -- Cafeteria Order Items Table

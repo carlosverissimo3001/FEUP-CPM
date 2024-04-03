@@ -10,6 +10,10 @@ data class Order(
     var barOrder: BarOrder
 )
 
+fun setTotal(barOrder: BarOrder, total: Double) {
+    barOrder.total = total
+}
+
 fun printBarOrder(barOrder: BarOrder) {
     println("BarOrder:")
     for ((item, quantity) in barOrder.items) {
@@ -25,4 +29,14 @@ fun printOrder(order: Order) {
         println(voucher)
     }
     printBarOrder(order.barOrder)
+}
+
+fun parseOrderToJson(order: Order): String {
+    return "{\n" +
+            "\"vouchersUsed\": [${order.vouchersUsed.joinToString(",") { it.voucherid.toString() }}],\n" +
+            "\"barOrder\": {\n" +
+            "\"items\": {${order.barOrder.items.entries.joinToString(",") { "\"${it.key}\": ${it.value}" }}},\n" +
+            "\"total\": ${order.barOrder.total}\n" +
+            "}\n" +
+            "}"
 }

@@ -40,10 +40,15 @@ fun VouchersTab(
     vouchers: List<Voucher>,
     onFilterChanged: (Boolean) -> Unit,
     isChoosingVoucher: Boolean,
-    onSubmitted: (List<Voucher>) -> Unit,
+    onSubmitted: (List<Voucher>, Double) -> Unit,
     total : Double = 0.0
 ) {
-    val (isChecked, setChecked) = remember { mutableStateOf(true) }
+    val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
+
+    // When user selects more than 2 vouchers
+    val (isSelectingMore, setSelectingMore) = remember { mutableStateOf(false) }
+    val (isDiscountAlreadyApplied, setDiscountAlreadyApplied) = remember { mutableStateOf(false) }
+
     val selectedVouchers = remember { mutableStateOf(emptyList<Voucher>()) }
     var updatedTotal by remember { mutableDoubleStateOf(total) }
 
@@ -63,7 +68,7 @@ fun VouchersTab(
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = {
-                        setChecked(it)
+                        setFilterChecked(it)
                         onFilterChanged(it)
                     },
                 )
@@ -78,12 +83,28 @@ fun VouchersTab(
             Row (
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Please select up to 2 vouchers", style = TextStyle(
-                    fontFamily = marcherFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
-                ))
+                if (isSelectingMore){
+                    Text(
+                        text = "You can only select up to 2 vouchers", style = TextStyle(
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                            color = Color.Red
+                        )
+                    )
+                }
+                else {
+                    Text(
+                        text = "Please select up to 2 vouchers", style = TextStyle(
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize
+                        )
+                    )
+                }
             }
+
+
         }
 
         LazyVerticalGrid(
@@ -91,15 +112,21 @@ fun VouchersTab(
             contentPadding = PaddingValues(10.dp)
         ) {
             items(vouchers.size) { index ->
+                val vch = vouchers[index]
                 Voucher(
-                    voucher = vouchers[index],
+                    voucher = vch,
+                    // Can select a new one if there are less than 2 selected
+                    // Second condition to prevent the case where 2 vouchers are selected and the user tries to unslect one
+                    canSelect = selectedVouchers.value.size < 2 || selectedVouchers.value.contains(vch),
                     selectionMode = isChoosingVoucher,
-                    onSelected = { voucher ->
+                    onSelected = { voucher, success ->
+                        // Voucher already selected, remove it
                         if (selectedVouchers.value.contains(voucher)) {
                             selectedVouchers.value = selectedVouchers.value.filter { it != voucher }
 
                             if (parseVoucherType(voucher.voucherType) == "5% Discount") {
                                 updatedTotal += possibleDiscount
+                                setDiscountAlreadyApplied(false)
                             }
 
                         } else {
@@ -108,9 +135,13 @@ fun VouchersTab(
                             }
                             if (parseVoucherType(voucher.voucherType) == "5% Discount") {
                                 updatedTotal -= possibleDiscount
+                                setDiscountAlreadyApplied(true)
                             }
                         }
-                    }
+
+                        setSelectingMore(!success)
+                    },
+                    isDiscountAlreadyApplied = isDiscountAlreadyApplied && !selectedVouchers.value.contains(vch)
                 )
             }
         }
@@ -118,7 +149,7 @@ fun VouchersTab(
         if (isChoosingVoucher) {
             FloatingActionButton(
                 onClick = {
-                    onSubmitted(selectedVouchers.value)
+                    onSubmitted(selectedVouchers.value, updatedTotal)
                 },
                 modifier = Modifier
                     .width(200.dp),
@@ -152,3 +183,6 @@ fun VouchersTab(
     }
 }
 
+fun findAppliedVoucher(vouchers: List<Voucher>): Voucher? {
+    return vouchers.find { parseVoucherType(it.voucherType) == "5% Discount" }
+}
