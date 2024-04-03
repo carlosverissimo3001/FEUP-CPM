@@ -124,15 +124,13 @@ fun ShowCard(show: Show, bitmap: Bitmap?, navController: NavController)  {
             .padding(8.dp),
         onClick = {
             navController.currentBackStackEntry?.savedStateHandle?.set("show", show)
+            navController.currentBackStackEntry?.savedStateHandle?.set("bitmap", bitmap)
             navController.navigate(NavRoutes.ShowDetails.route) {
                 launchSingleTop = true
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
             }
-
-
-
         }
     ) {
         Box(
