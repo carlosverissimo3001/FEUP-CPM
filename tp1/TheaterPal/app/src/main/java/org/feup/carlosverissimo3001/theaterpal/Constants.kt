@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +19,13 @@ object Server {
 //    const val URL = "https://16b2-193-136-33-100.ngrok-free.app"
     const val URL = "https://wrongly-in-pug.ngrok-free.app"
 }
+
+object MyColors
+{
+    val tertiaryColor: Color = Color(0xFFF54242)
+    val bottomNavBarUnselectedItemColor: Color = Color(0x88FFFFFF)
+}
+
 
 val marcherFontFamily: FontFamily = FontFamily(
     Font(R.font.marcher_light, FontWeight.Light),

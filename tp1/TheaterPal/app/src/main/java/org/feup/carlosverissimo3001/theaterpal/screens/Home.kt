@@ -11,11 +11,13 @@ import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -24,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.feup.carlosverissimo3001.theaterpal.MyColors
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.ShowDetails
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.Shows
@@ -80,7 +83,6 @@ fun Navigator(navController: NavHostController, ctx: Context) {
     }
 }
 
-// The Navigation bar to be included as the bottom bar of a Scaffold
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -106,7 +108,17 @@ fun BottomNavigationBar(navController: NavHostController) {
                     style = TextStyle(
                         fontFamily = marcherFontFamily,
                     )
-                ) }
+                ) },
+                colors = NavigationBarItemColors(
+                    selectedIconColor = Color.White,
+                    selectedTextColor = MyColors.tertiaryColor,
+                    selectedIndicatorColor = MyColors.tertiaryColor,
+                    unselectedIconColor = MyColors.bottomNavBarUnselectedItemColor,
+                    unselectedTextColor = MyColors.bottomNavBarUnselectedItemColor,
+                    disabledIconColor = Color.Black,
+                    disabledTextColor = Color.Black,
+                )
+
             )
         }
     }

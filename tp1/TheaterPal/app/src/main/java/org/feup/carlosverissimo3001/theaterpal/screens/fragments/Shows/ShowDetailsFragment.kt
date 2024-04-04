@@ -1,26 +1,27 @@
 package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import org.feup.carlosverissimo3001.theaterpal.MyColors
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 
@@ -44,21 +46,23 @@ fun ShowDetails(ctx: Context, navController: NavController) {
 
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap) {
-	LazyColumn {
-		item {
-			ShowImage(bitmap)
-		}
-		item {
-			Column(
-			) {
+	Scaffold (
+		bottomBar = {},
+		floatingActionButton = {MyFloatingActionButton()},
+		floatingActionButtonPosition = FabPosition.Center,
+	) {
+		LazyColumn {
+			item {
+				ShowImage(bitmap)
 				ShowName(show)
-//				ShowTags(show)
 				ShowDescription(show)
 			}
 		}
 	}
+
 }
 
 @Composable
@@ -89,20 +93,6 @@ fun ShowImage(bitmap: Bitmap) {
 					)
 				)
 		)
-//		Box(
-//			modifier = Modifier
-//				.matchParentSize()
-//				.background(
-//					brush = Brush.horizontalGradient(
-//						colors = listOf(
-//							MaterialTheme.colorScheme.background,
-//							Color.Transparent,
-//							MaterialTheme.colorScheme.background
-//						),
-//						tileMode = TileMode.Clamp
-//					)
-//				)
-//		)
 	}
 }
 
@@ -151,31 +141,28 @@ fun ShowDescription(show: Show) {
 }
 
 @Composable
-fun ShowTags(show: Show)
+fun MyFloatingActionButton()
 {
-	val tags : List<String> = listOf("Child", "Musical", "Drama")
-
-	LazyRow(
-		modifier = Modifier.padding(16.dp)
-	) {
-		items(tags.size) { index ->
-			SuggestionChip(
-				onClick = { },
-				label = {
-					Text(
-						text = tags[index],
-						style = TextStyle(
-							color = Color.White,
-							fontFamily = marcherFontFamily,
-							fontSize = 14.sp
-						),
-						textAlign = TextAlign.Center,
-						modifier = Modifier
-							.padding(end = 8.dp)
-					)
-				},
+	ExtendedFloatingActionButton(
+		text = {
+			Text(
+				text = "Buy Tickets",
+				style = TextStyle(
+					color = Color.White,
+					fontFamily = marcherFontFamily,
+				)
 			)
-		}
-	}
+		},
+		icon = {
+			Icon(
+				imageVector = Icons.Filled.ConfirmationNumber,
+				contentDescription = null,
+				tint = Color.White
+			)
+		},
+		containerColor = MyColors.tertiaryColor,
+		shape = RoundedCornerShape(50.dp),
+		onClick = { /*TODO*/ },
+	)
 }
 
