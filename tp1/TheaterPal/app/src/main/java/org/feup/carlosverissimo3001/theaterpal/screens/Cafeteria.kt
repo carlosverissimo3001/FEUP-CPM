@@ -150,7 +150,7 @@ fun Cafeteria(ctx: Context) {
                 else {
                     VouchersTab(
                         ctx,
-                        vouchers = filteredVouchers, // Use filtered vouchers instead of vouchersArray
+                        vouchers = if (isChoosingVoucher) vouchersState.filter { !it.isUsed } else filteredVouchers,
                         onFilterChanged = { isChecked ->
                             // if checked, shows only active vouchers, else shows all vouchers
                             filteredVouchers = if (isChecked) {
