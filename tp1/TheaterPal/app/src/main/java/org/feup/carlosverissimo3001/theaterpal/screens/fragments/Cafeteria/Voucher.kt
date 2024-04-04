@@ -20,10 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color as ComposeColor
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
+import org.feup.carlosverissimo3001.theaterpal.ParseIsUsed
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucherType
@@ -48,12 +51,11 @@ fun Voucher(
                         return@clickable
                     }
 
-                    if (selectionMode){
-                        if (canSelect){
+                    if (selectionMode) {
+                        if (canSelect) {
                             setSelected(!isSelected)
                             onSelected(voucher, true)
-                        }
-                        else{
+                        } else {
                             onSelected(voucher, false)
                         }
                     }
@@ -71,20 +73,16 @@ fun Voucher(
     ) {
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(12.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(12.dp)
-            ) {
+            Column {
                 Row (
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ){
                     Text(
                         text = parseVoucherType(voucher.voucherType),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         style = TextStyle(
                             color = ComposeColor.White,
                             fontWeight = FontWeight.Bold,
@@ -96,33 +94,21 @@ fun Voucher(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                parseIsUsed(voucher.isUsed)
+                ParseIsUsed(voucher.isUsed)
 
                 Spacer(modifier = Modifier.height(3.dp))
             }
+            Text(
+                text = "Unique ID: ${voucher.voucherid.substring(0, 8)}...",
+                style = TextStyle(
+                    color = ComposeColor.White,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    fontFamily = marcherFontFamily
+                ),
+            )
         }
     }
 }
 
 
-@Composable
-fun parseIsUsed (isUsed: Boolean) {
-    return if (isUsed)
-        Text (
-            text = "Used",
-            style = TextStyle(
-                color = ComposeColor.Red,
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                fontFamily = marcherFontFamily
-            )
-        )
-    else
-        Text (
-            text = "Active",
-            style = TextStyle(
-                color = ComposeColor.Green,
-                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                fontFamily = marcherFontFamily
-            )
-        )
-}

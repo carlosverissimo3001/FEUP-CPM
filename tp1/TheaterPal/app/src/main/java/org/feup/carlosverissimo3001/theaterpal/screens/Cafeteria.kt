@@ -32,22 +32,18 @@ import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
-import org.feup.carlosverissimo3001.theaterpal.models.printBarOrder
-import org.feup.carlosverissimo3001.theaterpal.models.printOrder
 import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTickets
 
 @Composable
 fun Cafeteria(ctx: Context) {
-    var areVouchersLoaded = remember { mutableStateOf(false) }
-
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val areVouchersLoaded = remember { mutableStateOf(false) }
+    var isChoosingVoucher by remember { mutableStateOf(false) }
+
     var vouchersState by remember { mutableStateOf(emptyList<Voucher>()) }
     var filteredVouchers by remember { mutableStateOf(emptyList<Voucher>()) }
-
-    var isChoosingVoucher by remember { mutableStateOf(false) }
 
     var barOrder by remember { mutableStateOf<BarOrder?>(null) }
 
