@@ -160,7 +160,8 @@ def get_show_dates(conn, show_id: str):
 
     cur.execute('''
         SELECT json_build_object(
-            'date', date
+            'date', date,
+            'showdateid', showdateid
         ) FROM showdates WHERE showid = %s
     ''', (show_id,))
 
@@ -168,7 +169,7 @@ def get_show_dates(conn, show_id: str):
 
     data = []
     for row in rows:
-        data.append(row[0]['date'])
+        data.append(row[0])
 
     return data
 

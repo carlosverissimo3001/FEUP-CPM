@@ -18,7 +18,9 @@ CREATE TABLE Shows (
     Name VARCHAR(255) NOT NULL,
     Description TEXT,
     Picture VARCHAR(255),
-    Price INT NOT NULL
+    Price INT NOT NULL,
+    Duration INT NOT NULL, -- Duration in minutes
+    ReleaseDate DATE NOT NULL
 );
 
 -- ShowsDates Table
@@ -83,17 +85,17 @@ CREATE TABLE Vouchers (
 
 -- INSERTING DATA
 -- Insert shows into Shows table
-INSERT INTO Shows (name, description, picture, price)
+INSERT INTO Shows (name, description, picture, price, duration, releasedate)
 VALUES
-    ('Hamilton', 'Award-winning Broadway musical about the life of Alexander Hamilton', 'hamilton.jpg', 25),
-    ('The Lion King', 'Musical based on the Disney animated film', 'lion_king.jpg', 28),
-    ('Wicked', 'Musical retelling of the Wizard of Oz story from the perspective of the Wicked Witch of the West', 'wicked.jpg', 17),
-    ('Les Misérables', 'Musical based on the novel by Victor Hugo', 'les_miserables.jpg', 19),
-    ('Phantom of the Opera', 'Classic musical by Andrew Lloyd Webber', 'phantom_of_the_opera.jpg', 23),
-    ('The Book of Mormon', 'Musical comedy about Mormon missionaries', 'book_of_mormon.jpg', 27),
-    ('Chicago', 'Musical set in the Roaring Twenties', 'chicago.jpg', 19),
-    ('Mamma Mia!', 'Musical featuring the music of ABBA', 'mamma_mia.jpg', 40),
-    ('Cats', 'Musical composed by Andrew Lloyd Webber', 'cats.jpg', 16);
+    ('Hamilton', 'Award-winning Broadway musical about the life of Alexander Hamilton', 'hamilton.jpg', 25, 165, '2015-02-17'),
+    ('The Lion King', 'Musical based on the Disney animated film', 'lion_king.jpg', 28, 18, '2024-03-05', 88, '1997-08-07'),
+    ('Wicked', 'Musical retelling of the Wizard of Oz story from the perspective of the Wicked Witch of the West', 'wicked.jpg', 17, 165, '2003-05-28'),
+    ('Les Misérables', 'Musical based on the novel by Victor Hugo', 'les_miserables.jpg', 170, '1980-09-24'),
+    ('Phantom of the Opera', 'Classic musical by Andrew Lloyd Webber', 'phantom_of_the_opera.jpg', 143, '2004-12-10'),
+    ('The Book of Mormon', 'Musical comedy about Mormon missionaries', 'book_of_mormon.jpg', 150, '2011-03-24'),
+    ('Chicago', 'Musical set in the Roaring Twenties', 'chicago.jpg', 120, '1975-06-03'),
+    ('Mamma Mia!', 'Musical featuring the music of ABBA', 'mamma_mia.jpg', 100, '1999-04-06'),
+    ('Cats', 'Musical composed by Andrew Lloyd Webber', 'cats.jpg', 90, '1981-05-11');
 
 -- Insert random dates for showid 1 (Hamilton)
 INSERT INTO ShowDates (showid, date, availableseats)
