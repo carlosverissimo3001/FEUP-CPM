@@ -5,7 +5,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +17,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExposedDropdownMenuBox
+import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.HorizontalRule
+import androidx.compose.material.icons.filled.Minimize
+import androidx.compose.material.icons.filled.PlusOne
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -26,7 +39,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,8 +62,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 import org.feup.carlosverissimo3001.theaterpal.MyColors
+import org.feup.carlosverissimo3001.theaterpal.api.purchaseTickets
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.Date
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 
 @Composable
@@ -56,8 +81,14 @@ fun ShowDetails(ctx: Context, navController: NavController) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: NavController) {
+	var showdateid by remember { mutableIntStateOf(0) }
+	var quantity by remember { mutableIntStateOf(0) }
+
 	Scaffold (
-		floatingActionButton = {MyFloatingActionButton()},
+		floatingActionButton = {MyFloatingActionButton(onSubmit = {
+			purchaseTickets(ctx, showdateid, quantity, quantity*show.price)
+			navController.navigate("wallet")
+		})},
 		floatingActionButtonPosition = FabPosition.Center,
 		topBar = {
 			GoBackButton(navController)
@@ -73,6 +104,16 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			}
 			item {
 				ShowDescription(show)
+			}
+			item {
+				ShowDatesDropdown(
+					show,
+					onDateSelected = { date : Date ->
+						showdateid = date.showdateid
+					},
+					onDecrement = { quantity -= 1 },
+					onIncrement = { quantity += 1 }
+				)
 			}
 			item {
 				Spacer(
@@ -132,7 +173,7 @@ fun ShowName(show: Show) {
 		textAlign = TextAlign.Center
 	)
 	Text(
-		text = "01-01-2001 • 20h00 • 90 min",
+		text = "${show.releasedate} · ${show.duration} min · ${show.price}€",
 		style = TextStyle(
 			color = Color(0x66FFFFFF),
 			fontFamily = marcherFontFamily,
@@ -148,7 +189,7 @@ fun ShowName(show: Show) {
 @Composable
 fun ShowDescription(show: Show) {
 	Text(
-		text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vulputate varius nisl, vel ultricies ligula facilisis id. Sed interdum magna in odio commodo, ac condimentum est vulputate. Vestibulum sed vestibulum dui. Ut sit amet arcu lobortis, interdum neque dictum, dignissim risus. Sed fermentum feugiat sagittis. Quisque elementum quam nec fringilla venenatis. Integer gravida nibh et sem euismod dignissim. Morbi finibus ut turpis at venenatis. Nullam in varius sem, sed tincidunt ex. Phasellus luctus sagittis turpis sit amet accumsan. Nunc congue ultrices fermentum. Vestibulum viverra faucibus diam, in dapibus massa interdum sit amet. Nam sodales, urna at consequat tincidunt, turpis mauris mattis augue, sed commodo enim sem non sapien. In nisl ipsum, porttitor vel fringilla ac, dictum id urna.",
+		text = show.description,
 		style = TextStyle(
 			color = Color(0x88FFFFFF),
 			fontFamily = marcherFontFamily,
@@ -160,8 +201,148 @@ fun ShowDescription(show: Show) {
 	)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MyFloatingActionButton()
+fun ShowDatesDropdown(
+	show: Show,
+	onDateSelected: (Date) -> Unit,
+	onDecrement: () -> Unit,
+	onIncrement: () -> Unit
+){
+	val (quantity, setQuantity) = remember { mutableIntStateOf(0) }
+
+	var isExpanded by remember {
+		mutableStateOf(false)
+	}
+
+	var showDate by remember {
+		mutableStateOf("")
+	}
+
+	var avaliableDates = show.dates.map { it.date }
+
+
+	Row(
+		horizontalArrangement = Arrangement.Start,
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.padding(16.dp)
+			.fillMaxWidth()
+	) {
+		ExposedDropdownMenuBox(
+			expanded = isExpanded,
+			onExpandedChange = {newVal -> isExpanded = newVal},
+			modifier = Modifier
+		) {
+			OutlinedTextField(
+				value = showDate,
+				onValueChange = {},
+				textStyle = TextStyle(
+					color = androidx.compose.material.MaterialTheme.colors.onSurface,
+					fontSize = androidx.compose.material.MaterialTheme.typography.body1.fontSize,
+					textAlign = TextAlign.Center,
+					fontFamily = marcherFontFamily
+				),
+				readOnly = true,
+				placeholder = {
+					Text(
+						text = "Please select the date",
+						style = TextStyle(
+							color = androidx.compose.material.MaterialTheme.colors.onSurface,
+							fontSize = androidx.compose.material.MaterialTheme.typography.body2.fontSize,
+							textAlign = TextAlign.Center,
+							fontFamily = marcherFontFamily
+						)
+					)
+				},
+				colors = TextFieldDefaults.outlinedTextFieldColors(
+					backgroundColor = (if (isSystemInDarkTheme())
+						lightColorScheme().background else darkColorScheme().background),
+				),
+				modifier = Modifier
+					.fillMaxWidth(0.7f),
+			)
+			ExposedDropdownMenu(
+				expanded = isExpanded,
+				onDismissRequest = {
+					isExpanded = false
+				}
+			) {
+
+				avaliableDates.forEach{ selectionOption  ->
+					DropdownMenuItem(onClick = {
+						val selected = show.dates.find { it.date == selectionOption }
+						selected?.let {
+							showDate = selectionOption
+							onDateSelected(it)
+							isExpanded = false
+						}
+					}) {
+						Text(
+							text = selectionOption,
+							fontSize = androidx.compose.material.MaterialTheme.typography.subtitle1.fontSize,
+							fontWeight = if (showDate == selectionOption) FontWeight.Black else FontWeight.Light,
+							fontFamily = marcherFontFamily
+						)
+					}
+				}
+			}
+		}
+
+		// Decrement button
+		Row(
+			horizontalArrangement = Arrangement.SpaceAround,
+		) {
+			TextButton(
+				onClick = {
+					if (quantity > 0) {
+						setQuantity(quantity - 1)
+						onDecrement()
+					}
+				},
+			) {
+				Icon(
+					imageVector = Icons.Filled.HorizontalRule,
+					contentDescription = null,
+					tint = Color.White,
+					modifier = Modifier.size(15.dp)
+				)
+			}
+
+			// Quantity
+			Text(
+				text = quantity.toString(),
+				style = TextStyle(
+					fontFamily = marcherFontFamily,
+					fontWeight = FontWeight.Bold,
+					fontSize = 16.sp
+				)
+			)
+
+
+			// Increment button
+			IconButton(
+				onClick = {
+					if (quantity < 4) {
+						setQuantity(quantity + 1)
+						onIncrement()
+					}
+				},
+			) {
+				Icon(
+					imageVector = Icons.Filled.Add,
+					contentDescription = null,
+					tint = Color.White,
+					modifier = Modifier.size(18.dp)
+				)
+			}
+		}
+	}
+
+}
+
+@Composable
+fun MyFloatingActionButton(onSubmit: () -> Unit)
 {
 	ExtendedFloatingActionButton(
 		text = {
@@ -182,7 +363,7 @@ fun MyFloatingActionButton()
 		},
 		containerColor = MyColors.tertiaryColor,
 		shape = RoundedCornerShape(50.dp),
-		onClick = { /*TODO*/ },
+		onClick = { onSubmit() },
 	)
 }
 

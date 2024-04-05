@@ -4,7 +4,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 data class Show (
-	val dates: JSONArray,
+	val duration: Int,
+	val releasedate: String,
+	val dates: List<Date>,
 	val description: String,
 	val name: String,
 	val picture: String,
@@ -17,14 +19,32 @@ data class Show (
 	}
 }
 
+data class Date (
+	val date: String,
+	val showdateid: Int
+)
+
+fun parseDate (jsonObject: JSONObject): Date {
+	return Date(
+			jsonObject.getString("date"),
+			jsonObject.getInt("showdateid")
+	)
+}
+
 fun parseShow (jsonObject: JSONObject): Show {
 	return Show(
-			jsonObject.getJSONArray("dates"),
+			jsonObject.getInt("duration"),
+			jsonObject.getString("releasedate"),
+			jsonObject.getJSONArray("dates").let {
+				List(it.length()) { i ->
+					parseDate(it.getJSONObject(i))
+				}
+			},
 			jsonObject.getString("description"),
 			jsonObject.getString("name"),
 			jsonObject.getString("picture"),
 			jsonObject.getString("picture_b64"),
 			jsonObject.getInt("price"),
-			jsonObject.getInt("showid"),
+			jsonObject.getInt("showid")
 	)
 }

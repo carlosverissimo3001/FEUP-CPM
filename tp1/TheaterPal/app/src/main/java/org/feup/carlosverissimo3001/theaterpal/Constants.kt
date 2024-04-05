@@ -3,7 +3,6 @@ package org.feup.carlosverissimo3001.theaterpal
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
@@ -21,8 +20,8 @@ object Crypto {
 }
 
 object Server {
-//    const val URL = "https://16b2-193-136-33-100.ngrok-free.app"
-    const val URL = "https://wrongly-in-pug.ngrok-free.app"
+    const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+    // const val URL = "https://wrongly-in-pug.ngrok-free.app"
 }
 
 object MyColors
