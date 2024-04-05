@@ -32,147 +32,118 @@ import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.OrdersTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastOrders
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTickets
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.TicketsTab
 
 @Composable
 fun Wallet(ctx: Context) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val ticketsState = remember { mutableStateOf(emptyList<Ticket>()) }
     val areTicketsLoaded = remember { mutableStateOf(false) }
-    val viewingPastTickets = remember { mutableStateOf(false) }
-    val viewingPastOrders = remember { mutableStateOf(false) }
+
+    var ticketsState by remember { mutableStateOf(emptyList<Ticket>()) }
+    var filteredTickets by remember { mutableStateOf(emptyList<Ticket>()) }
 
     LaunchedEffect(Unit) {
         getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
-            ticketsState.value = tickets
+            ticketsState = tickets
             areTicketsLoaded.value = true
+            filteredTickets = tickets.filter { !it.isUsed}
         }
     }
 
-    // Do the same for cafeteria orders
-
-    val ticketArray = ticketsState.value
-    val usedTicketArray = ticketArray.filter { it.isUsed }
-    val unusedTicketArray = ticketArray.filter { !it.isUsed }
-
     // unusedTicketArray = groupTickets(unusedTicketArray)
 
-    // Is not viewing past tickets or past orders
-    if (!viewingPastTickets.value && !viewingPastOrders.value) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Tab(
-                    selected = selectedTabIndex == 0,
-                    onClick = { selectedTabIndex = 0 },
-                    text = { Text("Tickets",
-                        style = TextStyle(
-                            fontFamily = marcherFontFamily,
-                            color = Color.White,
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontWeight = (selectedTabIndex == 0).let {
-                                if (it) FontWeight.Bold else FontWeight.Normal
-                            }
-                        )
-                    )}
-                )
-                Tab(
-                    selected = selectedTabIndex == 1,
-                    onClick = { selectedTabIndex = 1 },
-                    text = { Text("Cafeteria Orders", style =
-                        TextStyle(
-                            fontFamily = marcherFontFamily,
-                            color = Color.White,
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontWeight = (selectedTabIndex == 1).let {
-                                if (it) FontWeight.Bold else FontWeight.Normal
-                            }
-                        )
-                    )}
-                )
-            }
+    Column(modifier = Modifier.fillMaxSize()) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.primary,
+        ) {
+            Tab(
+                selected = selectedTabIndex == 0,
+                onClick = { selectedTabIndex = 0 },
+                text = { Text("Tickets",
+                    style = TextStyle(
+                        fontFamily = marcherFontFamily,
+                        color = Color.White,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontWeight = (selectedTabIndex == 0).let {
+                            if (it) FontWeight.Bold else FontWeight.Normal
+                        }
+                    )
+                )}
+            )
+            Tab(
+                selected = selectedTabIndex == 1,
+                onClick = { selectedTabIndex = 1 },
+                text = { Text("Cafeteria Orders", style =
+                    TextStyle(
+                        fontFamily = marcherFontFamily,
+                        color = Color.White,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontWeight = (selectedTabIndex == 1).let {
+                            if (it) FontWeight.Bold else FontWeight.Normal
+                        }
+                    )
+                )}
+            )
+        }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        // Handle swipe gestures to change tabs
-                        detectHorizontalDragGestures { change, dragAmount ->
-                            if (dragAmount > 30) {
-                                selectedTabIndex = 0
-                            } else if (dragAmount < -30) {
-                                selectedTabIndex = 1
-                            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    // Handle swipe gestures to change tabs
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (dragAmount > 30) {
+                            selectedTabIndex = 0
+                        } else if (dragAmount < -30) {
+                            selectedTabIndex = 1
                         }
-                    }
-            ) {
-                if (selectedTabIndex == 0) {
-                    // Hasn't loaded, display loading spinner
-                    if (!areTicketsLoaded.value) {
-                        LoadingSpinner()
-                    } else if (unusedTicketArray.isEmpty()) {
-                        // Display no tickets
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                "No tickets available", style = TextStyle(
-                                    fontFamily = marcherFontFamily,
-                                    color = Color.White,
-                                    fontSize = MaterialTheme.typography.titleMedium.fontSize
-                                )
-                            )
-                        }
-                    } else {
-                        // Display tickets
-                        // Use the ticket fragment to display the tickets
-                        TicketsTab(
-                            ctx = ctx,
-                            tickets = unusedTicketArray,
-                            onViewPastTicketsClick = {
-                                viewingPastTickets.value = true
-                            })
                     }
                 }
-                else if (selectedTabIndex == 1) {
-                    OrdersTab(ctx = ctx, onViewPastOrdersClick = {
-                        viewingPastOrders.value = true
+        ) {
+            if (selectedTabIndex == 0) {
+                // Hasn't loaded, display loading spinner
+                if (!areTicketsLoaded.value) {
+                    LoadingSpinner()
+                } else if (ticketsState.isEmpty()) {
+                    // Display no tickets
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            "No tickets available", style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                color = Color.White,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
+                            )
+                        )
+                    }
+                } else {
+                    // Display tickets
+                    // Use the ticket fragment to display the tickets
+                    TicketsTab(
+                        ctx = ctx,
+                        tickets = filteredTickets,
+                        onFilterChanged = { isChecked ->
+                            // if checked, shows only active vouchers, else shows all vouchers
+                            filteredTickets = if (isChecked) {
+                                ticketsState.filter { !it.isUsed }
+                            } else {
+                                ticketsState
+                            }
                         }
                     )
                 }
             }
-        }
-    }
-
-    // is viewing past tickets
-    else if (viewingPastTickets.value) {
-        AnimatedVisibility(
-            visible = viewingPastTickets.value,
-            enter = slideInVertically { it },
-        ) {
-            PastTickets(ctx = ctx, pastTickets = usedTicketArray, onBackButtonClick = {
-                viewingPastTickets.value = false
-            })
-        }
-    }
-
-    // is viewing past orders
-    else if (viewingPastOrders.value) {
-        // Display past orders
-        AnimatedVisibility(
-            visible = viewingPastOrders.value,
-            enter = slideInVertically { it },
-        ) {
-            PastOrders(ctx = ctx, /*pastTickets = usedTicketArray, */onBackButtonClick = {
-                viewingPastOrders.value = false
-            })
+            else if (selectedTabIndex == 1) {
+                OrdersTab(
+                    ctx = ctx,
+                    onFilterChanged = {/*TODO*/}
+                )
+            }
         }
     }
 }

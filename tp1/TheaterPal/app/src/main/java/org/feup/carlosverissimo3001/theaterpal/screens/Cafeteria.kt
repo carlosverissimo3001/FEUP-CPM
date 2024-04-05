@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,35 +26,35 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
+import org.feup.carlosverissimo3001.theaterpal.api.sumbitOrder
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
+import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
+import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.PastVouchers
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.PastTickets
 
 @Composable
 fun Cafeteria(ctx: Context) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val areVouchersLoaded = remember { mutableStateOf(false) }
+    var isChoosingVoucher by remember { mutableStateOf(false) }
 
-    var vouchersState = remember { mutableStateOf(emptyList<Voucher>()) }
-    var areVouchersLoaded = remember { mutableStateOf(false) }
+    var vouchersState by remember { mutableStateOf(emptyList<Voucher>()) }
+    var filteredVouchers by remember { mutableStateOf(emptyList<Voucher>()) }
 
-    val viewingPastVouchers = remember { mutableStateOf(false) }
+    var barOrder by remember { mutableStateOf<BarOrder?>(null) }
 
     LaunchedEffect(Unit) {
         getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
-            vouchersState.value = vouchers
+            vouchersState = vouchers
             areVouchersLoaded.value = true
+            filteredVouchers = vouchers.filter { !it.isUsed }
         }
     }
 
-    val vouchersArray = vouchersState.value
-    val usedVouchersArray = vouchersArray.filter { it.isUsed }
-    val unusedVouchersArray = vouchersArray.filter { !it.isUsed }
-
-    if (!viewingPastVouchers.value) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -96,42 +97,97 @@ fun Cafeteria(ctx: Context) {
             )
         }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        // Handle swipe gestures to change tabs
-                        detectHorizontalDragGestures { change, dragAmount ->
-                            if (dragAmount > 30) {
-                                selectedTabIndex = 0
-                            } else if (dragAmount < -30) {
-                                selectedTabIndex = 1
-                            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    // Handle swipe gestures to change tabs
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        if (dragAmount > 30) {
+                            selectedTabIndex = 0
+                        } else if (dragAmount < -30) {
+                            selectedTabIndex = 1
                         }
                     }
-            ) {
-                if (selectedTabIndex == 0) {
-                    BarTab(ctx)
-                } else {
+                }
+        ) {
+            if (selectedTabIndex == 0) {
+                isChoosingVoucher = false
+                BarTab(
+                    ctx,
+                    onNextStepClick = { order ->
+                        // Navigate to next step
+                        barOrder = order
+                        isChoosingVoucher = true
+                        selectedTabIndex = 1
+                    },
+                )
+            } else {
+                if (!areVouchersLoaded.value) {
+                    LoadingSpinner()
+                }
+                // No vouchers
+                else if (vouchersState.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("No vouchers available",
+                            style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                color = Color.White,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+                else {
                     VouchersTab(
-                        ctx = ctx,
-                        vouchers = unusedVouchersArray,
-                        onViewPastVouchersClick = {
-                            viewingPastVouchers.value = true
+                        ctx,
+                        vouchers = if (isChoosingVoucher) vouchersState.filter { !it.isUsed } else filteredVouchers,
+                        onFilterChanged = { isChecked ->
+                            // if checked, shows only active vouchers, else shows all vouchers
+                            filteredVouchers = if (isChecked) {
+                                vouchersState.filter { !it.isUsed }
+                            } else {
+                                vouchersState
+                            }
                         },
+                        isChoosingVoucher,
+                        onSubmitted = { selectedVouchers, updatedTotal ->
+                            // update total, user might have selected vouchers for discount
+                            setTotal(barOrder!!, updatedTotal)
+
+                            val order = barOrder?.let {
+                                Order(
+                                    barOrder = it,
+                                    vouchersUsed = selectedVouchers
+                                )
+                            }
+
+                            sendOrder(ctx, order!!)
+
+                            // Navigate to next step
+                            isChoosingVoucher = false
+                            selectedTabIndex = 0
+                        },
+                        total = barOrder?.total ?: 0.0
                     )
                 }
             }
         }
     }
-    else {
-        AnimatedVisibility(
-            visible = viewingPastVouchers.value,
-            enter = slideInVertically { it },
-        ) {
-            PastVouchers(ctx = ctx, pastVouchers = usedVouchersArray, onBackButtonClick = {
-                viewingPastVouchers.value = false
-            })
+}
+
+fun sendOrder(ctx: Context, order: Order) {
+    // API Request to send order
+    sumbitOrder(ctx, order) { success ->
+        if (success) {
+            println("Order sent successfully")
+        } else {
+            println("Error sending order")
         }
     }
 }

@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,12 +34,33 @@ import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 
 @Composable
-fun TicketsTab(ctx: Context, tickets: List<Ticket>, onViewPastTicketsClick: () -> Unit) {
+fun TicketsTab(
+    ctx: Context,
+    tickets: List<Ticket>,
+    onFilterChanged: (Boolean) -> Unit
+) {
+    val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = {
+                    setFilterChecked(it)
+                    onFilterChanged(it)
+                },
+            )
+            Text(text = "View only active tickets", style = TextStyle(
+                fontFamily = marcherFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize
+            ))
+        }
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             contentPadding = PaddingValues(10.dp)
@@ -49,39 +73,6 @@ fun TicketsTab(ctx: Context, tickets: List<Ticket>, onViewPastTicketsClick: () -
                 Ticket(
                     ticket = tickets[index],
                     image = bitmap
-                )
-            }
-        }
-    }
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        FloatingActionButton(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .padding(8.dp),
-            onClick = { onViewPastTicketsClick()}
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.tickets_icon),
-                    contentDescription = "View Used Tickets",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .padding(end = 8.dp)
-                )
-                Text(
-                    text = "View Used Tickets",
-                    style = TextStyle(
-                        fontFamily = marcherFontFamily,
-                        color = Color.White,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontWeight = FontWeight.Bold
-                    )
                 )
             }
         }

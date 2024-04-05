@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import org.feup.carlosverissimo3001.theaterpal.ParseIsUsed
 import org.feup.carlosverissimo3001.theaterpal.R
 import org.feup.carlosverissimo3001.theaterpal.formatDate
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
@@ -108,25 +109,50 @@ fun Ticket(ticket: Ticket, image: Bitmap?) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Casa da Música",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        fontFamily = marcherFontFamily
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Casa da Música",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontFamily = marcherFontFamily
+                        )
                     )
-                )
+                    ParseIsUsed(ticket.isUsed)
+                }
+
+
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                Text(
-                    text = "Sala VIP · ${ticket.seat}",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        fontFamily = marcherFontFamily
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Text(
+                        text = "Sala VIP · ${ticket.seat}",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontFamily = marcherFontFamily
+                        )
                     )
-                )
+                    Text(
+                        text = "ID: ${ticket.ticketids[0].substring(0,8)}...",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                            fontFamily = marcherFontFamily
+                        )
+                    )
+                }
+
+
 
             }
             Column(
