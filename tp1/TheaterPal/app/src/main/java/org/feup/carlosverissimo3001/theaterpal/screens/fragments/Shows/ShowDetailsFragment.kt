@@ -6,17 +6,24 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -42,23 +49,36 @@ fun ShowDetails(ctx: Context, navController: NavController) {
 	val show: Show? = navController.previousBackStackEntry?.savedStateHandle?.get("show")
 	val bitmap: Bitmap? = navController.previousBackStackEntry?.savedStateHandle?.get("bitmap")
 	if (show != null && bitmap != null)
-		ShowDetailsScreen(ctx, show, bitmap)
+		ShowDetailsScreen(ctx, show, bitmap, navController)
 
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap) {
+fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: NavController) {
 	Scaffold (
-		bottomBar = {},
 		floatingActionButton = {MyFloatingActionButton()},
 		floatingActionButtonPosition = FabPosition.Center,
+		topBar = {
+			GoBackButton(navController)
+		}
 	) {
+
 		LazyColumn {
 			item {
-				ShowImage(bitmap)
+				ShowImage(bitmap, navController)
+			}
+			item{
 				ShowName(show)
+			}
+			item {
 				ShowDescription(show)
+			}
+			item {
+				Spacer(
+					modifier = Modifier
+						.size(48.dp)
+				)
 			}
 		}
 	}
@@ -66,7 +86,7 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap) {
 }
 
 @Composable
-fun ShowImage(bitmap: Bitmap) {
+fun ShowImage(bitmap: Bitmap, navController: NavController) {
 	Box(
 		modifier = Modifier
 			.aspectRatio(0.8f)
@@ -164,5 +184,27 @@ fun MyFloatingActionButton()
 		shape = RoundedCornerShape(50.dp),
 		onClick = { /*TODO*/ },
 	)
+}
+
+@Composable
+fun GoBackButton(navController : NavController){
+	FilledIconButton(
+		onClick = { navController.popBackStack() },
+		shape = RoundedCornerShape(50.dp),
+		colors = IconButtonColors(
+			containerColor = Color(0x22FFFFFF),
+			contentColor = Color.White,
+			disabledContainerColor = Color.White,
+			disabledContentColor = Color.White
+		),
+		modifier = Modifier.padding(16.dp)
+	){
+		Icon(
+			imageVector = Icons.Filled.ArrowBackIosNew,
+			contentDescription = null,
+			tint = Color.White,
+			modifier = Modifier.size(24.dp)
+		)
+	}
 }
 
