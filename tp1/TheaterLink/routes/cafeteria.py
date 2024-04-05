@@ -48,9 +48,25 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
     @cafeteria_page.route('/orders', methods=['GET'])
     def get_user_orders():
         user_id = request.args.get('user_id')
-        """ orders = crud_ops.get_user_orders(dbConn, user_id) """
 
-        return jsonify({'message': 'Orders retrieved successfully!', 'orders': []}), 200
+        orders = build_user_orders(user_id)
+
+        print(f"Orders: {orders}")
+
+        return jsonify({'message': 'Orders retrieved successfully!', 'orders': orders }), 200
+
+
+    def build_user_orders(user_id):
+        ## GET CAFETERIA TRANSACTIONS ##
+        caft_transactions = crud_ops.get_cafeteria_transactions(dbConn, user_id)
+
+        print(f"Transactions: {caft_transactions}")
+
+        for transaction in caft_transactions:
+            transaction["items"] = crud_ops.get_cafeteria_order_items(dbConn, transaction["order_id"])
+            transaction["vouchers"] = len(crud_ops.get_vouchers_used(dbConn, transaction["transaction_id"]))
+
+        return caft_transactions
 
     def mark_voucher_as_used(voucher_id):
         crud_ops.mark_voucher_as_used(dbConn, voucher_id)

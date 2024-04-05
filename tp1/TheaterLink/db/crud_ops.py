@@ -543,4 +543,111 @@ def set_voucher_used_transaction(conn: psycopg2.extensions.connection, voucher_i
         conn.rollback()
         return None
 
+def get_cafeteria_transactions(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get all cafeteria transactions for a user
 
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: list of tuples
+    """
+
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+
+            SELECT json_build_object(
+                'transaction_id', transactions.transactionid,
+                'total', total,
+                'order_id', cafeteriatransactions.redundantorderid,
+                'order_number', cafeteriatransactions.ordernumber
+            )
+            from transactions join cafeteriatransactions on transactions.transactionid = cafeteriatransactions.transactionid
+            WHERE userid = %s AND transactiontype = 'CAFETERIA_ORDER'
+        ''', (user_id,)
+        )
+        conn.commit()
+
+        rows = cur.fetchall()
+
+    except psycopg2.Error as e:
+        print("Error getting user orders: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
+
+def get_cafeteria_order_items(conn: psycopg2.extensions.connection, order_id: str):
+    """
+    Get all items for a cafeteria order
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str order_id: order's id
+
+    :return: list of tuples
+    """
+
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+
+            SELECT json_build_object(
+                'item_name', itemname,
+                'price', price,
+                'quantity', quantity
+            )
+            from cafeteriaorderitem
+            WHERE cafeteriatransactionid = %s
+        ''', (order_id,)
+        )
+        conn.commit()
+
+        rows = cur.fetchall()
+
+    except psycopg2.Error as e:
+        print("Error getting user orders: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
+
+def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str):
+    """
+    Get all vouchers used in a transaction
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str voucher_id: voucher's id
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT * FROM vouchers WHERE transactionidused = %s
+        ''', (transaction_id,))
+        conn.commit()
+
+        rows = cur.fetchall()
+
+    except psycopg2.Error as e:
+        print("Error getting voucher used transaction: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
