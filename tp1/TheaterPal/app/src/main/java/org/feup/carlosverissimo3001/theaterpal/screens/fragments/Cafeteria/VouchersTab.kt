@@ -94,13 +94,26 @@ fun VouchersTab(
                     )
                 }
                 else {
-                    Text(
-                        text = "Please select up to 2 vouchers", style = TextStyle(
-                            fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize
+                    if (vouchers.isNotEmpty()) {
+                        Text(
+                            text = "Please select up to 2 vouchers", style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
+                            )
                         )
-                    )
+                    }
+                    else {
+                        Text(
+                            text = "No vouchers available :(",
+                            style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                color = Color.White
+                            )
+                        )
+                    }
                 }
             }
 

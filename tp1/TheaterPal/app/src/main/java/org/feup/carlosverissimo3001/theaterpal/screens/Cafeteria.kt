@@ -131,7 +131,7 @@ fun Cafeteria(ctx: Context) {
                     LoadingSpinner()
                 }
                 // No vouchers
-                else if (vouchersState.isEmpty()) {
+                /*else if (vouchersState.isEmpty()) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -146,7 +146,7 @@ fun Cafeteria(ctx: Context) {
                             )
                         )
                     }
-                }
+                }*/
 
                 else {
                     VouchersTab(
@@ -177,7 +177,7 @@ fun Cafeteria(ctx: Context) {
 
                             // TODO : Activate NFC
                             // On nfc read, the line below should be run
-                            sendOrder(ctx, order!!)
+                            /*sendOrder(ctx, order!!)*/
 
                             // Navigate to next step
                             /*isChoosingVoucher = false

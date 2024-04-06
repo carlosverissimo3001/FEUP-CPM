@@ -61,7 +61,8 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
 
         # give a 5% discount every 200 dollars spent
-        num_vouchers_added = total_cost // 200
+        num_vouchers_added = round(total_cost // 200)
+
         for _ in range(num_vouchers_added):
             vc_type = VOUCHER_TYPE[0]
             voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type, trans_id)

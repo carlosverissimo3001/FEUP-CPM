@@ -182,10 +182,7 @@ fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
                 200 -> {
                     val responseBody = response.body?.string()
                     val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val orders = jsonResponse?.getJSONArray("orders")
-
-                    if (orders == null)
-                        return
+                    val orders = jsonResponse?.getJSONArray("orders") ?: return
 
                     val ordersList = mutableListOf<OrderRcv>()
                     for (i in 0 until orders.length()) {

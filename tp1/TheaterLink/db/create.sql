@@ -45,7 +45,7 @@ CREATE TABLE Transactions (
     TransactionID UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- Unique identifier for the transaction
     TransactionType transaction_type NOT NULL,                 -- Type of transaction
     UserID UUID REFERENCES Users(UserID),                      -- User that made the transaction
-    Total INT NOT NULL                              -- Total amount of the transaction
+    Total DECIMAL(10, 2) NOT NULL                         -- Total amount of the transaction
 );
 
 -- Ticket Transaction Table
@@ -67,9 +67,8 @@ CREATE TABLE CafeteriaTransactions (
 CREATE TABLE CafeteriaOrderItem (
     CafeteriaTransactionID UUID REFERENCES CafeteriaTransactions(RedundantOrderID), -- Cafeteria order that generated the item
     ItemName VARCHAR(255) NOT NULL,                            -- Name of the item
-    Price INT NOT NULL,
-    Duration INT NOT NULL, -- Duration in minutes
-    ReleaseDate DATE NOT NULL
+    Quantity INT NOT NULL,                                     -- Quantity of the item
+    Price DECIMAL(10, 2) NOT NULL                           -- Price of the item
 );
 
 

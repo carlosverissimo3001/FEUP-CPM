@@ -32,7 +32,7 @@ data class OrderRcv(
     var items   : List<OrderRcvItem>,
     var order_id: String,
     var order_number: Int,
-    var total   : Int,
+    var total   : Double,
     var transaction_id: String,
     var vouchers_used_cnt: Int,
     var state: String = "Preparing"
@@ -40,14 +40,14 @@ data class OrderRcv(
 
 data class OrderRcvItem(
     var item_name: String,
-    var price    : Int,
+    var price    : Double,
     var quantity : Int
 )
 
 fun parseOrderRcvItem(json: JSONObject): OrderRcvItem {
     return OrderRcvItem(
         json.getString("item_name"),
-        json.getInt("price"),
+        json.getDouble("price"),
         json.getInt("quantity")
     )
 }
@@ -63,7 +63,7 @@ fun parseOrderRcv(json: JSONObject): OrderRcv {
         items,
         json.getString("order_id"),
         json.getInt("order_number"),
-        json.getInt("total"),
+        json.getDouble("total"),
         json.getString("transaction_id"),
         json.getInt("vouchers"),
         states.random()

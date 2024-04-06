@@ -14,7 +14,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
 
 ## HANDLER FUNCTIONS ##
-def put_transaction(transaction_type: str, user_id, total_cost: float):
+def put_transaction(transaction_type: str, user_id, total_cost):
     '''
     Top-level handler for transactions
 

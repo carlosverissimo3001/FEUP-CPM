@@ -13,6 +13,8 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
     def submit_order():
         data = request.get_json()
 
+        print("DATA: ", data)
+
         vouchers_used = data['vouchers_used']
         user_id = data['user_id']
         order = data['order']
@@ -28,16 +30,16 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
             # set in which transaction the vouchers were used
             crud_ops.set_voucher_used_transaction(dbConn, vouchers_used[i], transaction_id)
 
+        num_vouchers_to_create = round(total // 200)
+
 
         # if the total cost is greater than 200, give a 5% discount
-        if total >= 200:
+        for _ in range(num_vouchers_to_create):
             vc_type = VOUCHER_TYPE[0]
             voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type, transaction_id)
 
             if voucher_row is None:
                 return jsonify({'message': 'Error purchasing tickets! Error creating voucher!'})
-
-            """ voucher_data.append(voucher_row[0]) """
 
         ## HANDLE CAFETERIA ORDER ##
         order_no =  transactions.handle_cafeteria_order(transaction_id, order)

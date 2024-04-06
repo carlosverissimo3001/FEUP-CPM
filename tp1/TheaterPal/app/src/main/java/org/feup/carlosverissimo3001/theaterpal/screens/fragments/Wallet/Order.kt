@@ -46,6 +46,7 @@ import org.feup.carlosverissimo3001.theaterpal.formatDate
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.formatPrice
 
 @Composable
 fun Order(order: OrderRcv, ctx: Context) {
@@ -121,7 +122,7 @@ fun Order(order: OrderRcv, ctx: Context) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Total : ${order.total}€",
+                        text = "Total : ${formatPrice(order.total)}",
                         style = TextStyle(
                             color = Color.LightGray,
                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,

@@ -408,14 +408,14 @@ def get_user_vouchers(conn: psycopg2.extensions.connection, user_id: str):
 
     return data
 
-def create_transaction(conn: psycopg2.extensions.connection, user_id: str, transaction_type: str, total_cost: float):
+def create_transaction(conn: psycopg2.extensions.connection, user_id: str, transaction_type: str, total_cost):
     """
     Create a transaction
 
     :param psycopg2.extensions.connection conn: connection to the database
     :param str type: transaction's type
     :param str user_id: user's id
-    :param float total_cost: total cost of the transaction
+    :param total_cost: total cost of the transaction
 
     :return: tuple
     """
