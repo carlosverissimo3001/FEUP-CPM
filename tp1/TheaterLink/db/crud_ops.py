@@ -343,16 +343,19 @@ def mark_voucher_as_used(conn: psycopg2.extensions.connection, voucher_id: int):
 
     try:
         cur.execute('''
-            UPDATE vouchers SET isUsed = TRUE WHERE voucherid = %s
+            UPDATE vouchers
+            SET isUsed = TRUE
+            WHERE voucherid = %s
+            RETURNING *
         ''', (voucher_id,))
         conn.commit()
 
-        return True
+        return cur.fetchone()
 
     except psycopg2.Error as e:
         print("Error marking voucher as used: ", e)
         conn.rollback() # Rollback the transaction
-        return False
+        return None
 
 def mark_ticket_as_used(conn: psycopg2.extensions.connection, ticket_id: int):
     """
@@ -635,9 +638,11 @@ def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str)
 
     try:
         cur.execute('''
-            SELECT * FROM vouchers WHERE transactionidused = %s
+            SELECT json_build_object(
+                'voucherid', voucherid,
+                'vouchertype', vouchertype
+            ) FROM vouchers WHERE transactionidused = %s
         ''', (transaction_id,))
-        conn.commit()
 
         rows = cur.fetchall()
 
@@ -651,3 +656,4 @@ def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str)
         data.append(row[0])
 
     return data
+

@@ -23,9 +23,11 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         for i in range(len(vouchers_used)):
             # mark vouchers as used
-            mark_voucher_as_used(vouchers_used[i])
+            crud_ops.mark_voucher_as_used(dbConn, vouchers_used[i])
+
             # set in which transaction the vouchers were used
             crud_ops.set_voucher_used_transaction(dbConn, vouchers_used[i], transaction_id)
+
 
         # if the total cost is greater than 200, give a 5% discount
         if total >= 200:
@@ -51,8 +53,6 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         orders = build_user_orders(user_id)
 
-        print(f"Orders: {orders}")
-
         return jsonify({'message': 'Orders retrieved successfully!', 'orders': orders }), 200
 
 
@@ -60,15 +60,19 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         ## GET CAFETERIA TRANSACTIONS ##
         caft_transactions = crud_ops.get_cafeteria_transactions(dbConn, user_id)
 
-        print(f"Transactions: {caft_transactions}")
-
         for transaction in caft_transactions:
             transaction["items"] = crud_ops.get_cafeteria_order_items(dbConn, transaction["order_id"])
-            transaction["vouchers"] = len(crud_ops.get_vouchers_used(dbConn, transaction["transaction_id"]))
+            transaction["vouchers"] = crud_ops.get_vouchers_used(dbConn, transaction["transaction_id"])
+
+            for voucher in transaction["vouchers"]:
+                ## free coffee
+                if voucher["vouchertype"] == VOUCHER_TYPE[1]:
+                    transaction["items"].append({"item_name": "Free Coffee", "price": 0, "quantity": 1})
+                elif voucher["vouchertype"] == VOUCHER_TYPE[2]:
+                    transaction["items"].append({"item_name": "Free Popcorn", "price": 0, "quantity": 1})
+
+            transaction["vouchers"] = len(transaction["vouchers"])
 
         return caft_transactions
-
-    def mark_voucher_as_used(voucher_id):
-        crud_ops.mark_voucher_as_used(dbConn, voucher_id)
 
     return cafeteria_page

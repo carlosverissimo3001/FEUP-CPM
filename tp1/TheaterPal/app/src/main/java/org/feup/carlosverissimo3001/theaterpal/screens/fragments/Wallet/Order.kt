@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.ParseIsUsed
@@ -48,6 +50,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 @Composable
 fun Order(order: OrderRcv, ctx: Context) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .padding(10.dp)
             .background(
@@ -67,7 +70,7 @@ fun Order(order: OrderRcv, ctx: Context) {
             Column(
                 modifier = Modifier
                     .padding(12.dp)
-                    .fillMaxWidth(0.65f)
+                    .fillMaxWidth(0.62f)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -94,12 +97,14 @@ fun Order(order: OrderRcv, ctx: Context) {
                             fontFamily = marcherFontFamily
                         )
                     )
+
+                    Spacer(modifier = Modifier.height(6.dp))
                 }
 
                 // only when state is preparing or ready
                 if (order.state == "Preparing" || order.state == "Ready") {
                     Text(
-                        text = "(Please look for your order number in the caferia screen)",
+                        text = "(Please look for your order number in the cafeteria screen)",
                         style = TextStyle(
                             color = Color.LightGray,
                             fontSize = MaterialTheme.typography.bodySmall.fontSize,
@@ -130,29 +135,23 @@ fun Order(order: OrderRcv, ctx: Context) {
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                Row (
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ){
-                    Text(
-                        text = "You used " + order.vouchers_used_cnt.toString() + (if (order.vouchers_used_cnt != 1 ) " vouchers" else " voucher") + " in this order",
-                        style = TextStyle(
-                            color = Color.LightGray,
-                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                            fontFamily = marcherFontFamily
-                        )
+                Text(
+                    text = "You used " + order.vouchers_used_cnt.toString() + (if (order.vouchers_used_cnt != 1 ) " vouchers" else " voucher") + " in this order",
+                    style = TextStyle(
+                        color = Color.LightGray,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontFamily = marcherFontFamily
                     )
-                }
+                )
             }
 
             /*VerticalDivider(
                 color = Color.LightGray,
                 thickness = 1.dp,
                 modifier = Modifier
-                    .height(100.dp)
-            )
-*/
+                    .height(130.dp)
+            )*/
+
             Column(
                 modifier = Modifier
                     .padding(12.dp)
@@ -175,7 +174,7 @@ fun Order(order: OrderRcv, ctx: Context) {
                         text = "${item.quantity} x ${item.item_name}",
                         style = TextStyle(
                             color = Color.White,
-                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize,
                             fontFamily = marcherFontFamily
                         )
                     )
