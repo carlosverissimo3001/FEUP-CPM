@@ -27,9 +27,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTickets
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.OrdersTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.TicketsTab
@@ -42,13 +44,22 @@ fun Wallet(ctx: Context) {
     var ticketsState by remember { mutableStateOf(emptyList<Ticket>()) }
     var filteredTickets by remember { mutableStateOf(emptyList<Ticket>()) }
 
+    var ordersState by remember { mutableStateOf(emptyList<OrderRcv>()) }
+    var areOrdersLoaded = remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
             ticketsState = tickets
             areTicketsLoaded.value = true
             filteredTickets = tickets.filter { !it.isUsed}
         }
+
+        getUserOrders(user_id = Authentication(ctx).getUserID()) { orders ->
+            ordersState = orders
+            areOrdersLoaded.value = true
+        }
     }
+
 
     // unusedTicketArray = groupTickets(unusedTicketArray)
 
@@ -139,10 +150,14 @@ fun Wallet(ctx: Context) {
                 }
             }
             else if (selectedTabIndex == 1) {
-                OrdersTab(
-                    ctx = ctx,
-                    onFilterChanged = {/*TODO*/}
-                )
+                if (!areOrdersLoaded.value)
+                    LoadingSpinner()
+                else{
+                    OrdersTab(
+                        ctx = ctx,
+                        orders = ordersState
+                    )
+                }
             }
         }
     }

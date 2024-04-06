@@ -106,3 +106,23 @@ fun ParseIsUsed (isUsed: Boolean) {
             )
         )
 }
+
+@Composable
+fun ParseOrderState(state: String) {
+    val states = arrayOf("Collected", "Preparing", "Ready", "Delivered")
+
+    return Text(
+        text = state,
+        style = TextStyle(
+            color = when (state) {
+                "Collected" -> Color.Green
+                "Preparing" -> Color.Yellow
+                "Ready" -> Color.Cyan
+                "Delivered" -> Color.Red
+                else -> Color.White
+            },
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontFamily = marcherFontFamily
+        )
+    )
+}

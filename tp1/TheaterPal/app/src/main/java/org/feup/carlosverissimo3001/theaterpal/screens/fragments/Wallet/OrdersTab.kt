@@ -31,49 +31,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 
 @Composable
 fun OrdersTab(
     ctx: Context,
-    /*orders: List<Order>,*/
-    onFilterChanged: (Boolean) -> Unit
+    orders: List<OrderRcv>,
 ){
-    val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        /*Row (
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = {
-                    setFilterChecked(it)
-                    onFilterChanged(it)
-                },
-            )
-            Text(text = "View only active orders", style = TextStyle(
-                fontFamily = marcherFontFamily,
-                fontWeight = FontWeight.Bold,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize
-            ))
-        }*/
-        /*LazyVerticalGrid(
+        LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             contentPadding = PaddingValues(10.dp)
         ) {
-            items(tickets.size) { index ->
+            items(orders.size) { index ->
                 // Display ticket
                 // Use the ticket fragment to display the ticket
-                val imagePath = tickets[index].imagePath
-                val bitmap: Bitmap? = loadImageFromCache(imagePath, ctx)
-                Ticket(
-                    ticket = tickets[index],
-                    image = bitmap
+                Order(
+                    order = orders[index],
+                    ctx = ctx
                 )
             }
-        }*/
+        }
     }
 }

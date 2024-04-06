@@ -10,10 +10,12 @@ import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
 import org.feup.carlosverissimo3001.theaterpal.models.Order
+import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.models.parseShow
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
+import org.feup.carlosverissimo3001.theaterpal.models.parseOrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.parseTicket
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucher
 import org.json.JSONArray
@@ -155,6 +157,47 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
                 }
                 else -> {
                     print("Error getting shows")
+                }
+            }
+        }
+    })
+}
+
+fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
+    val client = OkHttpClient()
+
+    val request = okhttp3.Request.Builder()
+        .url("${Server.URL}/orders?user_id=$user_id")
+        .get()
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(emptyList())
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val orders = jsonResponse?.getJSONArray("orders")
+
+                    if (orders == null)
+                        return
+
+                    val ordersList = mutableListOf<OrderRcv>()
+                    for (i in 0 until orders.length()) {
+                        val order = orders.getJSONObject(i)
+
+                        ordersList.add(parseOrderRcv(order))
+                    }
+
+                    callback(ordersList)
+                }
+                else -> {
+                    print("Error getting orders")
                 }
             }
         }
