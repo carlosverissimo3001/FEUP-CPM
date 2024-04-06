@@ -27,17 +27,20 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTickets
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.NoOrders
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.NoTickets
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.OrdersTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.TicketsTab
 
 @Composable
-fun Wallet(ctx: Context) {
+fun Wallet(ctx: Context, navController: NavController) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val areTicketsLoaded = remember { mutableStateOf(false) }
 
@@ -118,20 +121,11 @@ fun Wallet(ctx: Context) {
                 if (!areTicketsLoaded.value) {
                     LoadingSpinner()
                 } else if (ticketsState.isEmpty()) {
-                    // Display no tickets
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "No tickets available", style = TextStyle(
-                                fontFamily = marcherFontFamily,
-                                color = Color.White,
-                                fontSize = MaterialTheme.typography.titleMedium.fontSize
-                            )
-                        )
-                    }
+                    NoTickets(
+                        onClick = {
+                            navController.navigate("shows")
+                        }
+                    )
                 } else {
                     // Display tickets
                     // Use the ticket fragment to display the tickets
@@ -153,19 +147,11 @@ fun Wallet(ctx: Context) {
                 if (!areOrdersLoaded.value)
                     LoadingSpinner()
                 else if (ordersState.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "No orders available", style = TextStyle(
-                                fontFamily = marcherFontFamily,
-                                color = Color.White,
-                                fontSize = MaterialTheme.typography.titleMedium.fontSize
-                            )
-                        )
-                    }
+                    NoOrders(
+                        onClick = {
+                            navController.navigate("cafeteria")
+                        }
+                    )
                 }
                 else{
                     OrdersTab(

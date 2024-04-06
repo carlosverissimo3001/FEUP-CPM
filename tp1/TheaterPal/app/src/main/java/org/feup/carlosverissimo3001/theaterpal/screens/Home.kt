@@ -72,7 +72,7 @@ fun Navigator(navController: NavHostController, ctx: Context) {
             Shows(ctx, navController)
         }
         composable(NavRoutes.Wallet.route) {
-            Wallet(ctx)
+            Wallet(ctx, navController)
         }
         composable(NavRoutes.ShowDetails.route) {
             ShowDetails(ctx, navController)
