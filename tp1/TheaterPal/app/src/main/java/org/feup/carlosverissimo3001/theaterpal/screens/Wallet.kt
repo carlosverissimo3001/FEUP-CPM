@@ -152,6 +152,21 @@ fun Wallet(ctx: Context) {
             else if (selectedTabIndex == 1) {
                 if (!areOrdersLoaded.value)
                     LoadingSpinner()
+                else if (ordersState.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            "No orders available", style = TextStyle(
+                                fontFamily = marcherFontFamily,
+                                color = Color.White,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
+                            )
+                        )
+                    }
+                }
                 else{
                     OrdersTab(
                         ctx = ctx,

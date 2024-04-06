@@ -34,6 +34,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendingOrderFragment
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
 
 @Composable
@@ -42,10 +43,13 @@ fun Cafeteria(ctx: Context) {
     val areVouchersLoaded = remember { mutableStateOf(false) }
     var isChoosingVoucher by remember { mutableStateOf(false) }
 
+    var isSendingOrder by remember { mutableStateOf(false) }
+
     var vouchersState by remember { mutableStateOf(emptyList<Voucher>()) }
     var filteredVouchers by remember { mutableStateOf(emptyList<Voucher>()) }
 
     var barOrder by remember { mutableStateOf<BarOrder?>(null) }
+    var order by remember { mutableStateOf<Order?>(null) }
 
     LaunchedEffect(Unit) {
         getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
@@ -143,6 +147,7 @@ fun Cafeteria(ctx: Context) {
                         )
                     }
                 }
+
                 else {
                     VouchersTab(
                         ctx,
@@ -160,22 +165,35 @@ fun Cafeteria(ctx: Context) {
                             // update total, user might have selected vouchers for discount
                             setTotal(barOrder!!, updatedTotal)
 
-                            val order = barOrder?.let {
+                            // create order
+                            order = barOrder?.let {
                                 Order(
                                     barOrder = it,
                                     vouchersUsed = selectedVouchers
                                 )
                             }
 
-                            sendOrder(ctx, order!!)
+                            isSendingOrder = true
+
+                            // TODO : Activate NFC
+                            // On nfc read, the line below should be run
+                            /*sendOrder(ctx, order!!)*/
 
                             // Navigate to next step
-                            isChoosingVoucher = false
-                            selectedTabIndex = 0
+                            /*isChoosingVoucher = false
+                            selectedTabIndex = 0*/
                         },
-                        total = barOrder?.total ?: 0.0
+                        total = barOrder?.total ?: 0.00
                     )
                 }
+
+                SendingOrderFragment(
+                    isSending = isSendingOrder,
+                    onCancel = {
+                        isSendingOrder = false
+                    },
+                    order = order
+                )
             }
         }
     }

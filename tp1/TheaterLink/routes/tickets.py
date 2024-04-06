@@ -59,8 +59,10 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
             voucher_data.append(voucher_row[0])
 
-        # if the total cost is greater than 200, give a 5% discount
-        if total_cost >= 200:
+
+        # give a 5% discount every 200 dollars spent
+        num_vouchers_added = total_cost // 200
+        for _ in range(num_vouchers_added):
             vc_type = VOUCHER_TYPE[0]
             voucher_row = crud_ops.create_voucher(dbConn, user_id, vc_type, trans_id)
 
