@@ -479,10 +479,10 @@ def create_cafeteria_transaction(conn: psycopg2.extensions.connection, transacti
 
     try:
         cur.execute('''
-            INSERT INTO cafeteriatransactions (TransactionID, OrderNumber, NumberOfItems)
-            VALUES (%s, %s, %s)
+            INSERT INTO cafeteriatransactions (TransactionID, OrderNumber, NumberOfItems, Status)
+            VALUES (%s, %s, %s, %s)
             RETURNING *
-        ''', (transaction_id, orderNumber, num_items))
+        ''', (transaction_id, orderNumber, num_items, 'PREPARING'))
         conn.commit()
 
         return cur.fetchone()
@@ -565,7 +565,8 @@ def get_cafeteria_transactions(conn: psycopg2.extensions.connection, user_id: st
                 'transaction_id', transactions.transactionid,
                 'total', total,
                 'order_id', cafeteriatransactions.redundantorderid,
-                'order_number', cafeteriatransactions.ordernumber
+                'order_number', cafeteriatransactions.ordernumber,
+                'status', cafeteriatransactions.status
             )
             from transactions join cafeteriatransactions on transactions.transactionid = cafeteriatransactions.transactionid
             WHERE userid = %s AND transactiontype = 'CAFETERIA_ORDER'

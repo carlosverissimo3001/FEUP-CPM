@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object Crypto {
     const val KEY_SIZE = 512
@@ -84,6 +85,16 @@ fun formatDate(inputDate: String): String {
 fun toTitleCase(input: String): String {
     return input.replaceFirstChar { it.titlecase() }
 }
+
+fun String.capitalized(): String {
+    return this.replaceFirstChar {
+        if (it.isLowerCase())
+            it.titlecase(Locale.getDefault())
+        else it.toString()
+    }
+}
+
+
 
 @Composable
 fun ParseIsUsed (isUsed: Boolean) {

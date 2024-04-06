@@ -42,11 +42,13 @@ import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.ParseIsUsed
 import org.feup.carlosverissimo3001.theaterpal.ParseOrderState
 import org.feup.carlosverissimo3001.theaterpal.R
+import org.feup.carlosverissimo3001.theaterpal.capitalized
 import org.feup.carlosverissimo3001.theaterpal.formatDate
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.formatPrice
+import java.util.Locale
 
 @Composable
 fun Order(order: OrderRcv, ctx: Context) {
@@ -71,7 +73,7 @@ fun Order(order: OrderRcv, ctx: Context) {
             Column(
                 modifier = Modifier
                     .padding(12.dp)
-                    .fillMaxWidth(0.62f)
+                    .fillMaxWidth(0.65f)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -89,9 +91,9 @@ fun Order(order: OrderRcv, ctx: Context) {
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                if (order.state == "Preparing") {
+                if (order.status == "Preparing") {
                     Text(
-                        text = "Estimated time: 15 minutes",
+                        text = "Estimated time: 5 minutes",
                         style = TextStyle(
                             color = Color.LightGray,
                             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
@@ -103,7 +105,7 @@ fun Order(order: OrderRcv, ctx: Context) {
                 }
 
                 // only when state is preparing or ready
-                if (order.state == "Preparing" || order.state == "Ready") {
+                if (order.status == "Preparing" || order.status == "Ready") {
                     Text(
                         text = "(Please look for your order number in the cafeteria screen)",
                         style = TextStyle(
@@ -130,20 +132,21 @@ fun Order(order: OrderRcv, ctx: Context) {
                             fontWeight = FontWeight.Bold
                         )
                     )
-                    ParseOrderState(order.state)
                 }
 
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                Text(
-                    text = "You used " + order.vouchers_used_cnt.toString() + (if (order.vouchers_used_cnt != 1 ) " vouchers" else " voucher") + " in this order",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        fontFamily = marcherFontFamily
+                if (order.vouchers_used_cnt > 0) {
+                    Text(
+                        text = "You used " + order.vouchers_used_cnt.toString() + (if (order.vouchers_used_cnt != 1) " vouchers" else " voucher") + " in this order",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontFamily = marcherFontFamily
+                        )
                     )
-                )
+                }
             }
 
             /*VerticalDivider(
@@ -180,6 +183,10 @@ fun Order(order: OrderRcv, ctx: Context) {
                         )
                     )
                 }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                ParseOrderState(order.status)
             }
         }
     }

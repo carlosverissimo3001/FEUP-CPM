@@ -10,6 +10,14 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
     transaction_page = Blueprint('transaction_page', __name__)
 
+    @transaction_page.route('/transactions', methods=['GET'])
+    def get_user_transactions():
+        user_id = request.args.get('user_id')
+
+        # TODO: implement this function
+
+        return jsonify({'message': 'Transactions retrieved successfully!', 'transactions': [] }), 200
+
     return transaction_page
 
 

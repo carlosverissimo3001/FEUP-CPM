@@ -3,6 +3,9 @@ package org.feup.carlosverissimo3001.theaterpal.models
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.toUpperCase
+import org.feup.carlosverissimo3001.theaterpal.capitalized
 import org.json.JSONObject
 
 /*
@@ -26,7 +29,6 @@ import org.json.JSONObject
     "vouchers": 0
 },*/
 
-val states = arrayOf("Collected", "Preparing", "Ready", "Delivered")
 
 data class OrderRcv(
     var items   : List<OrderRcvItem>,
@@ -35,7 +37,7 @@ data class OrderRcv(
     var total   : Double,
     var transaction_id: String,
     var vouchers_used_cnt: Int,
-    var state: String = "Preparing"
+    var status: String
 )
 
 data class OrderRcvItem(
@@ -66,25 +68,6 @@ fun parseOrderRcv(json: JSONObject): OrderRcv {
         json.getDouble("total"),
         json.getString("transaction_id"),
         json.getInt("vouchers"),
-        states.random()
+        json.getString("status").lowercase().capitalized()
     )
-}
-
-fun orderRcvToJson(order: OrderRcv): JSONObject {
-    val json = JSONObject()
-    val items = mutableListOf<JSONObject>()
-    for (item in order.items) {
-        val itemJson = JSONObject()
-        itemJson.put("item_name", item.item_name)
-        itemJson.put("price", item.price)
-        itemJson.put("quantity", item.quantity)
-        items.add(itemJson)
-    }
-    json.put("items", items)
-    json.put("order_id", order.order_id)
-    json.put("order_number", order.order_number)
-    json.put("total", order.total)
-    json.put("transaction_id", order.transaction_id)
-    json.put("vouchers", order.vouchers_used_cnt)
-    return json
 }

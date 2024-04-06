@@ -1,5 +1,6 @@
 CREATE TYPE voucher_type AS ENUM ('FIVE_PERCENT', 'FREE_COFFEE', 'FREE_POPCORN');
 CREATE TYPE transaction_type AS ENUM ('TICKET_PURCHASE', 'CAFETERIA_ORDER');
+CREATE TYPE order_status AS ENUM ('COLLECTED', 'PREPARING', 'READY', 'DELIVERED');
 
 -- Users Table
 CREATE TABLE Users (
@@ -60,7 +61,8 @@ CREATE TABLE CafeteriaTransactions (
     RedundantOrderID UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Unique identifier for the cafeteria order (only needed bc cafeteriaorderitem needs to reference this a primary key)
     TransactionID UUID REFERENCES Transactions(TransactionID),   -- Transaction that generated the cafeteria order
     OrderNumber INT NOT NULL, -- To be used by the user and the cafeteria to identify the order in a screen
-    NumberOfItems INT NOT NULL -- Number of items in the order
+    NumberOfItems INT NOT NULL, -- Number of items in the order
+    Status order_status NOT NULL
 );
 
 -- Cafeteria Order Items Table
