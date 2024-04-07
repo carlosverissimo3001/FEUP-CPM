@@ -20,8 +20,8 @@ object Crypto {
 }
 
 object Server {
-    const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
-    // const val URL = "https://wrongly-in-pug.ngrok-free.app"
+//    const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+     const val URL = "https://wrongly-in-pug.ngrok-free.app"
 }
 
 object MyColors
