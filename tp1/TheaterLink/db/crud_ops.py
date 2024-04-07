@@ -1,6 +1,8 @@
 import psycopg2
 import random, string
 
+STATUS_TYPE = ["ACCEPTED", "PREPARING", "READY", "COLLECTED"]
+
 ## GETTERS, no filters
 
 def get_users(conn: psycopg2.extensions.connection):
@@ -475,6 +477,7 @@ def create_cafeteria_transaction(conn: psycopg2.extensions.connection, transacti
     """
     cur = conn.cursor()
 
+    status = random.choice(STATUS_TYPE)
     orderNumber = random.randint(1, 1000)
 
     try:
