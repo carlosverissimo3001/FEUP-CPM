@@ -1,7 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
-import okhttp3.Authenticator
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -13,6 +12,8 @@ import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.models.User
+import org.feup.carlosverissimo3001.theaterpal.models.UserToJson
 import org.feup.carlosverissimo3001.theaterpal.models.parseShow
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseOrderRcv
@@ -20,6 +21,42 @@ import org.feup.carlosverissimo3001.theaterpal.models.parseTicket
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucher
 import org.json.JSONArray
 import org.json.JSONObject
+
+fun registerUser(user: User, callback: (Boolean, String) -> Unit){
+    var client = OkHttpClient()
+
+    var jsonObject = JSONObject(UserToJson(user))
+
+    var requestBody = jsonObject.toString()
+        .toRequestBody("application/json".toMediaTypeOrNull())
+
+    var request = okhttp3.Request.Builder()
+        .url("${Server.URL}/register")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(false, "")
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200,201 -> {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val userid = jsonResponse?.getString("user_id") ?: ""
+
+                    callback(true, userid)
+                }
+                else -> {
+                    callback(false, "")
+                }
+            }
+        }
+    })
+}
 
 fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
     var request = okhttp3.Request.Builder()
@@ -201,7 +238,7 @@ fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
     })
 }
 
-fun sumbitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
+fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
     val client = OkHttpClient()
 
     val jsonOrder = JSONObject()

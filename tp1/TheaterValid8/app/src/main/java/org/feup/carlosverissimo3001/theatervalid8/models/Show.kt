@@ -52,7 +52,7 @@ data class Show(
 
 data class ShowDate(
     val date: String,
-    val availableSeats: Int
+    val showdateid: Int
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
@@ -62,7 +62,6 @@ data class ShowDate(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(date)
-        parcel.writeInt(availableSeats)
     }
 
     override fun describeContents(): Int {

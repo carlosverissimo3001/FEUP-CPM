@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 
 object Server {
-    const val URL = "https://16b2-193-136-33-100.ngrok-free.app"
+    const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
 }
 
 @Composable

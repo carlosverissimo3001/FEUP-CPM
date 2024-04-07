@@ -94,9 +94,9 @@ class APILayer (private val ctx: Context){
             for (j in 0 until dates.length()) {
                 val date = dates.getJSONObject(j)
                 val dateString = date.getString("date")
-                val availableSeats = date.getInt("availableseats")
+                val showdateid = date.getInt("showdateid")
 
-                showDates.add(ShowDate(dateString, availableSeats))
+                showDates.add(ShowDate(dateString, showdateid))
             }
 
             shows.add(

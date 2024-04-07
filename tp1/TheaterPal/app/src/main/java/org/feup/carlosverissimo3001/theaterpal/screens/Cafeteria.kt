@@ -1,10 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,14 +16,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
-import org.feup.carlosverissimo3001.theaterpal.api.sumbitOrder
+import org.feup.carlosverissimo3001.theaterpal.api.submitOrder
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
@@ -201,7 +197,7 @@ fun Cafeteria(ctx: Context) {
 
 fun sendOrder(ctx: Context, order: Order) {
     // API Request to send order
-    sumbitOrder(ctx, order) { success ->
+    submitOrder(ctx, order) { success ->
         if (success) {
             println("Order sent successfully")
         } else {
