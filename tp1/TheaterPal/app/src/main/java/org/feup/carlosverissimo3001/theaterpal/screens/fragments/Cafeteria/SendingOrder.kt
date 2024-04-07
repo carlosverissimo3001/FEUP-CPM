@@ -55,7 +55,7 @@ fun SendingOrderFragment(
             // Slide in from the bottom
             initialOffsetY = { it },
             animationSpec = tween(
-                durationMillis = 500,
+                durationMillis = 1000,
                 easing = FastOutSlowInEasing
             )
         ),
@@ -63,7 +63,7 @@ fun SendingOrderFragment(
             // Slide out to the bottom
             targetOffsetY = { it },
             animationSpec = tween(
-                durationMillis = 500,
+                durationMillis = 1000,
                 easing = FastOutSlowInEasing
             )
         ),
@@ -79,7 +79,7 @@ fun SendingOrderFragment(
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize().padding(10.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -87,7 +87,7 @@ fun SendingOrderFragment(
                         .height(6.dp)
                         .background(Color.White, CircleShape)
                         .pointerInput(Unit) {
-                            detectDragGestures { change, dragAmount ->
+                            detectDragGestures { _, dragAmount ->
                                 if (dragAmount.y > 0) {
                                     // Dragging down, cancel the scanning
                                     onCancel()
@@ -180,7 +180,7 @@ fun SendingOrderFragment(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Your tentative total is: ",
+                            text = "Your total is: ",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                 fontFamily = marcherFontFamily
@@ -205,17 +205,18 @@ fun SendingOrderFragment(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
+                        .fillMaxWidth()
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = "Please head to the cafeteria terminal",
+                        text = "Please head to the cafeteria terminal and tap your device",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                             fontFamily = marcherFontFamily,
                         ),
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.White,
+                        textAlign = TextAlign.Center,
                     )
                     
                     Spacer(modifier = Modifier.size(10.dp))
@@ -244,8 +245,8 @@ fun SendingOrderFragment(
                     modifier = Modifier
                         .fillMaxWidth(0.6f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = androidx.compose.ui.graphics.Color.Gray,
-                        contentColor = androidx.compose.ui.graphics.Color.White
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 ) {
                     Text(
@@ -258,6 +259,8 @@ fun SendingOrderFragment(
                         color = androidx.compose.ui.graphics.Color.White,
                     )
                 }
+
+
             }
         }
     }

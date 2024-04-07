@@ -31,12 +31,15 @@ import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTickets
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.groupTickets
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendingOrderFragment
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.NoOrders
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.NoTickets
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.OrdersTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.SendingTicketsFragment
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.TicketsTab
 
 @Composable
@@ -46,15 +49,25 @@ fun Wallet(ctx: Context, navController: NavController) {
 
     var ticketsState by remember { mutableStateOf(emptyList<Ticket>()) }
     var filteredTickets by remember { mutableStateOf(emptyList<Ticket>()) }
+    /*var groupedTickets by remember { mutableStateOf(emptyList<Ticket>()) }*/
 
     var ordersState by remember { mutableStateOf(emptyList<OrderRcv>()) }
     var areOrdersLoaded = remember { mutableStateOf(false) }
+
+    var isValidatingTickets by remember { mutableStateOf(false) }
+    var ticketsToValidate by remember { mutableStateOf(emptyList<Ticket>()) }
+
 
     LaunchedEffect(Unit) {
         getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
             ticketsState = tickets
             areTicketsLoaded.value = true
-            filteredTickets = tickets.filter { !it.isUsed}
+
+            // filter out used tickets
+            filteredTickets = tickets.filter { !it.isUsed }
+
+            /*// group tickets with the same show and date
+            groupedTickets = groupTickets(tickets)*/
         }
 
         getUserOrders(user_id = Authentication(ctx).getUserID()) { orders ->
@@ -62,9 +75,6 @@ fun Wallet(ctx: Context, navController: NavController) {
             areOrdersLoaded.value = true
         }
     }
-
-
-    // unusedTicketArray = groupTickets(unusedTicketArray)
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(
@@ -75,21 +85,24 @@ fun Wallet(ctx: Context, navController: NavController) {
             Tab(
                 selected = selectedTabIndex == 0,
                 onClick = { selectedTabIndex = 0 },
-                text = { Text("Tickets",
-                    style = TextStyle(
-                        fontFamily = marcherFontFamily,
-                        color = Color.White,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontWeight = (selectedTabIndex == 0).let {
-                            if (it) FontWeight.Bold else FontWeight.Normal
-                        }
+                text = {
+                    Text("Tickets",
+                        style = TextStyle(
+                            fontFamily = marcherFontFamily,
+                            color = Color.White,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                            fontWeight = (selectedTabIndex == 0).let {
+                                if (it) FontWeight.Bold else FontWeight.Normal
+                            }
+                        )
                     )
-                )}
+                }
             )
             Tab(
                 selected = selectedTabIndex == 1,
                 onClick = { selectedTabIndex = 1 },
-                text = { Text("Cafeteria Orders", style =
+                text = {
+                    Text("Cafeteria Orders", style =
                     TextStyle(
                         fontFamily = marcherFontFamily,
                         color = Color.White,
@@ -98,7 +111,8 @@ fun Wallet(ctx: Context, navController: NavController) {
                             if (it) FontWeight.Bold else FontWeight.Normal
                         }
                     )
-                )}
+                    )
+                }
             )
         }
 
@@ -139,6 +153,18 @@ fun Wallet(ctx: Context, navController: NavController) {
                             } else {
                                 ticketsState
                             }
+                        },
+                        /*onGroupingChanged =  { isChecked ->
+                            // if checked, group tickets by show, else shows all tickets
+                            filteredTickets = if (isChecked) {
+                                groupedTickets
+                            } else {
+                                ticketsState
+                            }
+                        },*/
+                        onValidate = {
+                            isValidatingTickets = true
+                            ticketsToValidate = it
                         }
                     )
                 }
@@ -160,6 +186,15 @@ fun Wallet(ctx: Context, navController: NavController) {
                     )
                 }
             }
+
+            SendingTicketsFragment(
+                ctx = ctx,
+                isValidating = isValidatingTickets,
+                onCancel = {
+                    isValidatingTickets = false
+                },
+                tickets = ticketsToValidate
+            )
         }
     }
 }

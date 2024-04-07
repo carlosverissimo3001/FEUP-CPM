@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,7 +45,14 @@ import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx() }
 
 @Composable
-fun Ticket(ticket: Ticket, image: Bitmap?) {
+fun Ticket(
+    ticket: Ticket,
+    image: Bitmap?,
+    onClick: (Ticket) -> Unit = {},
+    isSelected : Boolean
+) {
+    /*val (isSelected, setSelected) = remember { mutableStateOf(false) }*/
+
     Box(
         modifier = Modifier
             .padding(10.dp)
@@ -51,7 +61,20 @@ fun Ticket(ticket: Ticket, image: Bitmap?) {
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable(
-                onClick = { println("Clicked on ticket") }
+                onClick = {
+                    // only allow click if ticket is not used
+                    if (!ticket.isUsed) {
+                        onClick(ticket)
+                    }
+                    else {
+                        return@clickable
+                    }
+                }
+            )
+            .border(
+                width = 5.dp,
+                color = if (isSelected) Color(parseColor("#FF43A047")) else Color.Transparent,
+                shape = RoundedCornerShape(16.dp)
             )
     ) {
         Row (

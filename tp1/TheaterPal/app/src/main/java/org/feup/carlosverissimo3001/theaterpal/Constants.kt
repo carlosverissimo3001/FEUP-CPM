@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal
 
+import android.graphics.Color.parseColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +42,7 @@ fun groupTickets(tickets: List<Ticket>) : List<Ticket>{
         } else {
             var found = false
             for (ticketJ in groupedTickets){
-                if (ticketI.showName == ticketJ.showName && ticketI.date == ticketJ.date){
+                if (ticketI.showName == ticketJ.showName && ticketI.date == ticketJ.date && ticketI.isUsed == ticketJ.isUsed){
                     // Add ticketI to the group
                     ticketJ.numTickets += 1
                     found = true
@@ -120,16 +121,16 @@ fun ParseIsUsed (isUsed: Boolean) {
 
 @Composable
 fun ParseOrderState(state: String) {
-    val states = arrayOf("Collected", "Preparing", "Ready", "Delivered")
+    val states = arrayOf("Accepted", "Preparing", "Ready", "Collected")
 
     return Text(
         text = state,
         style = TextStyle(
             color = when (state) {
-                "Collected" -> Color.Green
+                "Accepted" -> Color(parseColor("#006400"))
                 "Preparing" -> Color.Yellow
                 "Ready" -> Color.Cyan
-                "Delivered" -> Color.Red
+                "Collected" -> Color.Green
                 else -> Color.White
             },
             fontSize = MaterialTheme.typography.bodyMedium.fontSize,
