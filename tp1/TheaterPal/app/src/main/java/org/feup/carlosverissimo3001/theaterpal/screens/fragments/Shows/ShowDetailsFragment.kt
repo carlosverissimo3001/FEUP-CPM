@@ -105,7 +105,7 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			}
 			item{
 				BuyButton (
-					isVisible = showdateid > -1 && quantity > 0,
+					isVisible = (showdateid > -1 && quantity > 0),
 				) {
 					purchaseTickets(ctx, showdateid, quantity, quantity*show.price)
 					navController.navigate("wallet")

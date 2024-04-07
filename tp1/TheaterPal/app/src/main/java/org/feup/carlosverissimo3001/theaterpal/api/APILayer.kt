@@ -178,6 +178,9 @@ fun sumbitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
     val requestBody = jsonOrder.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
 
+//    val requestBody = encrypt(jsonOrder.toString())
+//        .toRequestBody("application/json".toMediaTypeOrNull())
+
     val request = okhttp3.Request.Builder()
         .url("${Server.URL}/submit_order")
         .post(requestBody)
@@ -218,6 +221,9 @@ fun purchaseTickets(
 
     val requestBody = jsonOrder.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
+
+//    val requestBody = encrypt(jsonOrder.toString())
+//        .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
         .url("${Server.URL}/purchase_tickets")
