@@ -20,6 +20,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         for transaction in transactions:
             transaction["vouchers_used"] = crud_ops.get_vouchers_used(DB_CONN, transaction["transaction_id"])
+            transaction["vouchers_generated"] = crud_ops.get_vouchers_generated(DB_CONN, transaction["transaction_id"])
 
             ## TICKET PURCHASE ##
             if transaction["transaction_type"] == "TICKET_PURCHASE":

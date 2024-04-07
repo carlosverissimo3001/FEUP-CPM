@@ -8,6 +8,7 @@ data class Transaction(
     val transactiontype: String,
     var total: Double,
     var vouchersUsed: List<Voucher>,
+    var vouchersGenerated: List<Voucher>,
     var items: List<Any>
 )
 
@@ -22,6 +23,10 @@ data class TicketItem(
     val showname : String
 )
 
+fun createDefaultTransaction(): Transaction {
+    return Transaction("", "", 0.0, emptyList(), emptyList(), emptyList())
+}
+
 fun parseTransaction(jsonObject: JSONObject): Transaction {
     val transactionid = jsonObject.getString("transaction_id")
     val transactiontype = jsonObject.getString("transaction_type")
@@ -34,6 +39,13 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
         vouchersUsed.add(voucher)
     }
 
+    val  vouchersGenerated = mutableListOf<Voucher>()
+    val vouchersGeneratedJsonArray = jsonObject.getJSONArray("vouchers_generated")
+    for (i in 0 until vouchersGeneratedJsonArray.length()) {
+        val voucher = parseVoucher(vouchersGeneratedJsonArray.getJSONObject(i))
+        vouchersGenerated.add(voucher)
+    }
+
     if (transactiontype == "CAFETERIA_ORDER") {
         val items = mutableListOf<CafeteriaTransactionItem>()
         val itemsJsonArray = jsonObject.getJSONArray("items")
@@ -44,7 +56,7 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
             )
             items.add(item)
         }
-        return Transaction(transactionid, transactiontype, total, vouchersUsed, items)
+        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items)
     }
 
     else{
@@ -54,11 +66,11 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
             val item = TicketItem(
                 itemsJsonArray.getJSONObject(i).getString("date"),
                 itemsJsonArray.getJSONObject(i).getInt("num_tickets"),
-                itemsJsonArray.getJSONObject(i).getString("show_name")
+                itemsJsonArray.getJSONObject(i).getString("showName")
             )
             items.add(item)
         }
-        return Transaction(transactionid, transactiontype, total, vouchersUsed, items)
+        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items)
     }
 }
 

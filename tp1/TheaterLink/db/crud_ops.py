@@ -647,7 +647,9 @@ def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str)
         cur.execute('''
             SELECT json_build_object(
                 'voucherid', voucherid,
-                'vouchertype', vouchertype
+                'vouchertype', vouchertype,
+                'isUsed', isUsed,
+                'user_id', userid
             ) FROM vouchers WHERE transactionidused = %s
         ''', (transaction_id,))
 
@@ -764,3 +766,37 @@ def get_cafeteria_transaction(conn: psycopg2.extensions.connection, transaction_
 
     return data
 
+def get_vouchers_generated(conn: psycopg2.extensions.connection, transaction_id: str):
+    """
+    Get all vouchers generated in a transaction
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str transaction_id: transaction's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT json_build_object(
+                'voucherid', voucherid,
+                'vouchertype', vouchertype,
+                'isUsed', isUsed,
+                'user_id', userid
+            ) FROM vouchers WHERE transactionidgenerated = %s
+        ''', (transaction_id,))
+        conn.commit()
+
+        rows = cur.fetchall()
+
+    except psycopg2.Error as e:
+        print("Error getting vouchers generated transaction: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data

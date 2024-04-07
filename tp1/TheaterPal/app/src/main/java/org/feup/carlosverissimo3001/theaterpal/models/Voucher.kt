@@ -18,7 +18,7 @@ fun parseVoucher (jsonObject: JSONObject): Voucher {
         jsonObject.getString("voucherid"),
         jsonObject.getString("vouchertype"),
         jsonObject.getBoolean("isUsed"),
-        jsonObject.getString("userid"),
+        jsonObject.getString("user_id"),
     )
 }
 

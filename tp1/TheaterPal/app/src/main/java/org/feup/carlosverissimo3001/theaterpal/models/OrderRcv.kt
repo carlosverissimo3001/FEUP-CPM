@@ -48,13 +48,14 @@ data class OrderRcvItem(
 
 fun parseOrderRcvItem(json: JSONObject): OrderRcvItem {
     return OrderRcvItem(
-        json.getString("item_name"),
+        json.getString("itemname"),
         json.getDouble("price"),
         json.getInt("quantity")
     )
 }
 
 fun parseOrderRcv(json: JSONObject): OrderRcv {
+    println("Object: $json")
     val items = mutableListOf<OrderRcvItem>()
     val itemsJson = json.getJSONArray("items")
     for (i in 0 until itemsJson.length()) {

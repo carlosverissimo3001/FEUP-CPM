@@ -12,12 +12,14 @@ import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Show
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.models.Transaction
 import org.feup.carlosverissimo3001.theaterpal.models.User
 import org.feup.carlosverissimo3001.theaterpal.models.UserToJson
 import org.feup.carlosverissimo3001.theaterpal.models.parseShow
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseOrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.parseTicket
+import org.feup.carlosverissimo3001.theaterpal.models.parseTransaction
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucher
 import org.json.JSONArray
 import org.json.JSONObject
@@ -279,3 +281,42 @@ fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
         }
     })
 }
+
+fun getUserTransactions(user_id: String, callback: (List<Transaction>) -> Unit) {
+    val client = OkHttpClient()
+
+    val request = okhttp3.Request.Builder()
+        .url("${Server.URL}/transactions?user_id=$user_id")
+        .get()
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(emptyList())
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val transactions = jsonResponse?.getJSONArray("transactions") ?: return
+
+                    val transactionsList = mutableListOf<Transaction>()
+                    for (i in 0 until transactions.length()) {
+                        val transaction = transactions.getJSONObject(i)
+
+                        transactionsList.add(parseTransaction(transaction))
+                    }
+
+                    callback(transactionsList)
+                }
+                else -> {
+                    print("Error getting transactions")
+                }
+            }
+        }
+    })
+}
+

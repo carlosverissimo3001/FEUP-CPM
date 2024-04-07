@@ -2,6 +2,7 @@ package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,8 @@ fun TicketsTab(
     tickets: List<Ticket>,
     onFilterChanged: (Boolean) -> Unit,
     /*onGroupingChanged: (Boolean) -> Unit,*/
-    onValidate: (List<Ticket>) -> Unit
+    onValidate: (List<Ticket>) -> Unit,
+    onConsultTransactionsClicked: () -> Unit
 ) {
     val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
     val (isGrouped, setGroupingChecked) = remember { mutableStateOf(true) }
@@ -143,6 +145,11 @@ fun TicketsTab(
                     color = Color.White,
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     textDecoration = TextDecoration.Underline
+                ),
+                modifier = Modifier.clickable(
+                    onClick = {
+                        onConsultTransactionsClicked()
+                    }
                 )
             )
         }
