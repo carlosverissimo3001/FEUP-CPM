@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders
 
 import android.content.Context
 import android.graphics.Bitmap

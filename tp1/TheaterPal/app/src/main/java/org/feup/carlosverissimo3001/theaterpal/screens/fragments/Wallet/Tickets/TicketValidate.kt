@@ -1,10 +1,9 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,14 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.feup.carlosverissimo3001.theaterpal.ParseIsUsed
 import org.feup.carlosverissimo3001.theaterpal.R
 import org.feup.carlosverissimo3001.theaterpal.formatDate
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily

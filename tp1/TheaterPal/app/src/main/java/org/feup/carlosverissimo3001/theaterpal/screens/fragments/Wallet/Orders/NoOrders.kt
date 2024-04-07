@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 
 @Composable
-fun NoTickets(
+fun NoOrders(
     onClick: () -> Unit
 ){
     Column(
@@ -32,7 +32,7 @@ fun NoTickets(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "No tickets available :( ",
+            "No orders available :( ",
             style = TextStyle(
                 fontFamily = marcherFontFamily,
                 color = Color.White,
@@ -44,7 +44,7 @@ fun NoTickets(
         Spacer(modifier = Modifier.padding(16.dp))
 
         Text(
-            text = "To see which shows are available, go to the Shows tab",
+            text = "To see which products are available, go to the Cafeteria tab",
             style = TextStyle(
                 fontFamily = marcherFontFamily,
                 color = Color.White,
@@ -65,7 +65,7 @@ fun NoTickets(
             )
         ) {
             Text(
-                text = "Buy tickets",
+                text = "Buy products",
                 style = TextStyle(
                     fontFamily = marcherFontFamily,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -75,7 +75,4 @@ fun NoTickets(
             )
         }
     }
-}
-
-class TicketValidating {
 }
