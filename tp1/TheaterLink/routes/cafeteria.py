@@ -69,9 +69,9 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
             for voucher in transaction["vouchers"]:
                 ## free coffee
                 if voucher["vouchertype"] == VOUCHER_TYPE[1]:
-                    transaction["items"].append({"item_name": "Free Coffee", "price": 0, "quantity": 1})
+                    transaction["items"].append({"itemname": "Free Coffee", "price": 0, "quantity": 1})
                 elif voucher["vouchertype"] == VOUCHER_TYPE[2]:
-                    transaction["items"].append({"item_name": "Free Popcorn", "price": 0, "quantity": 1})
+                    transaction["items"].append({"itemname": "Free Popcorn", "price": 0, "quantity": 1})
 
             transaction["vouchers"] = len(transaction["vouchers"])
 

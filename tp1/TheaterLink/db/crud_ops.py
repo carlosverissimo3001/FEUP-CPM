@@ -301,7 +301,10 @@ def get_ticket_by_ticket_id(conn: psycopg2.extensions.connection, ticket_id: int
     if row is None:
         return None
 
-    return row
+    data = []
+    data.append(row[0])
+
+    return data
 
 def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_type: str, gen_trans_id: str):
     """
@@ -606,7 +609,7 @@ def get_cafeteria_order_items(conn: psycopg2.extensions.connection, order_id: st
         cur.execute('''
 
             SELECT json_build_object(
-                'item_name', itemname,
+                'itemname', itemname,
                 'price', price,
                 'quantity', quantity
             )
@@ -658,6 +661,106 @@ def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str)
     data = []
     for row in rows:
         data.append(row[0])
+
+    return data
+
+def get_user_transactions(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get all transactions for a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT json_build_object(
+                'transaction_id', transactionid,
+                'transaction_type', transactiontype,
+                'total', total
+            ) FROM transactions WHERE userid = %s
+        ''', (user_id,))
+        conn.commit()
+
+        rows = cur.fetchall()
+
+    except psycopg2.Error as e:
+        print("Error getting user transactions: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row[0])
+
+    return data
+
+def get_ticket_transaction(conn: psycopg2.extensions.connection, transaction_id: str):
+    """
+    Get all tickets for a transaction
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str transaction_id: transaction's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT json_build_object(
+                'ticketid', tickettransactions.ticketid,
+                'numberoftickets', tickettransactions.numberoftickets
+            ) FROM tickettransactions WHERE transactionid = %s
+        ''', (transaction_id,))
+        conn.commit()
+
+        rows = cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error getting tickets for transaction: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row)
+
+    return data
+
+def get_cafeteria_transaction(conn: psycopg2.extensions.connection, transaction_id: str):
+    """
+    Get all tickets for a transaction
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str transaction_id: transaction's id
+
+    :return: list of tuples
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT json_build_object(
+                'orderid', cafeteriatransactions.redundantorderid,
+                'numberofitems', cafeteriatransactions.numberofitems
+            ) FROM cafeteriatransactions WHERE transactionid = %s
+        ''', (transaction_id,))
+        conn.commit()
+
+        rows = cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error getting cafeteria transaction: ", e)
+        conn.rollback()
+        return None
+
+    data = []
+    for row in rows:
+        data.append(row)
 
     return data
 

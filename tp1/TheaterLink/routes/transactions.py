@@ -14,9 +14,49 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
     def get_user_transactions():
         user_id = request.args.get('user_id')
 
-        # TODO: implement this function
+        transactions = crud_ops.get_user_transactions(DB_CONN, user_id)
 
-        return jsonify({'message': 'Transactions retrieved successfully!', 'transactions': [] }), 200
+
+
+        for transaction in transactions:
+            transaction["vouchers_used"] = crud_ops.get_vouchers_used(DB_CONN, transaction["transaction_id"])
+
+            ## TICKET PURCHASE ##
+            if transaction["transaction_type"] == "TICKET_PURCHASE":
+                ticket_transaction = crud_ops.get_ticket_transaction(DB_CONN, transaction["transaction_id"])[0]
+
+                ticket_id = ticket_transaction.get("ticketid")
+                num_tickets = ticket_transaction.get("numberoftickets")
+
+                ticket = crud_ops.get_ticket_by_ticket_id(DB_CONN, ticket_id)[0]
+                del ticket["ticketid"]
+                del ticket["userid"]
+                del ticket["seat"]
+                ticket["num_tickets"] = num_tickets
+
+                transaction["items"] = [ticket]
+
+            ## CAFETERIA ORDER ##
+            else:
+                cafeteria_transaction = crud_ops.get_cafeteria_transaction(DB_CONN, transaction["transaction_id"])[0]
+                orderid = cafeteria_transaction.get("orderid")
+
+                order_items = crud_ops.get_cafeteria_order_items(DB_CONN, orderid)
+                items = []
+
+                for voucher_used in transaction["vouchers_used"]:
+                    if voucher_used["vouchertype"] == "FREE_POPCORN":
+                        items.append({"itemname": "(Free) Popcorn", "quantity": 1})
+                    elif voucher_used["vouchertype"] == "FREE_COFFEE":
+                        items.append({"itemname": "(Free) Coffee", "quantity": 1})
+
+                for item in order_items:
+                    items.append(item)
+
+                transaction["items"] = items
+
+
+        return jsonify({'message': 'Transactions retrieved successfully!', 'transactions':  transactions}), 200
 
     return transaction_page
 
