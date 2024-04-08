@@ -126,24 +126,6 @@ fun Cafeteria(ctx: Context) {
                 if (!areVouchersLoaded.value) {
                     LoadingSpinner()
                 }
-                // No vouchers
-                /*else if (vouchersState.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text("No vouchers available",
-                            style = TextStyle(
-                                fontFamily = marcherFontFamily,
-                                color = Color.White,
-                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-                }*/
-
                 else {
                     VouchersTab(
                         ctx,
@@ -173,7 +155,7 @@ fun Cafeteria(ctx: Context) {
 
                             // TODO : Activate NFC
                             // On nfc read, the line below should be run
-                            /*sendOrder(ctx, order!!)*/
+                            sendOrder(ctx, order!!)
 
                             // Navigate to next step
                             /*isChoosingVoucher = false

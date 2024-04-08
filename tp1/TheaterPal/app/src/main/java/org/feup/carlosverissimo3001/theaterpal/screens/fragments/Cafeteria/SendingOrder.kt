@@ -123,7 +123,7 @@ fun SendingOrderFragment(
 
                     order?.barOrder?.items?.forEach {
                         Text(
-                            text = "· ${it.key} x ${it.value}",
+                            text = "· ${it.key.name} x ${it.value}",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                 fontFamily = marcherFontFamily,

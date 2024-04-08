@@ -1,7 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.models
 
 data class BarOrder(
-    var items: Map<String, Int>,
+    var items: Map<CafeteriaItem, Int>,
     var total: Double
 )
 
@@ -29,14 +29,4 @@ fun printOrder(order: Order) {
         println(voucher)
     }
     printBarOrder(order.barOrder)
-}
-
-fun parseOrderToJson(order: Order): String {
-    return "{\n" +
-            "\"vouchersUsed\": [${order.vouchersUsed.joinToString(",") { it.voucherid.toString() }}],\n" +
-            "\"barOrder\": {\n" +
-            "\"items\": {${order.barOrder.items.entries.joinToString(",") { "\"${it.key}\": ${it.value}" }}},\n" +
-            "\"total\": ${order.barOrder.total}\n" +
-            "}\n" +
-            "}"
 }

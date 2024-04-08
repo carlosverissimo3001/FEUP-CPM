@@ -47,6 +47,7 @@ class RegisterActivity : AppCompatActivity(){
             if (success) {
                 println("User registered successfully")
                 auth.storeUserID(userid)
+                auth.storeUserNIF(user.nif)
 
                 // start main activity (home screen)
                 val intent = Intent(this@RegisterActivity, MainActivity::class.java)

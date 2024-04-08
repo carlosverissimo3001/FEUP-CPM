@@ -9,18 +9,21 @@ data class Transaction(
     var total: Double,
     var vouchersUsed: List<Voucher>,
     var vouchersGenerated: List<Voucher>,
-    var items: List<Any>
+    var items: List<Any>,
+    var timestamp : String = ""
 )
 
 data class CafeteriaTransactionItem(
     val itemname: String,
-    val quantity: Int
+    val quantity: Int,
+    val price: Double = 0.00
 )
 
 data class TicketItem(
     val date : String,
     val numtickets : Int,
-    val showname : String
+    val showname : String,
+    val price: Double = 0.00
 )
 
 fun createDefaultTransaction(): Transaction {
@@ -31,6 +34,7 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
     val transactionid = jsonObject.getString("transaction_id")
     val transactiontype = jsonObject.getString("transaction_type")
     val total = jsonObject.getDouble("total")
+    val timestamp = jsonObject.getString("timestamp")
 
     val vouchersUsed = mutableListOf<Voucher>()
     val vouchersUsedJsonArray = jsonObject.getJSONArray("vouchers_used")
@@ -52,11 +56,13 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
         for (i in 0 until itemsJsonArray.length()) {
             val item = CafeteriaTransactionItem(
                 itemsJsonArray.getJSONObject(i).getString("itemname"),
-                itemsJsonArray.getJSONObject(i).getInt("quantity")
+                itemsJsonArray.getJSONObject(i).getInt("quantity"),
+                if (itemsJsonArray.getJSONObject(i).has("price"))
+                    itemsJsonArray.getJSONObject(i).getDouble("price") else 0.00
             )
             items.add(item)
         }
-        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items)
+        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items, timestamp)
     }
 
     else{
@@ -66,11 +72,12 @@ fun parseTransaction(jsonObject: JSONObject): Transaction {
             val item = TicketItem(
                 itemsJsonArray.getJSONObject(i).getString("date"),
                 itemsJsonArray.getJSONObject(i).getInt("num_tickets"),
-                itemsJsonArray.getJSONObject(i).getString("showName")
+                itemsJsonArray.getJSONObject(i).getString("showName"),
+                itemsJsonArray.getJSONObject(i).getInt("price").toDouble()
             )
             items.add(item)
         }
-        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items)
+        return Transaction(transactionid, transactiontype, total, vouchersUsed, vouchersGenerated, items, timestamp)
     }
 }
 

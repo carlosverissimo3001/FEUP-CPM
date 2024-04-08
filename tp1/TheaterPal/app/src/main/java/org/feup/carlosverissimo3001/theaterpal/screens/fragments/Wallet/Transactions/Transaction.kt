@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.ParseOrderState
+import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Transaction
@@ -62,7 +63,7 @@ fun Transaction(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = parseTransactionType(transaction),
+                    text = parseTransactionType(transaction.transactiontype),
                     style = TextStyle(
                         color = Color.White,
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
@@ -180,8 +181,8 @@ fun Transaction(
     }
 }
 
-fun parseTransactionType(transaction: Transaction): String {
-    return when (transaction.transactiontype) {
+fun parseTransactionType(transactionType: String): String {
+    return when (transactionType) {
         "TICKET_PURCHASE" -> "Ticket Purchase"
         "CAFETERIA_ORDER" -> "Cafeteria Order"
         else -> "Unknown"

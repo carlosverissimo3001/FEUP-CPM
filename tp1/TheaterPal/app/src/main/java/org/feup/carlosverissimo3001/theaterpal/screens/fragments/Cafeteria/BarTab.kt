@@ -43,7 +43,7 @@ fun BarTab(ctx: Context, onNextStepClick : (BarOrder) -> Unit){
     var barItems : List<CafeteriaItem> = getCafeteriaItems()
     var total by remember { mutableDoubleStateOf(0.0) }
 
-    var order by remember { mutableStateOf(emptyMap<String, Int>()) }
+    var order by remember { mutableStateOf(emptyMap<CafeteriaItem, Int>()) }
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -59,19 +59,19 @@ fun BarTab(ctx: Context, onNextStepClick : (BarOrder) -> Unit){
                     onIncrement = { item ->
                         total += item.price
                         order = order.toMutableMap().apply {
-                            this[item.name] = (this[item.name] ?: 0) + 1
+                            this[item] = (this[item] ?: 0) + 1
                         }
                     },
                     onDecrement = { item ->
                         total -= item.price
                         order = order.toMutableMap().apply {
-                            this[item.name] = (this[item.name] ?: 0) - 1
+                            this[item] = (this[item] ?: 0) - 1
                         }
                     },
                     onRemove = { item, quantity ->
                         total -= item.price * quantity
                         order = order.toMutableMap().apply {
-                            this[item.name] = 0
+                            this[item] = 0
                         }
                     }
                 )
@@ -165,8 +165,4 @@ fun BarTab(ctx: Context, onNextStepClick : (BarOrder) -> Unit){
             }
         }
     }
-}
-
-class CafeteriaViewModel : ViewModel() {
-    var itemQuantities by mutableStateOf(mapOf<CafeteriaItem, Int>())
 }

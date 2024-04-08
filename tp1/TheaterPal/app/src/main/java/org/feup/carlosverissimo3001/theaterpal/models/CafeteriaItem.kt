@@ -8,7 +8,8 @@ data class CafeteriaItem(
     val name: String,
     val description: String,
     val price: Double,
-    val icon: ImageVector
+    val icon: ImageVector = Icons.Outlined.Fastfood,
+    val quantity: Int = 0
 )
 
 var barItems = listOf(
@@ -16,8 +17,7 @@ var barItems = listOf(
     "Soda",
     "Coffee",
     "Sandwich",
-    "Beer",
-    "Hambuger",
+    "Beer"
 )
 
 fun getCafeteriaItems(): List<CafeteriaItem> {

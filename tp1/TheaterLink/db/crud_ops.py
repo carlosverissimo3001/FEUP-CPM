@@ -292,7 +292,8 @@ def get_ticket_by_ticket_id(conn: psycopg2.extensions.connection, ticket_id: int
             'userid', tickets.userid,
             'showName', shows.name,
             'seat', tickets.seat,
-            'date', showdates.date
+            'date', showdates.date,
+            'price', shows.price
         ) FROM tickets join showdates on tickets.showdateid = showdates.showdateid join shows on showdates.showid = shows.showid WHERE ticketid = %s
     ''', (ticket_id,))
 
@@ -498,7 +499,7 @@ def create_cafeteria_transaction(conn: psycopg2.extensions.connection, transacti
         conn.rollback()
         return None
 
-def add_cafeteria_order_item(conn: psycopg2.extensions.connection, transaction_id: str, item: str, quantity: int):
+def add_cafeteria_order_item(conn: psycopg2.extensions.connection, transaction_id: str, item: str, quantity: int, price:int):
     """
     Add an item to a cafeteria order
 
@@ -516,7 +517,7 @@ def add_cafeteria_order_item(conn: psycopg2.extensions.connection, transaction_i
             INSERT INTO cafeteriaorderitem (CafeteriaTransactionID, Price, ItemName, Quantity)
             VALUES (%s, %s, %s, %s)
             RETURNING *
-        ''', (transaction_id, 3, item, quantity))
+        ''', (transaction_id, price, item, quantity))
         conn.commit()
 
         return cur.fetchone()
@@ -649,7 +650,7 @@ def get_vouchers_used(conn: psycopg2.extensions.connection, transaction_id: str)
                 'voucherid', voucherid,
                 'vouchertype', vouchertype,
                 'isUsed', isUsed,
-                'user_id', userid
+                'userid', userid
             ) FROM vouchers WHERE transactionidused = %s
         ''', (transaction_id,))
 
@@ -682,7 +683,8 @@ def get_user_transactions(conn: psycopg2.extensions.connection, user_id: str):
             SELECT json_build_object(
                 'transaction_id', transactionid,
                 'transaction_type', transactiontype,
-                'total', total
+                'total', total,
+                'timestamp', transactiontimestamp
             ) FROM transactions WHERE userid = %s
         ''', (user_id,))
         conn.commit()
@@ -783,7 +785,7 @@ def get_vouchers_generated(conn: psycopg2.extensions.connection, transaction_id:
                 'voucherid', voucherid,
                 'vouchertype', vouchertype,
                 'isUsed', isUsed,
-                'user_id', userid
+                'userid', userid
             ) FROM vouchers WHERE transactionidgenerated = %s
         ''', (transaction_id,))
         conn.commit()
@@ -800,3 +802,29 @@ def get_vouchers_generated(conn: psycopg2.extensions.connection, transaction_id:
         data.append(row[0])
 
     return data
+
+def get_user_nif(conn: psycopg2.extensions.connection, user_id: str):
+    """
+    Get the nif of a user
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str user_id: user's id
+
+    :return: str
+    """
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''
+            SELECT nif FROM users WHERE userid = %s
+        ''', (user_id,))
+        conn.commit()
+
+        row = cur.fetchone()
+
+    except psycopg2.Error as e:
+        print("Error getting user nif: ", e)
+        conn.rollback()
+        return None
+
+    return row[0]

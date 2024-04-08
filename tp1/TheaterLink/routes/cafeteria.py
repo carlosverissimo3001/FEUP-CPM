@@ -13,8 +13,6 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
     def submit_order():
         data = request.get_json()
 
-        print("DATA: ", data)
-
         vouchers_used = data['vouchers_used']
         user_id = data['user_id']
         order = data['order']

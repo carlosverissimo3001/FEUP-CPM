@@ -16,8 +16,6 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         transactions = crud_ops.get_user_transactions(DB_CONN, user_id)
 
-
-
         for transaction in transactions:
             transaction["vouchers_used"] = crud_ops.get_vouchers_used(DB_CONN, transaction["transaction_id"])
             transaction["vouchers_generated"] = crud_ops.get_vouchers_generated(DB_CONN, transaction["transaction_id"])
@@ -56,6 +54,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
                 transaction["items"] = items
 
+            """ transactions["nif"] = crud_ops.get_user_nif(DB_CONN, user_id) """
 
         return jsonify({'message': 'Transactions retrieved successfully!', 'transactions':  transactions}), 200
 
@@ -115,7 +114,8 @@ def handle_cafeteria_order(trans_id, order):
 
     # add to the cafeteria_orders table
     items = order["items"]
-    num_items = sum(quantity for _, quantity in items.items())
+    num_items = sum([item["quantity"] for item in items])
+
 
     ## add to the cafeteria transactions table
     order_row = crud_ops.create_cafeteria_transaction(DB_CONN, trans_id, num_items)
@@ -125,9 +125,13 @@ def handle_cafeteria_order(trans_id, order):
     redundant_id = order_row[0] # used for FK constraint below
     order_no = order_row[2] # order_no
 
-    for item,qnt in items.items():
+    for item in items:
+        qnt = item["quantity"]
+        price = item["price"]
+        itemname = item["itemname"]
+
         # add to the cafeteria_orders table
-        order_row = crud_ops.add_cafeteria_order_item(DB_CONN, redundant_id, item, qnt)
+        order_row = crud_ops.add_cafeteria_order_item(DB_CONN, redundant_id, itemname, qnt, price)
         if order_row is None:
             return jsonify({'message': 'Error creating cafeteria order item!'})
 

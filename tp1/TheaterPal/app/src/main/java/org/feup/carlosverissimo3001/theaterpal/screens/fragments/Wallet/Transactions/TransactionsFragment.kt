@@ -144,6 +144,7 @@ fun TransactionsFragment(
             }
 
             TransactionDetails(
+                nif = Authentication(ctx).getUserNIF(),
                 transaction = selectedTransaction,
                 onCancel = {
                     isViewingDetails = false

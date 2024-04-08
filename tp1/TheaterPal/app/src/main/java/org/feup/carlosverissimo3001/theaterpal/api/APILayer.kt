@@ -246,10 +246,16 @@ fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
     val jsonOrder = JSONObject()
     jsonOrder.put("vouchers_used", JSONArray(order.vouchersUsed.map { it.voucherid }))
     val barOrder = JSONObject()
-    val items = JSONObject()
+    val items = JSONArray()
+
     for ((item, quantity) in order.barOrder.items) {
-        items.put(item, quantity)
+        var itemJson = JSONObject()
+        itemJson.put("itemname", item.name)
+        itemJson.put("quantity", quantity)
+        itemJson.put("price", item.price)
+        items.put(itemJson)
     }
+
     barOrder.put("items", items)
     barOrder.put("total", order.barOrder.total)
     jsonOrder.put("order", barOrder)
