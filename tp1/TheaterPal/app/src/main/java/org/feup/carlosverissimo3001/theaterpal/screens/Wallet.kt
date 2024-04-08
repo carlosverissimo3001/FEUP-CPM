@@ -1,11 +1,14 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -130,66 +133,63 @@ fun Wallet(ctx: Context, navController: NavController) {
                         }
                     }
             ) {
-                if (selectedTabIndex == 0) {
-                    // Hasn't loaded, display loading spinner
-                    if (!areTicketsLoaded.value) {
-                        LoadingSpinner()
-                    } else if (ticketsState.isEmpty()) {
-                        NoTickets(
-                            onClick = {
-                                navController.navigate("shows")
-                            }
-                        )
-                    } else {
-                        // Display tickets
-                        // Use the ticket fragment to display the tickets
-                        TicketsTab(
-                            ctx = ctx,
-                            tickets = filteredTickets,
-                            onFilterChanged = { isChecked ->
-                                // if checked, shows only active vouchers, else shows all vouchers
-                                filteredTickets = if (isChecked) {
-                                    ticketsState.filter { !it.isUsed }
-                                } else {
-                                    ticketsState
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    if (selectedTabIndex == 0) {
+                        // Hasn't loaded, display loading spinner
+                        if (!areTicketsLoaded.value) {
+                            LoadingSpinner()
+                        } else if (ticketsState.isEmpty()) {
+                            NoTickets(
+                                onClick = {
+                                    navController.navigate("shows")
                                 }
-                            },
-                            /*onGroupingChanged =  { isChecked ->
-                            // if checked, group tickets by show, else shows all tickets
-                            filteredTickets = if (isChecked) {
-                                groupedTickets
-                            } else {
-                                ticketsState
-                            }
-                        },*/
-                            onValidate = {
-                                isValidatingTickets = true
-                                ticketsToValidate = it
-                            },
-                            onConsultTransactionsClicked = {
-                                isViewingTransactions = true
-                            }
-                        )
+                            )
+                        } else {
+                            // Display tickets
+                            // Use the ticket fragment to display the tickets
+                            TicketsTab(
+                                ctx = ctx,
+                                tickets = filteredTickets,
+                                onFilterChanged = { isChecked ->
+                                    // if checked, shows only active vouchers, else shows all vouchers
+                                    filteredTickets = if (isChecked) {
+                                        ticketsState.filter { !it.isUsed }
+                                    } else {
+                                        ticketsState
+                                    }
+                                },
+                                onValidate = {
+                                    isValidatingTickets = true
+                                    ticketsToValidate = it
+                                },
+                                onConsultTransactionsClicked = {
+                                    isViewingTransactions = true
+                                }
+                            )
+                        }
                     }
-                }
 
-                else if (selectedTabIndex == 1) {
-                    if (!areOrdersLoaded)
-                        LoadingSpinner()
-                    else if (orders.isEmpty()) {
-                        NoOrders(
-                            onClick = {
-                                navController.navigate("cafeteria")
-                            }
-                        )
-                    } else {
-                        OrdersTab(
-                            ctx,
-                            orders,
-                            onConsultTransactionsClicked = {
-                                isViewingTransactions = true
-                            }
-                        )
+                    else if (selectedTabIndex == 1) {
+                        if (!areOrdersLoaded)
+                            LoadingSpinner()
+                        else if (orders.isEmpty()) {
+                            NoOrders(
+                                onClick = {
+                                    navController.navigate("cafeteria")
+                                }
+                            )
+                        } else {
+                            OrdersTab(
+                                ctx,
+                                orders,
+                                onConsultTransactionsClicked = {
+                                    isViewingTransactions = true
+                                }
+                            )
+                        }
                     }
                 }
 

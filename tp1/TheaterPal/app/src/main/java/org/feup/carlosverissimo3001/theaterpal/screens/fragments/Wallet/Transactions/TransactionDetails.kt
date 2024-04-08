@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -78,174 +80,145 @@ fun TransactionDetails(
             )
         ),
     ){
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .padding(16.dp)
-                .pointerInput(Unit) {
-                    // draw down == go back
-                    detectDragGestures { change, dragAmount ->
-                        if (dragAmount.y > 50) {
-                            onCancel()
-                        }
-                    }
-                }
-        ){
-            /*Image(
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Image(
                 painter = textureImage,
                 contentDescription = "Texture",
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.FillBounds
-            )*/
-
-            // NAME OF THEATER
-            // ADDRESS OF THEATER
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Text(
-                    text = "CASA DA MÚSICA",
-                    style = TextStyle(
-                        fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                        fontFamily = marcherFontFamily,
-                    ),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                )
-
-                Text(
-                    text = "Fundaçao Casa da Música SA",
-                    style = TextStyle(
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontFamily = marcherFontFamily,
-                    ),
-                    color = Color.Black,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-
-                Text(
-                    text = "Edifício da Casa da Música (Av. da Boavista, 604-610) 4100-071 Porto",
-                    style = TextStyle(
-                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                        fontFamily = marcherFontFamily,
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Text(
-                    text = "NIF: 507636295",
-                    style = TextStyle(
-                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                        fontFamily = marcherFontFamily,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            // the items
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.matchParentSize()
+            )
+            
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .padding(16.dp)
+                    .pointerInput(Unit) {
+                        // draw down == go back
+                        detectDragGestures { change, dragAmount ->
+                            if (dragAmount.y > 50) {
+                                onCancel()
+                            }
+                        }
+                    }
             ) {
-                Text(
-                    text = parseTransactionType(transaction.transactiontype),
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontFamily = marcherFontFamily,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                if (transaction.transactiontype == "TICKET_PURCHASE"){
-                    val items = transaction.items.map { it as TicketItem }
-                    TicketItems(items)
-                } else {
-                    val items = transaction.items.map { it as CafeteriaTransactionItem }
-
-                    discount = abs(transaction.total - items.sumOf { it.price * it.quantity })
-
-                    CafeteriaItems(items)
-                }
-            }
-
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                // NAME OF THEATER
+                // ADDRESS OF THEATER
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "TOTAL",
+                        text = "CASA DA MÚSICA",
                         style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                             fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
                         ),
+                        fontWeight = FontWeight.Bold,
                         color = Color.Black,
                     )
 
                     Text(
-                        text = formatPrice(transaction.total),
+                        text = "Fundaçao Casa da Música SA",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleMedium.fontSize,
                             fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
                         ),
                         color = Color.Black,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
-                }
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                ) {
                     Text(
-                        text = "Credit Card (ending in xxxx3919)",
+                        text = "Edifício da Casa da Música (Av. da Boavista, 604-610) 4100-071 Porto",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleSmall.fontSize,
                             fontFamily = marcherFontFamily,
                         ),
                         color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
 
                     Text(
-                        text = formatPrice(transaction.total),
+                        text = "NIF: 507636295",
                         style = TextStyle(
                             fontSize = MaterialTheme.typography.titleSmall.fontSize,
                             fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold
                         ),
                         color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
 
-                // if used a voucher of type 5% discount
-                if (transaction.vouchersUsed.any { parseVoucherType(it.voucherType) == "5% Discount" }){
+                // the items
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                ) {
+                    Text(
+                        text = parseTransactionType(transaction.transactiontype),
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    if (transaction.transactiontype == "TICKET_PURCHASE") {
+                        val items = transaction.items.map { it as TicketItem }
+                        TicketItems(items)
+                    } else {
+                        val items = transaction.items.map { it as CafeteriaTransactionItem }
+
+                        discount = abs(transaction.total - items.sumOf { it.price * it.quantity })
+
+                        CafeteriaItems(items)
+                    }
+                }
+
+                Column {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Discount (5%)",
+                            text = "TOTAL",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                        )
+
+                        Text(
+                            text = formatPrice(transaction.total),
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Credit Card (ending in xxxx3919)",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleSmall.fontSize,
                                 fontFamily = marcherFontFamily,
@@ -254,7 +227,7 @@ fun TransactionDetails(
                         )
 
                         Text(
-                            text = formatPrice(discount),
+                            text = formatPrice(transaction.total),
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.titleSmall.fontSize,
                                 fontFamily = marcherFontFamily,
@@ -262,162 +235,205 @@ fun TransactionDetails(
                             color = Color.Black,
                         )
                     }
+
+                    // if used a voucher of type 5% discount
+                    if (transaction.vouchersUsed.any { parseVoucherType(it.voucherType) == "5% Discount" }) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Discount (5%)",
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                    fontFamily = marcherFontFamily,
+                                ),
+                                color = Color.Black,
+                            )
+
+                            Text(
+                                text = formatPrice(discount),
+                                style = TextStyle(
+                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                    fontFamily = marcherFontFamily,
+                                ),
+                                color = Color.Black,
+                            )
+                        }
+                    }
+
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        thickness = 1.dp,
+                        color = Color.Black
+                    )
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Final Consumer NIF: $nif",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                        )
+                        Text(
+                            // use the current date and time
+                            text = "Transaction Date: ${
+                                LocalDateTime.parse(transaction.timestamp).format(formatter)
+                            }",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        Text(
+                            // use the current date and time
+                            text = "Transaction ID: ${
+                                transaction.transactionid
+                            }",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Normal
+                            ),
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 4.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    // Vouchers Used
+                    if (transaction.vouchersUsed.isNotEmpty()) {
+                        Text(
+                            text = "Vouchers Used",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+
+                        transaction.vouchersUsed.forEach { voucher ->
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = parseVoucherType(voucher.voucherType),
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                        fontFamily = marcherFontFamily,
+                                    ),
+                                    color = Color.Black,
+                                )
+                                Text(
+                                    text = "ID: ${voucher.voucherid.substring(0, 8)}...",
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                        fontFamily = marcherFontFamily,
+                                    ),
+                                    color = Color.Black,
+                                )
+
+                            }
+                        }
+                    }
+
+                    // Vouchers Earned
+                    if (transaction.vouchersGenerated.isNotEmpty()) {
+                        Text(
+                            text = "Vouchers Earned",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 32.dp)
+                        )
+                        var i = 0
+                        transaction.vouchersGenerated.forEach { voucher ->
+                            i += 1
+                            if (i == 5) {
+                                Text(
+                                    text = "And ${transaction.vouchersGenerated.size - 4} more...",
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                        fontFamily = marcherFontFamily,
+                                    ),
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                                return@forEach
+                            }
+                            if (i > 5) return@forEach
+
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = parseVoucherType(voucher.voucherType),
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                        fontFamily = marcherFontFamily,
+                                    ),
+                                    color = Color.Black,
+                                )
+                                Text(
+                                    text = "ID: ${voucher.voucherid.substring(0, 8)}...",
+                                    style = TextStyle(
+                                        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                        fontFamily = marcherFontFamily,
+                                    ),
+                                    color = Color.Black,
+                                )
+                            }
+                        }
+                    }
                 }
 
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    thickness = 1.dp,
-                    color = Color.Black
-                )
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Button(
+                    onClick = { onCancel() },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                ){
-                    Text(
-                        text = "Final Consumer NIF: $nif",
-                        style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                            fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color.Black,
+                        .fillMaxWidth(0.8f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
+                ) {
                     Text(
-                        // use the current date and time
-                        text = "Transaction Date: ${LocalDateTime.parse(transaction.timestamp).format(formatter)}",
+                        text = "< Take me back",
                         style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
                         ),
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 4.dp)
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
                     )
                 }
 
-                // Vouchers Used
-                if (transaction.vouchersUsed.isNotEmpty()){
-                    Text(
-                        text = "Vouchers Used",
-                        style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
-
-                    transaction.vouchersUsed.forEach{voucher ->
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ){
-                            Text(
-                                text = parseVoucherType(voucher.voucherType),
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                                    fontFamily = marcherFontFamily,
-                                ),
-                                color = Color.Black,
-                            )
-                            Text(
-                                text = "ID: ${voucher.voucherid.substring(0, 8)}...",
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                                    fontFamily = marcherFontFamily,
-                                ),
-                                color = Color.Black,
-                            )
-
-                        }
-                    }
-                }
-
-                // Vouchers Earned
-                if (transaction.vouchersGenerated.isNotEmpty()){
-                    Text(
-                        text = "Vouchers Earned",
-                        style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontFamily = marcherFontFamily,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 32.dp)
-                    )
-                    var i = 0
-                    transaction.vouchersGenerated.forEach{voucher ->
-                        i += 1
-                        if (i == 5){
-                            Text(
-                                text = "And ${transaction.vouchersGenerated.size - 4} more...",
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                                    fontFamily = marcherFontFamily,
-                                ),
-                                color = Color.Black,
-                                modifier = Modifier.padding(vertical = 4.dp)
-                            )
-                            return@forEach
-                        }
-                        if (i > 5) return@forEach
-
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ){
-                            Text(
-                                text = parseVoucherType(voucher.voucherType),
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                                    fontFamily = marcherFontFamily,
-                                ),
-                                color = Color.Black,
-                            )
-                            Text(
-                                text = "ID: ${voucher.voucherid.substring(0, 8)}...",
-                                style = TextStyle(
-                                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                                    fontFamily = marcherFontFamily,
-                                ),
-                                color = Color.Black,
-                            )
-                        }
-                    }
-                }
             }
-
-
-
-            Button(
-                onClick = { onCancel() },
-                modifier = Modifier
-                    .fillMaxWidth(0.6f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            ) {
-                Text(
-                    text = "< Take me back",
-                    style = TextStyle(
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontFamily = marcherFontFamily,
-                    ),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                )
-            }
-
         }
     }
 }

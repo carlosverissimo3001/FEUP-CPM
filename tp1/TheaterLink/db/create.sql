@@ -46,7 +46,8 @@ CREATE TABLE Transactions (
     TransactionID UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- Unique identifier for the transaction
     TransactionType transaction_type NOT NULL,                 -- Type of transaction
     UserID UUID REFERENCES Users(UserID),                      -- User that made the transaction
-    Total DECIMAL(10, 2) NOT NULL                         -- Total amount of the transaction
+    Total DECIMAL(10, 2) NOT NULL                         -- Total amount of the transaction,
+    TransactionTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP -- Timestamp of the transaction
 );
 
 -- Ticket Transaction Table

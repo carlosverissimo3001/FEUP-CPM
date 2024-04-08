@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,6 +53,9 @@ fun VouchersTab(
     val (isDiscountAlreadyApplied, setDiscountAlreadyApplied) = remember { mutableStateOf(false) }
 
     val selectedVouchers = remember { mutableStateOf(emptyList<Voucher>()) }
+
+    // when a voucher is not in view, its state should still be remembered
+    val selectedVouchersIndices = remember { mutableStateListOf<Int>() }
     var updatedTotal by remember { mutableDoubleStateOf(total) }
 
     val possibleDiscount = String.format("%.2f", total*0.05).toDouble()
@@ -128,6 +132,8 @@ fun VouchersTab(
         ) {
             items(vouchers.size) { index ->
                 val vch = vouchers[index]
+                var isSelected = selectedVouchers.value.contains(vch)
+
                 Voucher(
                     voucher = vch,
                     // Can select a new one if there are less than 2 selected
@@ -138,6 +144,7 @@ fun VouchersTab(
                         // Voucher already selected, remove it
                         if (selectedVouchers.value.contains(voucher)) {
                             selectedVouchers.value = selectedVouchers.value.filter { it != voucher }
+                            selectedVouchersIndices.remove(index)
 
                             if (parseVoucherType(voucher.voucherType) == "5% Discount") {
                                 updatedTotal += possibleDiscount
@@ -147,6 +154,7 @@ fun VouchersTab(
                         } else {
                             if (selectedVouchers.value.size < 2) {
                                 selectedVouchers.value += voucher
+                                selectedVouchersIndices.add(index)
                             }
                             if (parseVoucherType(voucher.voucherType) == "5% Discount") {
                                 updatedTotal -= possibleDiscount

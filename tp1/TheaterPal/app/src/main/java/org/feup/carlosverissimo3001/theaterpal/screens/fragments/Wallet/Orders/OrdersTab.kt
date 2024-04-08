@@ -44,23 +44,9 @@ fun OrdersTab(
             .padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            contentPadding = PaddingValues(10.dp)
-        ) {
-            items(orders.size) { index ->
-                // Display ticket
-                // Use the ticket fragment to display the ticket
-                Order(
-                    order = orders[index],
-                    ctx = ctx
-                )
-            }
-        }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
         ) {
             Text(
                 text = "Click here to consult all transactions",
@@ -80,6 +66,20 @@ fun OrdersTab(
                     }
                 )
             )
+        }
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            contentPadding = PaddingValues(10.dp)
+        ) {
+            items(orders.size) { index ->
+                // Display ticket
+                // Use the ticket fragment to display the ticket
+                Order(
+                    order = orders[index],
+                    ctx = ctx
+                )
+            }
         }
     }
 }

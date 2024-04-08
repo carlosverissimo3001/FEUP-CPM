@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -84,26 +85,26 @@ fun TicketsTab(
                     )
                 )
             }
+        }
 
-            /*Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isGrouped,
-                    onCheckedChange = {
-                        setGroupingChecked(it)
-                        onGroupingChanged(it)
-                    },
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Click here to consult all transactions",
+                style = TextStyle(
+                    fontFamily = marcherFontFamily,
+                    color = Color.White,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    textDecoration = TextDecoration.Underline
+                ),
+                modifier = Modifier.clickable(
+                    onClick = {
+                        onConsultTransactionsClicked()
+                    }
                 )
-                Text(
-                    text = "Group Tickets", style = TextStyle(
-                        fontFamily = marcherFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.titleSmall.fontSize
-                    )
-                )
-            }*/
+            )
         }
 
         LazyVerticalGrid(
@@ -132,26 +133,6 @@ fun TicketsTab(
                     }
                 )
             }
-        }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = "Click here to consult all transactions",
-                style = TextStyle(
-                    fontFamily = marcherFontFamily,
-                    color = Color.White,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    textDecoration = TextDecoration.Underline
-                ),
-                modifier = Modifier.clickable(
-                    onClick = {
-                        onConsultTransactionsClicked()
-                    }
-                )
-            )
         }
     }
 

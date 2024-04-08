@@ -155,7 +155,7 @@ fun Cafeteria(ctx: Context) {
 
                             // TODO : Activate NFC
                             // On nfc read, the line below should be run
-                            sendOrder(ctx, order!!)
+                            /*sendOrder(ctx, order!!)*/
 
                             // Navigate to next step
                             /*isChoosingVoucher = false
