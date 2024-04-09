@@ -5,7 +5,7 @@ import uuid
 def construct_blueprint(dbConn):
     user_page = Blueprint('user_page', __name__)
 
-    @user_page.route('/users')
+    @user_page.route('/users', methods=['GET'])
     def users():
         users = crud_ops.get_users(dbConn)
 
@@ -38,11 +38,9 @@ def construct_blueprint(dbConn):
         return jsonify({'user_id': user_id, 'message': 'User added successfully'}), 201
 
     # given a user id, return the user details
-    @user_page.route('/get_user', methods=['POST'])
+    @user_page.route('/get_user', methods=['GET'])
     def get_name():
-        data = request.json
-
-        user_id = data.get('user_id')
+        user_id = request.args.get('user_id')
 
         user = crud_ops.get_user_by_user_id(dbConn, user_id)
 

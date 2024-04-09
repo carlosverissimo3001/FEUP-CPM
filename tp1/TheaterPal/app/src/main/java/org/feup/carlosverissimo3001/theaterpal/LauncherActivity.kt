@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import okhttp3.OkHttpClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.feup.carlosverissimo3001.theaterpal.api.getUserName
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.json.JSONObject
 
@@ -56,51 +57,4 @@ class LauncherActivity : AppCompatActivity() {
             finish()
         }
     }
-
-    private fun getUserName(userId: String, callback: (String) -> Unit) {
-        // get the user's name from the server
-        val client = OkHttpClient()
-
-        // add the user_id to the request body
-        val requestBody = JSONObject()
-        requestBody.put("user_id", userId)
-
-        val body = requestBody.toString().toRequestBody("application/json".toMediaType())
-
-        val request = okhttp3.Request.Builder()
-            .url("${Server.URL}/get_user")
-            .post(body)
-            .build()
-
-        client.newCall(request).enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-                e.printStackTrace()
-                // Pass an empty string to the callback to indicate failure
-                callback("")
-            }
-
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                val responseCode = response.code
-
-                // 200 means the user was found
-                if (responseCode == 200) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = responseBody?.let { JSONObject(it) }
-                    // get the user's name
-                    val name = jsonResponse?.getString("name")
-                    // Pass the name to the callback
-                    if (name != null) {
-                        callback(name)
-                    }
-                } else if (responseCode == 404) {
-                    // user_id not found
-                    println("User not found")
-                    // Pass an empty string to the callback to indicate failure
-                    callback("")
-                    // TODO: handle this case, although it should never happen
-                }
-            }
-        })
-    }
-
 }

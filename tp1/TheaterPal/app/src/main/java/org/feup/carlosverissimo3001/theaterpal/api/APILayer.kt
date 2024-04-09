@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -326,3 +327,42 @@ fun getUserTransactions(user_id: String, callback: (List<Transaction>) -> Unit) 
     })
 }
 
+fun getUserName(userId: String, callback: (String) -> Unit) {
+    // get the user's name from the server
+    val client = OkHttpClient()
+
+    val request = okhttp3.Request.Builder()
+        .url("${Server.URL}/get_user?user_id=$userId")
+        .get()
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            // Pass an empty string to the callback to indicate failure
+            callback("")
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            val responseCode = response.code
+
+            // 200 means the user was found
+            if (responseCode == 200) {
+                val responseBody = response.body?.string()
+                val jsonResponse = responseBody?.let { JSONObject(it) }
+                // get the user's name
+                val name = jsonResponse?.getString("name")
+                // Pass the name to the callback
+                if (name != null) {
+                    callback(name)
+                }
+            } else if (responseCode == 404) {
+                // user_id not found
+                println("User not found")
+                // Pass an empty string to the callback to indicate failure
+                callback("")
+                // TODO: handle this case, although it should never happen
+            }
+        }
+    })
+}
