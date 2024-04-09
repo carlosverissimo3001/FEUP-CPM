@@ -4,32 +4,84 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import org.feup.carlosverissimo3001.theaterpal.Crypto
+import android.util.Log
+import org.feup.carlosverissimo3001.theaterpal.Constants
+import java.math.BigInteger
 import java.security.KeyPairGenerator
 import java.security.KeyStore
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
+import java.util.Calendar
+import java.util.GregorianCalendar
+import javax.security.auth.x500.X500Principal
+
+const val logTag = "TheaterPal"
+
 
 class Authentication (private val context: Context){
+    inner class PubKey {
+        var modulus = ByteArray(0)
+        var exponent = ByteArray(0)
+    }
+
+    // Public key field
+    val pubKey: PubKey
+        get() {
+            val pKey = PubKey()
+            try {
+                val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
+                    load(null)
+                    getEntry(Constants.KEY_NAME, null)
+                }
+                val pub = (entry as KeyStore.PrivateKeyEntry).certificate.publicKey
+                pKey.modulus = (pub as RSAPublicKey).modulus.toByteArray()
+                pKey.exponent = pub.publicExponent.toByteArray()
+            } catch (ex: Exception) {
+                Log.d(logTag, ex.toString())
+            }
+            return pKey
+        }
+
+    // Private exponent field
+    public val privExp: ByteArray
+        get() {
+            var exp = ByteArray(0)
+            try {
+                val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
+                    load(null)
+                    getEntry(Constants.KEY_NAME, null)
+                }
+                exp = ((entry as KeyStore.PrivateKeyEntry).privateKey as RSAPrivateKey).privateExponent.toByteArray()
+            } catch (ex: Exception) {
+                Log.d(logTag, ex.toString())
+            }
+            return exp
+        }
+
     fun generateRSAKeyPair() {
         try {
-            val spec = KeyGenParameterSpec.Builder(
-                Crypto.KEY_NAME,
-                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
-            )
-                .setKeySize(Crypto.KEY_SIZE)
-                .setDigests(KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_SHA256)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
-                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-                // the other fields in the demo crypto project are also for signing
-                // but we only need encryption here (i think)
-                .build()
-
-            KeyPairGenerator.getInstance(Crypto.KEY_ALGO, Crypto.ANDROID_KEYSTORE).apply {
-                initialize(spec)
-                generateKeyPair() // the generated key pair is stored in the Android KeyStore
+            val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
+                load(null)
+                getEntry(Constants.KEY_NAME, null)
+            }
+            if (entry == null) {
+                val spec = KeyGenParameterSpec.Builder(Constants.KEY_NAME, KeyProperties.PURPOSE_SIGN)
+                    .setKeySize(Constants.KEY_SIZE)
+                    .setDigests(KeyProperties.DIGEST_SHA256)
+                    .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                    .setCertificateSubject(X500Principal("CN=" + Constants.KEY_NAME))
+                    .setCertificateSerialNumber(BigInteger.valueOf(12131415L))
+                    .setCertificateNotBefore(GregorianCalendar().time)
+                    .setCertificateNotAfter(GregorianCalendar().apply { add(Calendar.YEAR, 10) }.time)
+                    .build()
+                KeyPairGenerator.getInstance(Constants.KEY_ALGO, Constants.ANDROID_KEYSTORE).run {
+                    initialize(spec)
+                    generateKeyPair()
+                }
             }
         }
         catch (ex: Exception) {
-            ex.printStackTrace()
+            Log.d(logTag, ex.toString())
         }
     }
 
@@ -37,10 +89,10 @@ class Authentication (private val context: Context){
      * Get the public key from the Android KeyStore
      * @return the public key in Base64
      */
-    fun getPublicKey(): String {
-        val keyStore = KeyStore.getInstance(Crypto.ANDROID_KEYSTORE)
+    fun getPublicKeyB64(): String {
+        val keyStore = KeyStore.getInstance(Constants.ANDROID_KEYSTORE)
         keyStore.load(null)
-        val publicKey = keyStore.getCertificate(Crypto.KEY_NAME).publicKey
+        val publicKey = keyStore.getCertificate(Constants.KEY_NAME).publicKey
 
         val publicKeyBytes = publicKey.encoded
 
@@ -82,6 +134,6 @@ class Authentication (private val context: Context){
     fun doesRSAKeyPairExist(): Boolean {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
-        return keyStore.containsAlias(Crypto.KEY_NAME)
+        return keyStore.containsAlias(Constants.KEY_NAME)
     }
 }

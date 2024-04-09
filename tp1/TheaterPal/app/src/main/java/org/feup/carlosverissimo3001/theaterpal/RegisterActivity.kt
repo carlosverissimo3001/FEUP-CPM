@@ -41,7 +41,7 @@ class RegisterActivity : AppCompatActivity(){
         auth.generateRSAKeyPair()
 
         // get the public key
-        user.publicKey = auth.getPublicKey()
+        user.publicKey = auth.getPublicKeyB64()
 
         registerUser(user, callback = {success, userid ->
             if (success) {

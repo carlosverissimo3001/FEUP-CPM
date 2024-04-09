@@ -1,11 +1,10 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.feup.carlosverissimo3001.theaterpal.Server
+import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
@@ -34,7 +33,7 @@ fun registerUser(user: User, callback: (Boolean, String) -> Unit){
         .toRequestBody("application/json".toMediaTypeOrNull())
 
     var request = okhttp3.Request.Builder()
-        .url("${Server.URL}/register")
+        .url("${Constants.URL}/register")
         .post(requestBody)
         .build()
 
@@ -63,7 +62,7 @@ fun registerUser(user: User, callback: (Boolean, String) -> Unit){
 
 fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
     var request = okhttp3.Request.Builder()
-        .url("${Server.URL}/tickets?user_id=$user_id")
+        .url("${Constants.URL}/tickets?user_id=$user_id")
         .build()
 
     val client = OkHttpClient()
@@ -103,7 +102,7 @@ fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
 
 fun getUserVouchers(user_id: String, callback: (List<Voucher>) -> Unit){
     var request = okhttp3.Request.Builder()
-        .url("${Server.URL}/vouchers?user_id=$user_id")
+        .url("${Constants.URL}/vouchers?user_id=$user_id")
         .build()
 
     val client = OkHttpClient()
@@ -147,13 +146,13 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
     val areImagesCached = areImagesStoreInCache(ctx)
 
     var request = okhttp3.Request.Builder()
-        .url("${Server.URL}/shows")
+        .url("${Constants.URL}/shows")
         .get()
         .build()
 
     if (!areImagesCached){
         request = okhttp3.Request.Builder()
-            .url("${Server.URL}/shows?images=true")
+            .url("${Constants.URL}/shows?images=true")
             .get()
             .build()
     }
@@ -207,7 +206,7 @@ fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
-        .url("${Server.URL}/orders?user_id=$user_id")
+        .url("${Constants.URL}/orders?user_id=$user_id")
         .get()
         .build()
 
@@ -266,7 +265,7 @@ fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
         .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
-        .url("${Server.URL}/submit_order")
+        .url("${Constants.URL}/submit_order")
         .post(requestBody)
         .build()
 
@@ -293,7 +292,7 @@ fun getUserTransactions(user_id: String, callback: (List<Transaction>) -> Unit) 
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
-        .url("${Server.URL}/transactions?user_id=$user_id")
+        .url("${Constants.URL}/transactions?user_id=$user_id")
         .get()
         .build()
 
@@ -332,7 +331,7 @@ fun getUserName(userId: String, callback: (String) -> Unit) {
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
-        .url("${Server.URL}/get_user?user_id=$userId")
+        .url("${Constants.URL}/get_user?user_id=$userId")
         .get()
         .build()
 

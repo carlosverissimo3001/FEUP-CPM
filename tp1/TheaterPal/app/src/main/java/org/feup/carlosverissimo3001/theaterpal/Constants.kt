@@ -19,15 +19,13 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-object Crypto {
+object Constants {
     const val KEY_SIZE = 512
     const val ANDROID_KEYSTORE = "AndroidKeyStore"
     const val KEY_ALGO = "RSA"
     const val KEY_NAME = "user_auth_key"
-}
-
-object Server {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+    const val ACTION_CARD_DONE = "CMD_PROCESSING_DONE"
 }
 
 val marcherFontFamily: FontFamily = FontFamily(
@@ -98,6 +96,20 @@ fun String.capitalized(): String {
             it.titlecase(Locale.getDefault())
         else it.toString()
     }
+}
+
+/* Utility top-level function */
+fun byteArrayToHex(ba: ByteArray): String {
+    val sb = StringBuilder(ba.size * 2)
+    for (b in ba) sb.append(String.format("%02x", b))
+    return sb.toString()
+}
+
+fun hexStringToByteArray(s: String): ByteArray {
+    val data = ByteArray(s.length/2)
+    for (k in 0 until s.length/2)
+        data[k] = ((Character.digit(s[2*k], 16) shl 4) + Character.digit(s[2*k+1], 16)).toByte()
+    return data
 }
 
 
