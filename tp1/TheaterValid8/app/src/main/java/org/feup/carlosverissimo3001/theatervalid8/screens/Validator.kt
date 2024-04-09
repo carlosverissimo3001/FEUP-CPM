@@ -37,11 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.feup.carlosverissimo3001.theatervalid8.americanDateToNormal
 import org.feup.carlosverissimo3001.theatervalid8.decodeBase64ToBitmap
 import org.feup.carlosverissimo3001.theatervalid8.loadImageFromCache
 import org.feup.carlosverissimo3001.theatervalid8.models.*
+import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,8 +56,6 @@ fun ValidatorScreen(
     onValidate: () -> Unit,
     isScanning: Boolean)
 {
-    val sampleActors = arrayOf("Jane Doe", "John Doe", "Alice Doe", "Bob Doe")
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
         rememberTopAppBarState()
     )
@@ -82,11 +83,14 @@ fun ValidatorScreen(
                     Text(
                         text = "SALA VIP",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = poppinsFontFamily,
                     )
                     Text(
                         text = "In Session",
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = poppinsFontFamily,
                     )
                 }
             },
@@ -154,9 +158,12 @@ fun ValidatorScreen(
                     overflow = TextOverflow.Ellipsis,
                     softWrap = true,
                     style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = poppinsFontFamily,
                     color = isSystemInDarkTheme().let {
                         if (it) Color.White else Color.Black
                     },
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.size(4.dp))
@@ -167,114 +174,103 @@ fun ValidatorScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.size(15.dp))
 
                 Text(
                     text = show.description,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    softWrap = true,
                     style = MaterialTheme.typography.bodySmall,
+                    fontFamily = poppinsFontFamily,
                     color = isSystemInDarkTheme().let {
                         if (it) Color.White else Color.Black
                     },
+                    textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.size(13.dp))
-
-                Row {
-                    Text(
-                        text = "Age Rating: ",
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                    Text(
-                        text = "16+",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                }
-
                 Spacer(modifier = Modifier.size(10.dp))
 
-                /*Row {*/
-                    Text(
-                        text = "Director: ",
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                    Text(
-                        text = "Christopher Nolan",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-               /* }*/
-
-                Spacer(modifier = Modifier.size(10.dp))
-
-                Row {
-                    Text(
-                        text = "Price: ",
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                    Text(
-                        text = "${show.price}€",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(10.dp))
-
-                /*Text(
-                    text = "Cast: ",
+                Text(
+                    text = "Release Date: ",
                     fontWeight = FontWeight.ExtraBold,
+                    fontFamily = poppinsFontFamily,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+
+                Text(
+                    text = americanDateToNormal(show.releasedate),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontFamily = poppinsFontFamily,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+
+
+
+                Spacer(modifier = Modifier.size(10.dp))
+
+
+                Text(
+                    text = "Price: ",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = poppinsFontFamily,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+                Text(
+                    text = "${show.price}€",
                     style = MaterialTheme.typography.bodySmall,
                     color = isSystemInDarkTheme().let {
                         if (it) Color.White else Color.Black
                     },
                 )
 
-                Column {
-                    sampleActors.forEach {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = isSystemInDarkTheme().let {
-                                if (it) Color.White else Color.Black
-                            },
-                        )
-                    }
-                }*/
 
                 Spacer(modifier = Modifier.size(10.dp))
 
+
+                Text(
+                    text = "Duration: ",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = poppinsFontFamily,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+                Text(
+                    text = "${show.duration} min",
+                    fontFamily = poppinsFontFamily,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+
                 Spacer(modifier = Modifier.size(10.dp))
 
-                Row {
+                Text(
+                    text = "Available Dates: ",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = poppinsFontFamily,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = isSystemInDarkTheme().let {
+                        if (it) Color.White else Color.Black
+                    },
+                )
+
+                show.dates.sortedBy { it.date }.forEach {
+                    Spacer(modifier = Modifier.size(1.dp))
                     Text(
-                        text = "Duration: ",
-                        fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = isSystemInDarkTheme().let {
-                            if (it) Color.White else Color.Black
-                        },
-                    )
-                    Text(
-                        text = "150 minutes",
+                        text = americanDateToNormal(it.date),
+                        fontFamily = poppinsFontFamily,
                         style = MaterialTheme.typography.bodySmall,
                         color = isSystemInDarkTheme().let {
                             if (it) Color.White else Color.Black

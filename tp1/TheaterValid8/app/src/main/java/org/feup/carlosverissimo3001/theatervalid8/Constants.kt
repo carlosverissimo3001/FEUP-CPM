@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import java.text.SimpleDateFormat
 
 object Server {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
@@ -62,4 +63,11 @@ fun hexStringToByteArray(s: String): ByteArray {
     for (k in 0 until s.length/2)
         data[k] = ((Character.digit(s[2*k], 16) shl 4) + Character.digit(s[2*k+1], 16)).toByte()
     return data
+}
+
+fun americanDateToNormal(date: String): String {
+    val formatter = SimpleDateFormat("yyyy-MM-dd")
+    val date = formatter.parse(date)
+    val formatter2 = SimpleDateFormat("dd/MM/yyyy")
+    return formatter2.format(date)
 }

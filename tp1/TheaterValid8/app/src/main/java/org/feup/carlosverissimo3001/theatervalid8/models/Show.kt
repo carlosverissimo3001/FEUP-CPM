@@ -9,6 +9,8 @@ data class Show(
     val description: String,
     val picture: String,
     val pictureBase64: String,
+    val releasedate: String,
+    val duration: Int,
     val price: Int,
     val dates: List<ShowDate>
 ) : Parcelable {
@@ -18,6 +20,8 @@ data class Show(
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readInt(),
         parcel.readInt(),
         parcel.createTypedArrayList(ShowDate)!!
     ) {
@@ -29,6 +33,8 @@ data class Show(
         parcel.writeString(description)
         parcel.writeString(picture)
         parcel.writeString(pictureBase64)
+        parcel.writeString(releasedate)
+        parcel.writeInt(duration)
         parcel.writeInt(price)
         parcel.writeTypedList(dates)
     }
@@ -57,11 +63,11 @@ data class ShowDate(
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readInt()
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(date)
+        parcel.writeInt(showdateid)
     }
 
     override fun describeContents(): Int {

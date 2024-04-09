@@ -106,6 +106,8 @@ class APILayer (private val ctx: Context){
                     show.getString("description"),
                     show.getString("picture"),
                     show.getString("picture_b64"),
+                    show.getString("releasedate"),
+                    show.getInt("duration"),
                     show.getInt("price"),
                     showDates
                 )
