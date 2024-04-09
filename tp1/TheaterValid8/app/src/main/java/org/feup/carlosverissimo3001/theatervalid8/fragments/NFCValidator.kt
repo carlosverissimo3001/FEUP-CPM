@@ -27,8 +27,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theatervalid8.R
+import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 @Composable
 fun NfcValidatorFragment(
@@ -52,15 +54,18 @@ fun NfcValidatorFragment(
             modifier = Modifier.fillMaxSize()
         ){
             Text(
-                text = "Validate your ticket",
+                text = "Validate your ticket(s)",
                 style = MaterialTheme.typography.titleLarge,
+                fontFamily = poppinsFontFamily,
                 fontWeight = FontWeight.ExtraBold,
-                color = androidx.compose.ui.graphics.Color.White,
+                color = Color.White,
             )
             Text(
-                text = "Please approach your device to validate your theater ticket.",
+                text = "Please approach your device to validate your theater ticket(s).",
+                fontFamily = poppinsFontFamily,
                 style = MaterialTheme.typography.bodySmall,
-                color = androidx.compose.ui.graphics.Color.White
+                color = Color.White,
+                textAlign = TextAlign.Center,
             )
 
             Image(
@@ -82,7 +87,11 @@ fun NfcValidatorFragment(
                     contentColor = androidx.compose.ui.graphics.Color.White
                 )
             ) {
-                Text("Scan")
+                Text(
+                    "Scan",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
     }
