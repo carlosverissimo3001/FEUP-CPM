@@ -34,7 +34,6 @@ class NFCSendActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        Card.type = 0  // allow sending only when this Activity is running
         LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(broadcastReceiver)
     }
 }

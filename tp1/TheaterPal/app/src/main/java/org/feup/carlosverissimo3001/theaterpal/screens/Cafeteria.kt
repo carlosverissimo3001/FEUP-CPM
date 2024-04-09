@@ -1,6 +1,8 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
+import android.nfc.NfcAdapter
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,9 +34,13 @@ import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendingOrderFragment
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
 
 @Composable
 fun Cafeteria(ctx: Context) {
+    val nfcAdapter = NfcAdapter.getDefaultAdapter(ctx)
+
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val areVouchersLoaded = remember { mutableStateOf(false) }
     var isChoosingVoucher by remember { mutableStateOf(false) }
@@ -153,13 +159,20 @@ fun Cafeteria(ctx: Context) {
 
                             isSendingOrder = true
 
-                            // TODO : Activate NFC
-                            // On nfc read, the line below should be run
-                            /*sendOrder(ctx, order!!)*/
+                            if (nfcAdapter == null){
+                                Toast.makeText(ctx, "NFC is not supported on this device", Toast.LENGTH_SHORT).show()
+                            }
+                            else if (!nfcAdapter.isEnabled){
+                                Toast.makeText(ctx, "Please enable NFC", Toast.LENGTH_SHORT).show()
+                            }
+                            else {
+                                // TODO : Activate NFC
+                                sendOrder(ctx, order!!)
 
-                            // Navigate to next step
-                            /*isChoosingVoucher = false
-                            selectedTabIndex = 0*/
+                                // Navigate to next step
+                                /*isChoosingVoucher = false
+                                selectedTabIndex = 0*/
+                            }
                         },
                         total = barOrder?.total ?: 0.00
                     )
@@ -178,12 +191,23 @@ fun Cafeteria(ctx: Context) {
 }
 
 fun sendOrder(ctx: Context, order: Order) {
-    // API Request to send order
-    submitOrder(ctx, order) { success ->
-        if (success) {
-            println("Order sent successfully")
-        } else {
-            println("Error sending order")
-        }
+    try {
+        // Serialize the Order object into a byte array
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val objectOutputStream = ObjectOutputStream(byteArrayOutputStream)
+        objectOutputStream.writeObject(order)
+        val orderByteArray = byteArrayOutputStream.toByteArray()
+
+        // Send the orderByteArray through NFC
+        // Example: NFC.sendData(orderByteArray)
+
+        // Close the streams
+        objectOutputStream.close()
+        byteArrayOutputStream.close()
+
+        println("Order sent successfully through NFC.")
+    } catch (e: Exception) {
+        println("Error sending order through NFC: $e")
     }
+    println("I'm here")
 }
