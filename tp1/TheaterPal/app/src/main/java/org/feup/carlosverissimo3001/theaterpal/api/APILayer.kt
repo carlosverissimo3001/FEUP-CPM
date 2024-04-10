@@ -264,6 +264,9 @@ fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
     val requestBody = jsonOrder.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
 
+//    val requestBody = encrypt(jsonOrder.toString())
+//        .toRequestBody("application/json".toMediaTypeOrNull())
+
     val request = okhttp3.Request.Builder()
         .url("${Constants.URL}/submit_order")
         .post(requestBody)
@@ -282,6 +285,49 @@ fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
                 }
                 else -> {
                     callback(false)
+                }
+            }
+        }
+    })
+}
+
+fun purchaseTickets(
+    ctx: Context,
+    showDateId: Int,
+    numTickets: Int,
+    totalCost: Int
+){
+    val client = OkHttpClient()
+
+    val jsonOrder = JSONObject()
+    jsonOrder.put("show_date_id", showDateId)
+    jsonOrder.put("num_tickets", numTickets)
+    jsonOrder.put("total_cost", totalCost)
+    jsonOrder.put("user_id", Authentication(ctx).getUserID())
+
+    val requestBody = jsonOrder.toString()
+        .toRequestBody("application/json".toMediaTypeOrNull())
+
+//    val requestBody = encrypt(jsonOrder.toString())
+//        .toRequestBody("application/json".toMediaTypeOrNull())
+
+    val request = okhttp3.Request.Builder()
+        .url("${Server.URL}/purchase_tickets")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200, 201 -> {
+                    print("Tickets purchased")
+                }
+                else -> {
+                    print("Error purchasing tickets")
                 }
             }
         }

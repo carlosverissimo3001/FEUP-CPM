@@ -1,4 +1,5 @@
 import psycopg2
+import rsa
 from db import crud_ops
 
 def get_public_key(dbConn: psycopg2.extensions.connection, user_id: str, ) -> str:
@@ -38,3 +39,23 @@ def get_full_ticket(dbConn: psycopg2.extensions.connection, ticket_id: str) -> d
         return None
 
     return ticket[0]
+
+def decrypt_body(cyphertext: str, publickey: str):
+	'''
+	Decrypt the body of a message
+
+		Parameters:
+			cyphertext (str): cyphertext to decrypt
+			publickey (str): public key to use
+
+		Returns:
+			str: decrypted message
+	'''
+	# Try to decrypt the message, if it fails return None
+ 
+	try:
+		publickey = rsa.PublicKey.load_pkcs1(publickey)
+		return rsa.decrypt(cyphertext, publickey).decode()
+	except:
+		return ""
+        

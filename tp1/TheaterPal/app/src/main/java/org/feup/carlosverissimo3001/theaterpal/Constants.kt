@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,8 +26,16 @@ object Constants {
     const val KEY_ALGO = "RSA"
     const val KEY_NAME = "user_auth_key"
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+    /* const val URL = "https://wrongly-in-pug.ngrok-free.app" */
     const val ACTION_CARD_DONE = "CMD_PROCESSING_DONE"
 }
+
+object MyColors
+{
+    val tertiaryColor: Color = Color(0xFFF54242)
+    val bottomNavBarUnselectedItemColor: Color = Color(0x88FFFFFF)
+}
+
 
 val marcherFontFamily: FontFamily = FontFamily(
     Font(R.font.marcher_light, FontWeight.Light),
