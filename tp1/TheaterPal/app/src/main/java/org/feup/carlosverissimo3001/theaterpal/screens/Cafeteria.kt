@@ -191,7 +191,15 @@ fun Cafeteria(ctx: Context) {
 }
 
 fun sendOrder(ctx: Context, order: Order) {
-    try {
+    /*submitOrder(ctx, order = order, callback = { success ->
+        if (success) {
+            println("Order submitted successfully")
+        } else {
+            println("Error submitting order")
+        }
+    })*/
+
+    /*try {
         // Serialize the Order object into a byte array
         val byteArrayOutputStream = ByteArrayOutputStream()
         val objectOutputStream = ObjectOutputStream(byteArrayOutputStream)
@@ -209,5 +217,5 @@ fun sendOrder(ctx: Context, order: Order) {
     } catch (e: Exception) {
         println("Error sending order through NFC: $e")
     }
-    println("I'm here")
+    println("I'm here")*/
 }

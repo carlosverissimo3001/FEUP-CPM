@@ -218,9 +218,14 @@ fun TypeDropdown(
     val types = CardType.entries.map { it.name }
     var type by remember { mutableStateOf("") }
 
+    println(types)
+
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        onExpandedChange = { isExpanded = it }
+        onExpandedChange = {newVal ->
+            isExpanded = newVal
+            println("Expanded: $newVal")
+        }
     ) {
         OutlinedTextField(
             value = type,
@@ -247,7 +252,6 @@ fun TypeDropdown(
                 isExpanded = false
             }
         ) {
-            println("Dropdown menu")
             types.forEach { selectionOption ->
                 DropdownMenuItem(
                     onClick = {

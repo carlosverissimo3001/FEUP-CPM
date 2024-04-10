@@ -51,6 +51,7 @@ import kotlin.math.abs
 @Composable
 fun TransactionDetails(
     nif: String,
+    name: String = "Your Name",
     transaction: Transaction,
     onCancel: () -> Unit,
     isInspecting: Boolean
@@ -276,6 +277,15 @@ fun TransactionDetails(
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     ) {
+                        Text(
+                            text = "Name: $name",
+                            style = TextStyle(
+                                fontSize = MaterialTheme.typography.titleSmall.fontSize,
+                                fontFamily = marcherFontFamily,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color.Black,
+                        )
                         Text(
                             text = "Final Consumer NIF: $nif",
                             style = TextStyle(

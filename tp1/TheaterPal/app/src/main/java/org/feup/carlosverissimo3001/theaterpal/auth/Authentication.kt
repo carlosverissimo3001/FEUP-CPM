@@ -112,6 +112,21 @@ class Authentication (private val context: Context){
             it.write(nif.toByteArray())
         }
     }
+
+    fun storeUserName(name: String) {
+        context.openFileOutput("user_name", Context.MODE_PRIVATE).use {
+            it.write(name.toByteArray())
+        }
+    }
+
+    fun getUserName(): String {
+        val file = context.getFileStreamPath("user_name")
+        if (file.exists()) {
+            return file.readText()
+        }
+
+        return ""
+    }
     
     fun getUserID(): String {
         val file = context.getFileStreamPath("user_id")
