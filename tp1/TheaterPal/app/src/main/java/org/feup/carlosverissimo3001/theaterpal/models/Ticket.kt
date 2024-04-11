@@ -1,9 +1,10 @@
 package org.feup.carlosverissimo3001.theaterpal.models
 
+import android.os.Parcelable
 import org.json.JSONObject
 
 data class Ticket (
-    val ticketids: List<String>,
+    val ticketid: String,
     val userid: String,
     val showName: String,
     val seat: String,
@@ -11,15 +12,47 @@ data class Ticket (
     val date: String,
     val imagePath: String = "",
     var numTickets: Int = 1
-) {
-    fun getTicketInfo(): String {
-        return "Ticket for show $showName, seat $seat, date $date"
+) : Parcelable {
+    constructor(parcel: android.os.Parcel) : this(
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readByte() != 0.toByte(),
+        parcel.readString()!!,
+        parcel.readString()!!,
+        parcel.readInt()
+    )
+
+    override fun writeToParcel(parcel: android.os.Parcel, flags: Int) {
+        parcel.writeString(ticketid)
+        parcel.writeString(userid)
+        parcel.writeString(showName)
+        parcel.writeString(seat)
+        parcel.writeByte(if (isUsed) 1 else 0)
+        parcel.writeString(date)
+        parcel.writeString(imagePath)
+        parcel.writeInt(numTickets)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Ticket> {
+        override fun createFromParcel(parcel: android.os.Parcel): Ticket {
+            return Ticket(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Ticket?> {
+            return arrayOfNulls(size)
+        }
     }
 }
 
 fun parseTicket (jsonObject: JSONObject): Ticket {
     return Ticket(
-        List(1) { jsonObject.getString("ticketid") }, // List of 1 element
+        jsonObject.getString("ticketid"),
         jsonObject.getString("userid"),
         jsonObject.getString("showName"),
         jsonObject.getString("seat"),

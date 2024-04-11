@@ -103,7 +103,7 @@ fun TicketValidate(
                         )
 
                         Text(
-                            text = "ID: ${ticket.ticketids[0].substring(0, 8)}...",
+                            text = "ID: ${ticket.ticketid.substring(0, 8)}...",
                             style = TextStyle(
                                 color = Color.LightGray,
                                 fontSize = MaterialTheme.typography.bodySmall.fontSize,
