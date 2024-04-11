@@ -55,7 +55,6 @@ fun parseOrderRcvItem(json: JSONObject): OrderRcvItem {
 }
 
 fun parseOrderRcv(json: JSONObject): OrderRcv {
-    println("Object: $json")
     val items = mutableListOf<OrderRcvItem>()
     val itemsJson = json.getJSONArray("items")
     for (i in 0 until itemsJson.length()) {
