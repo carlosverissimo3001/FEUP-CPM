@@ -1,0 +1,4 @@
+content[0] -> Number of tickets in the content   // numtickets
+content[1] -> Length of the userid               // useridlength
+
+content[2..2+useridlength-1] -> userid            // userid

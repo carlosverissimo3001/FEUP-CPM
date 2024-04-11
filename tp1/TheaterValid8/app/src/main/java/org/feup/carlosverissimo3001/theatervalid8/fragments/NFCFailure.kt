@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +32,8 @@ import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 @Composable
 fun NfcFailureFragment(
-    onCancel: () -> Unit = {}
+    error: String,
+    onRetry: () -> Unit = {}
 ) {
     val errorMessage : String = "This ticket is not valid anymore."
 
@@ -77,6 +81,22 @@ fun NfcFailureFragment(
                 ),
                 color = Color.White
             )
+
+            Button(
+                onClick = { onRetry() },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color (android.graphics.Color.parseColor("#50bc64")),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    "Retry",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }

@@ -163,7 +163,8 @@ fun ShowDatesDropDownMenu(
                         fontSize = MaterialTheme.typography.body2.fontSize,
                         textAlign = TextAlign.Center,
                         fontFamily = poppinsFontFamily
-                    )
+                    ),
+                    textAlign = TextAlign.Center
                 )
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(

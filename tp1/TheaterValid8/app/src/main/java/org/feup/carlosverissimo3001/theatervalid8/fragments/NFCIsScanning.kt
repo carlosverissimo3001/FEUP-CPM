@@ -68,14 +68,6 @@ fun NfcIsScanningFragment(
         Box(
             modifier = Modifier
                 .background(Color(parseColor("#302c2c")), RoundedCornerShape(15.dp))
-                .pointerInput(Unit) {
-                    // draw down == go back
-                    detectDragGestures { _, dragAmount ->
-                        if (dragAmount.y > 50) {
-                            onCancel()
-                        }
-                    }
-                }
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -84,18 +76,17 @@ fun NfcIsScanningFragment(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.5f)
+                        .fillMaxWidth(0.3f)
                         .height(6.dp)
                         .background(Color.White, CircleShape)
                         .pointerInput(Unit) {
-                            detectDragGestures { change, dragAmount ->
+                            detectDragGestures { _, dragAmount ->
                                 if (dragAmount.y > 0) {
                                     // Dragging down, cancel the scanning
                                     onCancel()
                                 }
                             }
                         }
-                        .padding(top = 0.dp)
                 )
 
                 Spacer(modifier = Modifier.size(5.dp))
@@ -104,7 +95,7 @@ fun NfcIsScanningFragment(
                     painter = painterResource(id = R.drawable.nfc_scanning),
                     contentDescription = "NFC action",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth(0.8f)
+                    modifier = Modifier.size(125.dp)
                 )
 
                 Spacer(modifier = Modifier.size(5.dp))

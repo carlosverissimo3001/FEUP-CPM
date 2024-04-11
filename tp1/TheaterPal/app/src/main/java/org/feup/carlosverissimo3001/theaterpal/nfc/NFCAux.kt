@@ -26,10 +26,13 @@ fun buildTicketMessage(tickets: List<Ticket>, ctx: Context): ByteArray {
     // get the user_id
     val user_id = Authentication(ctx).getUserID()
 
-    val totalSize = tickets.sumOf {
+    // byte @index 0 is the number of tickets
+    // byte @index 1 is the length of the user_id
+    val totalSize = 1 + 1 + user_id.length + tickets.sumOf {
         1 + it.ticketid.length + 1 + it.userid.length + 1 + it.showName.length + 1 +
                 it.seat.length + 1 + 1 + it.date.length
-    } + 1 + Constants.KEY_SIZE / 8 + user_id.length // include the size of the signature and the size of the user_id
+    } + Constants.KEY_SIZE / 8
+    // include the size of the signature and the size of the user_id
 
     val messageBuilder = ByteBuffer.allocate(totalSize)
 
@@ -76,13 +79,12 @@ fun buildTicketMessage(tickets: List<Ticket>, ctx: Context): ByteArray {
         val dateLength = dateBytes.size.toByte()
         messageBuilder.put(dateLength)
         messageBuilder.put(dateBytes)
-
-
-        // NUM TICKETS
-        messageBuilder.put(ticket.numTickets.toByte())
     }
 
     val message = messageBuilder.array()
+
+    // Delimits where the signature should be placed
+    val messageOffset = message.size - Constants.KEY_SIZE / 8
 
     try {
         val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
@@ -92,10 +94,12 @@ fun buildTicketMessage(tickets: List<Ticket>, ctx: Context): ByteArray {
         val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
         val signature = Signature.getInstance(Constants.SIGN_ALGO).run {
             initSign(privateKey)
-            update(message)
-            sign()
+            update(message, 0, messageOffset)
+            sign(message, messageOffset, Constants.KEY_SIZE / 8)
         }
-        Log.d(logTag, "Signature size = ${signature.size} bytes.")
+        Log.d(logTag, "Signature size = $signature bytes.")
+        println("Signature size = $signature bytes.")
+        println("Total size = ${message.size} bytes.")
     } catch (ex: Exception) {
         Log.d(logTag, ex.toString())
     }

@@ -43,7 +43,7 @@ class Authentication (private val context: Context){
         }
 
     // Private exponent field
-    public val privExp: ByteArray
+    val privExp: ByteArray
         get() {
             var exp = ByteArray(0)
             try {

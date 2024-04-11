@@ -13,10 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import java.security.KeyFactory
+import java.security.PublicKey
+import java.security.spec.X509EncodedKeySpec
 import java.text.SimpleDateFormat
 
-object Server {
+object Constants {
+    const val KEY_SIZE = 512
+    const val ANDROID_KEYSTORE = "AndroidKeyStore"
+    const val KEY_ALGO = "RSA"
+    const val SIGN_ALGO = "SHA256WithRSA"
+    const val KEY_NAME = "user_auth_key"
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+    /* const val URL = "https://wrongly-in-pug.ngrok-free.app" */
+    const val ACTION_CARD_DONE = "CMD_PROCESSING_DONE"
 }
 
 @Composable
@@ -70,4 +80,18 @@ fun americanDateToNormal(date: String): String {
     val date = formatter.parse(date)
     val formatter2 = SimpleDateFormat("dd/MM/yyyy")
     return formatter2.format(date)
+}
+
+fun decodePublicKey(base64PublicKey: String): PublicKey {
+    // Decode the Base64 string into a byte array
+    val publicKeyBytes = Base64.decode(base64PublicKey, Base64.DEFAULT)
+
+    // Create an X509EncodedKeySpec using the byte array
+    val keySpec = X509EncodedKeySpec(publicKeyBytes)
+
+    // Initialize a KeyFactory for RSA
+    val keyFactory = KeyFactory.getInstance("RSA")
+
+    // Generate the public key from the X509EncodedKeySpec
+    return keyFactory.generatePublic(keySpec)
 }

@@ -34,7 +34,7 @@ import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 @Composable
 fun NfcSuccessFragment(
-    onCancel: () -> Unit = {}
+    onDone: () -> Unit = {}
 ) {
     val numTicketsValidated = 1
 
@@ -84,6 +84,22 @@ fun NfcSuccessFragment(
                 ),
                 color = Color.White
             )
+
+            Button(
+                onClick = { onDone() },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color (android.graphics.Color.parseColor("#50bc64")),
+                    contentColor = androidx.compose.ui.graphics.Color.White
+                )
+            ) {
+                Text(
+                    "Scan more tickets",
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }

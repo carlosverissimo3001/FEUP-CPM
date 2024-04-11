@@ -3,7 +3,7 @@ package org.feup.carlosverissimo3001.theatervalid8.api
 import android.content.Context
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
-import org.feup.carlosverissimo3001.theatervalid8.Server
+import org.feup.carlosverissimo3001.theatervalid8.Constants
 import org.feup.carlosverissimo3001.theatervalid8.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
 import org.feup.carlosverissimo3001.theatervalid8.file.saveImageToCache
@@ -20,13 +20,13 @@ class APILayer (private val ctx: Context){
         println("Are images cached: $areImagesCached")
 
         var request = okhttp3.Request.Builder()
-            .url("${Server.URL}/shows")
+            .url("${Constants.URL}/shows")
             .get()
             .build()
 
         if (!areImagesCached){
             request = okhttp3.Request.Builder()
-                .url("${Server.URL}/shows?images=true")
+                .url("${Constants.URL}/shows?images=true")
                 .get()
                 .build()
         }
@@ -88,7 +88,7 @@ class APILayer (private val ctx: Context){
 
     fun getPublicKey(user_id: String, callback: (String) -> Unit) {
         val request = okhttp3.Request.Builder()
-            .url("${Server.URL}/get_user_pkey?user_id=$user_id")
+            .url("${Constants.URL}/get_user_pkey?user_id=$user_id")
             .get()
             .build()
 

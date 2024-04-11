@@ -71,7 +71,7 @@ class SendTicketsActivity : AppCompatActivity() {
         val intentFilter = IntentFilter(Constants.ACTION_CARD_DONE)
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(broadcastReceiver, intentFilter)  // to receive 'link loss'
 
-        println("Message: ${Card.contentMessage}")
+        // println("Message: ${Card.contentMessage}")
     }
 
     override fun onPause() {
