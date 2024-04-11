@@ -25,17 +25,6 @@ fun CenteredContent(content: @Composable () -> Unit) {
     }
 }
 
-@Composable
-fun TopCenteredContent(content: @Composable () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        content()
-    }
-}
-
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
     Font(R.font.poppins_light, FontWeight.W300),
     Font(R.font.poppins_regular, FontWeight.W400),
