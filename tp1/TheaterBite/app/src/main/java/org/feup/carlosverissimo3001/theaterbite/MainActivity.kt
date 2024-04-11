@@ -1,7 +1,6 @@
 package org.feup.carlosverissimo3001.theaterbite
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +22,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,42 +55,49 @@ class MainActivity : AppCompatActivity() {
             statusBarStyle = SystemBarStyle.dark(
                 Color.Transparent.toArgb()
             ),
+            navigationBarStyle = SystemBarStyle.dark(
+                Color.Transparent.toArgb()
+            )
         )
-
-        setContentView(R.layout.activity_main)
 
         setContent {
-            Column (
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CafeterialTerminalTopBar()
-                CafeteriaTerminalDescription(
-                    str = "Please approach your device to scan your order."
-                )
-                CafeteriaTerminalImage()
-                CafeteriaTerminalSubmitButton("Scan Order") {
-
-                }
-            }
+            CafeteriaTerminal()
         }
-    }
-}
-
-
-
-@Composable
-fun LoadingSpinner() {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(
-            color = Color.White,
-            strokeWidth = 2.dp
-        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CafeterialTerminalTopBar() {
+fun CafeteriaTerminal()
+{
+    var showBottomSheet by remember { mutableStateOf(false) }
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CafeteriaTerminalTopBar()
+        CafeteriaTerminalDescription(
+            str = "Please approach your device to scan your order."
+        )
+        CafeteriaTerminalImage()
+        CafeteriaTerminalSubmitButton("Scan Order"){
+            // API LAYER STUFF HERE
+            // ACTIVATE SCANNING OF NFC DEVICE
+            showBottomSheet = true
+        }
+        if (showBottomSheet)
+            CafeteriaTerminalBottomSheet(
+                imageID = R.drawable.nfc_scanning,
+                description = "Scanning your device...",
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+            )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CafeteriaTerminalTopBar() {
     CenterAlignedTopAppBar(
         modifier = Modifier.
             padding(top = 25.dp, bottom = 15.dp),
@@ -141,13 +156,13 @@ fun CafeteriaTerminalImage()
 fun CafeteriaTerminalSubmitButton(str: String, onClick: () -> Unit)
 {
     Button(
-        onClick = onClick,
         modifier = Modifier
             .padding(top = 50.dp, bottom = 20.dp)
             .fillMaxWidth(0.8f),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xBB22FF22),
-        )
+            containerColor = Color(0xBB00AA66),
+        ),
+        onClick = onClick
     ) {
         Text(
             text = str,
@@ -159,5 +174,50 @@ fun CafeteriaTerminalSubmitButton(str: String, onClick: () -> Unit)
             ),
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CafeteriaTerminalBottomSheet(
+    imageID: Int,
+    description: String,
+    onDismissRequest: () -> Unit
+)
+{
+    val sheetState = rememberModalBottomSheetState()
+
+    ModalBottomSheet(
+        onDismissRequest = { onDismissRequest() },
+        sheetState = sheetState,
+        containerColor = Color(0xFF1F1F1F),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(id = imageID),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clip(CircleShape)
+                    .fillMaxWidth(0.3f)
+                    .aspectRatio(1f)
+            )
+            Text(
+                text = description,
+                style = TextStyle(
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontFamily = poppinsFontFamily,
+                ),
+                modifier = Modifier
+                    .padding(5.dp)
+            )
+            Spacer(
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
+        }
     }
 }

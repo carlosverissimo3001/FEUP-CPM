@@ -1,28 +1,11 @@
 package org.feup.carlosverissimo3001.theaterbite
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import java.text.SimpleDateFormat
 
 object Server {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
-}
-
-@Composable
-fun CenteredContent(content: @Composable () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        content()
-    }
 }
 
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
