@@ -98,7 +98,7 @@ fun TransactionDetails(
                     .padding(16.dp)
                     .pointerInput(Unit) {
                         // draw down == go back
-                        detectDragGestures { change, dragAmount ->
+                        detectDragGestures { _, dragAmount ->
                             if (dragAmount.y > 50) {
                                 onCancel()
                             }

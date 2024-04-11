@@ -1,9 +1,12 @@
-package org.feup.carlosverissimo3001.theatervalid8
+package org.feup.carlosverissimo3001.theatervalid8.api
 
 import android.content.Context
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
+import org.feup.carlosverissimo3001.theatervalid8.Server
+import org.feup.carlosverissimo3001.theatervalid8.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.file.saveImageToCache
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -78,6 +81,44 @@ class APILayer (private val ctx: Context){
                     // Pass an empty string to the callback to indicate failure
                     callback(emptyList())
                     // TODO: handle this case, although it should never happen
+                }
+            }
+        })
+    }
+
+    fun getPublicKey(user_id: String, callback: (String) -> Unit) {
+        val request = okhttp3.Request.Builder()
+            .url("${Server.URL}/get_user_pkey?user_id=$user_id")
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                e.printStackTrace()
+                // Pass an empty string to the callback to indicate failure
+                callback("")
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val responseCode = response.code
+
+                // 200 means the user was found
+                if (responseCode == 200) {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val publicKey = jsonResponse?.getString("publickey")
+
+
+                    // Pass the public key to the callback
+                    if (publicKey != null) {
+                        callback(publicKey)
+                    }
+
+                } else if (responseCode == 404) {
+                    // user_id not found
+                    println("User not found")
+                    // Pass an empty string to the callback to indicate failure
+                    callback("")
                 }
             }
         })

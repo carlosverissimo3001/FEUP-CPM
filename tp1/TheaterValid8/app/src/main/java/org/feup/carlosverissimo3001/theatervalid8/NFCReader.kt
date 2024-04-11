@@ -19,8 +19,13 @@ class NFCReader(private val listener: (Int, ByteArray)->Unit) : NfcAdapter.Reade
                 val result = isoDep.transceive(hexStringToByteArray(CMD_SEL_AID + String.format("%02X", CARD_AID.length/2) + CARD_AID))
                 val rLen = result.size
                 val status = byteArrayOf(result[rLen-2], result[rLen-1])
-                if (RES_OK_SW.contentEquals(status))
-                    listener(result[0].toInt(), result.sliceArray(1..rLen-3))      // received a key (type == 1) or a list (type == 2)
+                println("Status: ${byteArrayToHex(status)}")
+                if (RES_OK_SW.contentEquals(status)) {
+                    listener(
+                        result[0].toInt(),
+                        result.sliceArray(1..rLen - 3)
+                    )      // received a key (type == 1) or a list (type == 2)
+                }
             } catch (e: IOException) {
                 Log.e("CardReader", "Error communicating with card: $e")
             }

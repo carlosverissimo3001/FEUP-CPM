@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theatervalid8
+package org.feup.carlosverissimo3001.theatervalid8.file
 
 import android.content.Context
 import android.graphics.Bitmap

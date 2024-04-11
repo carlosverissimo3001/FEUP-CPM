@@ -41,8 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theatervalid8.americanDateToNormal
-import org.feup.carlosverissimo3001.theatervalid8.decodeBase64ToBitmap
-import org.feup.carlosverissimo3001.theatervalid8.loadImageFromCache
+import org.feup.carlosverissimo3001.theatervalid8.file.decodeBase64ToBitmap
+import org.feup.carlosverissimo3001.theatervalid8.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theatervalid8.models.*
 import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 

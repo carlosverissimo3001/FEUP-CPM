@@ -51,4 +51,17 @@ def construct_blueprint(dbConn):
 
         return jsonify({'name': user["name"]}), 200
 
+    @user_page.route('/get_user_pkey', methods=['GET'])
+    def get_public_key():
+        user_id = request.args.get('user_id')
+
+        user = crud_ops.get_user_by_user_id(dbConn, user_id)
+
+        if user is None:
+            return jsonify({'error': 'User not found'}), 404
+        else:
+            user = user[0]
+
+        return jsonify({'publickey': user["publickey"]}), 200
+
     return user_page

@@ -29,8 +29,6 @@ class ValidatorActivity : AppCompatActivity() {
     private lateinit var showDate : ShowDate
     private var validationStatus: Boolean = false
     private var isScanning: Boolean = false
-    //private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
-    //private val nfcReader by lazy { NFCReader(::nfcReceived) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,44 +56,18 @@ class ValidatorActivity : AppCompatActivity() {
                         isScanning = isScanning
                     )
 
-                    NfcIsScanningFragment(
-                        isScanning = isScanning,
-                        onCancel = {
-                            // Stop scanning
-                            setIsScanning(false)
+                    NfcValidatorFragment(
+                        onScanButtonClick = {
+                            // Start scanning
+                            intent = Intent(this@ValidatorActivity, ScanningActivity::class.java)
+                            intent.putExtra("show", show)
+                            intent.putExtra("showDate", showDate)
+                            startActivity(intent)
                         }
                     )
-
-                    if (!isScanning){
-                        NfcValidatorFragment(
-                            onScanButtonClick = {
-                                // Start scanning
-                                setIsScanning(true)
-
-                                // TODO : ACTIVATE NFC
-                            }
-                        )
-                    }
                 }
             }
         )
-    }
-
-    /*override fun onResume() {
-        super.onResume()
-        nfc.enableReaderMode(this, nfcReader, READER_FLAGS, null)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        nfc.disableReaderMode(this)
-    }*/
-
-    // callback to receive a key or product list from the NFC reader
-    private fun nfcReceived(type: Int, content: ByteArray) {
-        runOnUiThread {
-            //
-        }
     }
 }
 
