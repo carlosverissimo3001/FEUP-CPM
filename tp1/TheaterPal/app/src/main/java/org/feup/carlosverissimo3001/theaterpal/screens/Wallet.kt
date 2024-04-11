@@ -1,14 +1,11 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.content.Intent
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -25,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
@@ -36,10 +33,11 @@ import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.nfc.buildTicketMessage
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders.NoOrders
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.NoTickets
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders.OrdersTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.SendingTicketsFragment
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.SendTicketsActivity
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.TicketsTab
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Transactions.TransactionsFragment
 
@@ -56,9 +54,10 @@ fun Wallet(ctx: Context, navController: NavController) {
     var areOrdersLoaded by remember { mutableStateOf(false) }
 
     var isValidatingTickets by remember { mutableStateOf(false) }
-    var ticketsToValidate by remember { mutableStateOf(emptyList<Ticket>()) }
 
     var isViewingTransactions by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
@@ -124,7 +123,7 @@ fun Wallet(ctx: Context, navController: NavController) {
                     .fillMaxSize()
                     .pointerInput(Unit) {
                         // Handle swipe gestures to change tabs
-                        detectHorizontalDragGestures { change, dragAmount ->
+                        detectHorizontalDragGestures { _, dragAmount ->
                             if (dragAmount > 30) {
                                 selectedTabIndex = 0
                             } else if (dragAmount < -30) {
@@ -136,7 +135,7 @@ fun Wallet(ctx: Context, navController: NavController) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     if (selectedTabIndex == 0) {
                         // Hasn't loaded, display loading spinner
                         if (!areTicketsLoaded.value) {
@@ -161,18 +160,29 @@ fun Wallet(ctx: Context, navController: NavController) {
                                         ticketsState
                                     }
                                 },
-                                onValidate = {
+                                onValidate = { ticketsToSend ->
                                     isValidatingTickets = true
-                                    ticketsToValidate = it
+
+                                    // tickets to nfc message
+                                    val ticketMessage = buildTicketMessage(ticketsToSend, ctx)
+
+                                    // create intent and put the message and tickets
+                                    val intent = Intent(context, SendTicketsActivity::class.java)
+                                    intent.putExtra("message", ticketMessage)
+                                    intent.putExtra("valuetype", 1)
+                                    intent.putParcelableArrayListExtra(
+                                        "tickets",
+                                        ArrayList(ticketsToSend)
+                                    )
+
+                                    context.startActivity(intent)
                                 },
                                 onConsultTransactionsClicked = {
                                     isViewingTransactions = true
                                 }
                             )
                         }
-                    }
-
-                    else if (selectedTabIndex == 1) {
+                    } else if (selectedTabIndex == 1) {
                         if (!areOrdersLoaded)
                             LoadingSpinner()
                         else if (orders.isEmpty()) {
@@ -192,32 +202,20 @@ fun Wallet(ctx: Context, navController: NavController) {
                         }
                     }
                 }
-
-                SendingTicketsFragment(
-                    ctx = ctx,
-                    isValidating = isValidatingTickets,
-                    onCancel = {
-                        isValidatingTickets = false
-                    },
-                    tickets = ticketsToValidate
-                )
             }
         }
-    }
-    else {
+    } else {
         TransactionsFragment(
             ctx,
             onBackButtonClick = {
                 isViewingTransactions = false
             },
-            onClick = {route ->
+            onClick = { route ->
                 navController.navigate(route)
             }
         )
     }
-
 }
-
 
 @Composable
 fun LoadingSpinner() {

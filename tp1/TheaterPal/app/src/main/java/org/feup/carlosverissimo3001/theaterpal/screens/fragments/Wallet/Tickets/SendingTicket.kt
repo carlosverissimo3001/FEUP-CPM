@@ -30,6 +30,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +48,7 @@ import org.feup.carlosverissimo3001.theaterpal.R
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.nfc.buildTicketMessage
 
 @Composable
 fun SendingTicketsFragment(
@@ -77,12 +82,21 @@ fun SendingTicketsFragment(
                     Color(android.graphics.Color.parseColor("#302c2c")),
                     RoundedCornerShape(15.dp)
                 )
-                .fillMaxSize()
+                .fillMaxSize().pointerInput(Unit) {
+                    // draw down == go back
+                    detectDragGestures { change, dragAmount ->
+                        if (dragAmount.y > 50) {
+                            onCancel()
+                        }
+                    }
+                }
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth().padding(10.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -103,7 +117,9 @@ fun SendingTicketsFragment(
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize().padding(10.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
             ) {
                 Text(
                     modifier = Modifier.padding(top = 10.dp),
@@ -148,18 +164,7 @@ fun SendingTicketsFragment(
                         textAlign = TextAlign.Center,
                     )
 
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Text(
-                        text = "(Make sure NFC is active on your device)",
-                        style = TextStyle(
-                            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                            fontFamily = marcherFontFamily,
-                        ),
-                        color = Color.White,
-                    )
-
-                    Spacer(modifier = Modifier.size(10.dp))
+                    Spacer(modifier = Modifier.size(20.dp))
 
                     Image(
                         painter = painterResource(id = R.drawable.nfc_scanning),
@@ -168,15 +173,15 @@ fun SendingTicketsFragment(
                         modifier = Modifier.fillMaxHeight(0.5f)
                     )
 
-                    Spacer(modifier = Modifier.size(10.dp))
+                    Spacer(modifier = Modifier.size(20.dp))
 
                     Button(
                         onClick = { onCancel() },
                         modifier = Modifier
                             .fillMaxWidth(0.6f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                         )
                     ) {
                         Text(
@@ -186,7 +191,7 @@ fun SendingTicketsFragment(
                                 fontFamily = marcherFontFamily,
                             ),
                             fontWeight = FontWeight.Bold,
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = Color.White,
                         )
                     }
                 }
