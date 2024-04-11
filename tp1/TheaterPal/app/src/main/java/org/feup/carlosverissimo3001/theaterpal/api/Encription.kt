@@ -1,6 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
-import org.feup.carlosverissimo3001.theaterpal.Crypto
+import org.feup.carlosverissimo3001.theaterpal.Constants
 import java.security.KeyStore
 import javax.crypto.Cipher
 
@@ -10,13 +10,13 @@ fun encrypt(content: String) : ByteArray {
 	if (content.isEmpty())
 		return (ByteArray(0))
 
-	val privateKey = KeyStore.getInstance(Crypto.ANDROID_KEYSTORE).run {
+	val privateKey = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
 		load(null)
-		getKey(Crypto.KEY_NAME, null)
+		getKey(Constants.KEY_NAME, null)
 	}
 
 	try {
-		result = Cipher.getInstance(Crypto.KEY_ALGO).run {
+		result = Cipher.getInstance(Constants.KEY_ALGO).run {
 			init(Cipher.ENCRYPT_MODE, privateKey)
 			doFinal(content.toByteArray())
 		}

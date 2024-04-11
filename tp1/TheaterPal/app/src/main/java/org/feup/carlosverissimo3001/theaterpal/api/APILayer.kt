@@ -312,7 +312,7 @@ fun purchaseTickets(
 //        .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
-        .url("${Server.URL}/purchase_tickets")
+        .url("${Constants.URL}/purchase_tickets")
         .post(requestBody)
         .build()
 
