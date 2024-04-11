@@ -9,6 +9,7 @@ import org.feup.carlosverissimo3001.theaterpal.hexStringToByteArray
 
 object Card {
     var contentMessage = ByteArray(0)        /* Card state */
+    var type = 0
 
     private const val CARD_AID = "F010203040"         // AID for this applet service.
     private const val CMD_SEL_AID = "00A40400"        // SmartCard select AID command
@@ -20,10 +21,13 @@ object Card {
 
 class CardService : HostApduService() {
     override fun processCommandApdu(command: ByteArray, extra: Bundle?): ByteArray {
-        return if (Card.SELECT_APDU.contentEquals(command))
-            Card.contentMessage + Card.OK_SW    // send content in response to SELECT AID
+        if (Card.type != 0 && Card.SELECT_APDU.contentEquals(command))
+            println("Card selected")
+
+        return if (Card.type != 0 && Card.SELECT_APDU.contentEquals(command))
+            byteArrayOf(Card.type.toByte()) + Card.contentMessage + Card.OK_SW    // send content in response to SELECT AID
         else
-            Card.UNKNOWN_CMD_SW                 // APDU command not recognized
+            Card.UNKNOWN_CMD_SW                                                   // APDU command not recognized
     }
 
     override fun onDeactivated(cause: Int) {

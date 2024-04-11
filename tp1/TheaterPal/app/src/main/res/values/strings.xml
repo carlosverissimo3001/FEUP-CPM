@@ -9,4 +9,6 @@
     <string name="register">Register</string>
     <string name="credit_card_number">Credit Card Number</string>
     <string name="add_card">Add Card</string>
+    <string name="service_name">Theater Pal</string>
+    <string name="card_title">Sending Card</string>
 </resources>
