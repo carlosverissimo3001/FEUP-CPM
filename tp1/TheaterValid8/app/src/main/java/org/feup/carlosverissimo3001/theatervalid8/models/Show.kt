@@ -3,6 +3,8 @@ package org.feup.carlosverissimo3001.theatervalid8.models
 import android.os.Parcel
 import android.os.Parcelable
 
+// map between name and image
+
 data class Show(
     val showId: Int,
     val name: String,
@@ -84,3 +86,4 @@ data class ShowDate(
         }
     }
 }
+
