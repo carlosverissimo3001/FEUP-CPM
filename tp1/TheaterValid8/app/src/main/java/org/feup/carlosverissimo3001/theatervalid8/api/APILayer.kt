@@ -1,18 +1,26 @@
 package org.feup.carlosverissimo3001.theatervalid8.api
 
 import android.content.Context
+import android.graphics.Bitmap
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.feup.carlosverissimo3001.theatervalid8.models.Show
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theatervalid8.Constants
 import org.feup.carlosverissimo3001.theatervalid8.file.areImagesStoreInCache
+import org.feup.carlosverissimo3001.theatervalid8.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
 import org.feup.carlosverissimo3001.theatervalid8.file.saveImageToCache
+import org.feup.carlosverissimo3001.theatervalid8.models.TicketState
+import org.feup.carlosverissimo3001.theatervalid8.showNameImageMap
 import org.json.JSONArray
 import org.json.JSONObject
 
 // Handles the API calls
 class APILayer (private val ctx: Context){
     private val client = OkHttpClient()
+
+    /*private val showNameImageMap = mutableMapOf<String, String>()*/
 
     fun fetchShows(callback: (List<Show>) -> Unit) {
         val areImagesCached = areImagesStoreInCache(ctx)
@@ -108,7 +116,6 @@ class APILayer (private val ctx: Context){
                     val jsonResponse = responseBody?.let { JSONObject(it) }
                     val publicKey = jsonResponse?.getString("publickey")
 
-
                     // Pass the public key to the callback
                     if (publicKey != null) {
                         callback(publicKey)
@@ -124,7 +131,7 @@ class APILayer (private val ctx: Context){
         })
     }
 
-    private fun setShows(jsonArray: JSONArray) : List<Show>{
+    fun setShows(jsonArray: JSONArray) : List<Show>{
         val shows = mutableListOf<Show>()
 
         for (i in 0 until jsonArray.length()) {
@@ -139,6 +146,10 @@ class APILayer (private val ctx: Context){
 
                 showDates.add(ShowDate(dateString, showdateid))
             }
+            val showName = show.getString("name")
+            val imageName = show.getString("picture")
+
+            showNameImageMap[showName] = imageName
 
             shows.add(
                 Show(
@@ -155,5 +166,56 @@ class APILayer (private val ctx: Context){
             )
         }
         return shows
+    }
+
+    fun validateTicketsWithServer(user_id: String, ticketids: List<String>, callback: (List<TicketState>) -> Unit) {
+        val json = JSONObject()
+        json.put("userid", user_id)
+        json.put("ticketids", JSONArray(ticketids))
+
+        val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val request = okhttp3.Request.Builder()
+            .url("${Constants.URL}/validate_tickets")
+            .post(body)
+            .build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                e.printStackTrace()
+                // Pass an empty list to the callback to indicate failure
+                callback(emptyList())
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val responseCode = response.code
+
+                // 200 means the user was found
+                if (responseCode == 200) {
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONArray(it) }
+                    val ticketStates = mutableListOf<TicketState>()
+
+                    jsonResponse?.let {
+                        for (i in 0 until it.length()) {
+                            val ticket = it.getJSONObject(i)
+                            ticketStates.add(
+                                TicketState(
+                                    ticket.getString("ticketid"),
+                                    ticket.getString("state")
+                                )
+                            )
+                        }
+                    }
+                    callback(ticketStates)
+                }
+            }
+        })
+    }
+
+    fun fetchShowImage(showname: String): Bitmap? {
+        val imageName = showNameImageMap[showname]
+
+        return loadImageFromCache(imageName!!, ctx)
     }
 }
