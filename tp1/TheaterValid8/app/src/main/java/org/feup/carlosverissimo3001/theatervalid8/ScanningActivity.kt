@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theatervalid8
 
+import android.content.Intent
 import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -7,16 +8,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.feup.carlosverissimo3001.theatervalid8.api.APILayer
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcFailureFragment
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcIsScanningFragment
-import org.feup.carlosverissimo3001.theatervalid8.fragments.NfcSuccessFragment
+import org.feup.carlosverissimo3001.theatervalid8.models.Show
+import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.screens.NfcIsScanningFragment
 import org.feup.carlosverissimo3001.theatervalid8.models.Ticket
+import org.feup.carlosverissimo3001.theatervalid8.screens.ValidationStatusActivity
 import java.nio.ByteBuffer
-import java.security.PublicKey
 import java.security.Signature
 
+
 class ScanningActivity : AppCompatActivity() {
-    private var isSuccessfullScan : Boolean = false
+    private lateinit var show : Show
+    private lateinit var showDate : ShowDate
+
     private var isError : Boolean = false
     private var error : String = ""
 
@@ -27,6 +31,9 @@ class ScanningActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        show = intent.parcelable("show")!!
+        showDate = intent.parcelable("showDate")!!
+
         setContent (
             content = {
                 val (isScanning, setIsScanning) = remember { mutableStateOf(true) }
@@ -36,33 +43,12 @@ class ScanningActivity : AppCompatActivity() {
                     onCancel = {
                         // Stop scanning
                         setIsScanning(false)
-
                         finish()
-                    }
+                    },
+                    showName = show.name,
+                    date = showDate.date,
                 )
 
-                if (isSuccessfullScan){
-                    setIsScanning(false)
-                    NfcSuccessFragment(
-                        onDone = {
-                            // Finish the activity
-                            finish()
-                        }
-                    )
-                }
-
-                if (isError) {
-                    setIsScanning(false)
-
-                    NfcFailureFragment(
-                        error = error,
-                        onRetry = {
-                            // Try again
-                            setIsScanning(true)
-                            isError = false
-                        }
-                    )
-                }
             }
         )
     }
@@ -70,7 +56,7 @@ class ScanningActivity : AppCompatActivity() {
     private fun nfcReceived(type: Int, content: ByteArray) {
         runOnUiThread {
             when (type) {
-                1 -> validateTickets(content)
+                1 -> parseContent(content)
             }
         }
     }
@@ -85,8 +71,7 @@ class ScanningActivity : AppCompatActivity() {
         nfc.disableReaderMode(this)
     }
 
-    private fun validateTickets(content: ByteArray) {
-        // Check message.txt for the format of the message
+    private fun parseContent(content: ByteArray) {
         val useridlength = content[1].toInt()
         val userid  = String(content.sliceArray(2..useridlength+1))
 
@@ -128,20 +113,16 @@ class ScanningActivity : AppCompatActivity() {
             println("Signature verified: $validated")
         }
 
-        // Validate the ticket
-        // validateTicket(ticket)
-        println("Ticket validated")
-        isSuccessfullScan = true
+        // Validate the tickets
+        val ticketsState = validateTickets(userid, tickets)
 
-        setContent(
-            content = {
-                NfcSuccessFragment(
-                    onDone = {
-                        finish()
-                    }
-                )
-            }
-        )
+        // show that status of the validation in the next activity
+        val intent = Intent(this, ValidationStatusActivity::class.java)
+        intent.putExtra("tickets", ArrayList(ticketsState))
+        intent.putExtra("show", show.name)
+        intent.putExtra("date", showDate.date)
+
+        startActivity(intent)
     }
 
     private fun extractTicketsFromMessage(content: ByteArray): Pair<MutableList<Ticket>, Int> {
@@ -187,13 +168,55 @@ class ScanningActivity : AppCompatActivity() {
                 showName,
                 seat,
                 isUsed,
-                date,
-                "",
+                date
             )
             tickets.add(ticket)
         }
 
 
         return Pair(tickets, currentIndex)
+    }
+
+    private fun validateTickets(userid: String, tickets: MutableList<Ticket>) : List<Ticket> {
+        val wrongDateTickets = mutableListOf<Ticket>()
+        //val states = mutableListOf<TicketState>()
+
+        for (t in tickets) {
+            if (show.name != t.showName){
+                t.isValidated = false
+                t.stateDesc = "Wrong show"
+
+                wrongDateTickets.add(t)
+            }
+
+            else if (showDate.date != t.date){
+                t.isValidated = false
+                t.stateDesc = "Wrong date"
+
+                wrongDateTickets.add(t)
+            }
+        }
+
+        // remove the tickets with the wrong date
+        tickets.removeAll(wrongDateTickets)
+
+        // validate the rest of the tickets with the server
+        var isValidationComplete = false
+        apiLayer.validateTicketsWithServer(userid, tickets.map { it.ticketid }) {
+            for (i in it.indices) {
+                // update the tickets with the new state
+                tickets[i].isValidated = it[i].state == "Ticket validated!"
+                tickets[i].stateDesc = it[i].state
+            }
+
+            isValidationComplete = true
+        }
+
+        while (!isValidationComplete) {
+            // wait for the validation to complete
+            Thread.sleep(100) // Avoid busy waiting
+        }
+
+        return tickets + wrongDateTickets
     }
 }

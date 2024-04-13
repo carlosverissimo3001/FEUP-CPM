@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import org.feup.carlosverissimo3001.theatervalid8.fragments.*
 import org.feup.carlosverissimo3001.theatervalid8.models.*
 import org.feup.carlosverissimo3001.theatervalid8.screens.*
 
