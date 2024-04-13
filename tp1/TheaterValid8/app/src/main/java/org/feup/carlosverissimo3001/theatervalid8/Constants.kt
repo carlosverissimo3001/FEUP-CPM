@@ -17,6 +17,8 @@ import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object Constants {
     const val KEY_SIZE = 512
@@ -28,6 +30,8 @@ object Constants {
     /* const val URL = "https://wrongly-in-pug.ngrok-free.app" */
     const val ACTION_CARD_DONE = "CMD_PROCESSING_DONE"
 }
+
+val showNameImageMap = mutableMapOf<String, String>()
 
 @Composable
 fun CenteredContent(content: @Composable () -> Unit) {
@@ -94,4 +98,33 @@ fun decodePublicKey(base64PublicKey: String): PublicKey {
 
     // Generate the public key from the X509EncodedKeySpec
     return keyFactory.generatePublic(keySpec)
+}
+
+fun formatDate(inputDate: String): String {
+    // Parse the input date string
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(inputDate, formatter)
+
+    var dayOfWeek = date.dayOfWeek.toString().lowercase()
+    dayOfWeek = toTitleCase(dayOfWeek)
+
+    val day = date.dayOfMonth.toString()
+
+    var month = date.month.toString().lowercase()
+    month = toTitleCase(month)
+
+    val daySuffix = when {
+        day.toInt() in 11..13 -> "th"
+        day.last() == '1' -> "st"
+        day.last() == '2' -> "nd"
+        day.last() == '3' -> "rd"
+        else -> "th"
+    }
+
+    // Format the output string
+    return "$dayOfWeek · $day$daySuffix of $month · 21:30h"
+}
+
+fun toTitleCase(input: String): String {
+    return input.replaceFirstChar { it.titlecase() }
 }
