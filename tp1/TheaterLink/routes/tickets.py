@@ -94,9 +94,33 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         return {"tickets" : tickets}
 
     # Will be called by the validation terminal app after the ticket is scanned
-    @ticket_page.route('/validate_ticket', methods=['POST'])
-    def validate_ticket():
-        return NotImplementedError
+    @ticket_page.route('/validate_tickets', methods=['POST'])
+    def validate_tickets():
+        userid = request.json.get('userid')
+        ticketids = request.json.get('ticketids')
+
+        response = []
+
+        for tid in ticketids:
+            data = {"ticketid": tid}
+            ticket = utils.get_full_ticket(dbConn, tid)
+
+            if ticket.get('isUsed'):
+                data['state'] = 'Ticket already used!'
+                response.append(data)
+                continue
+
+            if ticket.get('userid') != userid:
+                data['state'] = 'Ticket does not belong to user!'
+                response.append(data)
+                continue
+
+            data['state'] = 'Ticket validated!'
+            response.append(data)
+            crud_ops.mark_ticket_as_used(dbConn, tid)
+
+
+        return jsonify(response)
 
     # Will be called by the validation terminal app after the ticket is validated
     # Might not have to be an actual endpoint, could be handled by the validate_ticket endpoint
