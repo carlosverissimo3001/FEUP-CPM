@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +65,11 @@ fun BarTab(ctx: Context, onNextStepClick : (BarOrder) -> Unit){
                         total -= item.price
                         order = order.toMutableMap().apply {
                             this[item] = (this[item] ?: 0) - 1
+
+                            // remove item from order if quantity is 0
+                            if (this[item] == 0) {
+                                this.remove(item)
+                            }
                         }
                     },
                     onRemove = { item, quantity ->
