@@ -28,6 +28,7 @@ object Constants {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
     /* const val URL = "https://wrongly-in-pug.ngrok-free.app" */
     const val ACTION_CARD_DONE = "CMD_PROCESSING_DONE"
+    const val UUID_SIZE = 36
 }
 
 object MyColors
