@@ -51,7 +51,7 @@ class APILayer (private val ctx: Context){
         })
     }
 
-    fun submitOrder(user_id: String, order: Order, callback: (Boolean) -> Unit){
+    fun submitOrder(user_id: String, order: Order, callback: (Int) -> Unit){
         val client = OkHttpClient()
 
         val jsonOrder = JSONObject()
@@ -87,16 +87,22 @@ class APILayer (private val ctx: Context){
         client.newCall(request).enqueue(object : okhttp3.Callback {
             override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
                 e.printStackTrace()
-                callback(false)
+                callback(0)
             }
 
             override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                 when (response.code) {
                     200, 201 -> {
-                        callback(true)
+                        val responseBody = response.body?.string()
+                        val jsonResponse = responseBody?.let { JSONObject(it) }
+                        val orderNo = jsonResponse?.getInt("order_no")
+
+                        if (orderNo != null){
+                            callback(orderNo)
+                        }
                     }
                     else -> {
-                        callback(false)
+                        callback(0)
                     }
                 }
             }
