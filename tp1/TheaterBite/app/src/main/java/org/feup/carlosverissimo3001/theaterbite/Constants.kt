@@ -9,6 +9,7 @@ const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_
 
 object Constants {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
+    const val UUID_SIZE = 36
 }
 
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(

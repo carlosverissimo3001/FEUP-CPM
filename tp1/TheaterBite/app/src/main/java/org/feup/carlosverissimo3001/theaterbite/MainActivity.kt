@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.feup.carlosverissimo3001.theaterbite.api.APILayer
+import org.feup.carlosverissimo3001.theaterbite.models.Order
+import org.feup.carlosverissimo3001.theaterbite.models.Product
 
 
 class MainActivity : AppCompatActivity() {
@@ -91,9 +93,72 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun parseContent(content: ByteArray){
+        // get the userid
         val useridlength = content[1].toInt()
         val userid  = String(content.sliceArray(2..useridlength+1))
+
+        // get the ids of the vouchers used
+        var (vouchersUsed, currIndex) = extractVouchers(content)
+
+        val (products, nextIndex) = extractProducts(content, currIndex)
+
+        // get the order amount
+        val orderAmountLength = content[nextIndex].toInt()
+        var orderAmount = String(content.sliceArray(nextIndex + 1 until nextIndex + 1 + orderAmountLength)).toDouble()
+
+        var order = Order(products, orderAmount, vouchersUsed)
+
+        apiLayer.submitOrder(userid, order){success ->
+            // Start the intent to show the order
+            if (success){
+                // TODO
+            }
+        }
     }
+}
+
+fun extractVouchers(content: ByteArray) : Pair<List<String>, Int> {
+    val numberOfVouchersIdx = 2 + content[1].toInt()
+    var numberOfVouchers = content[numberOfVouchersIdx].toInt()
+
+    var vouchers = mutableListOf<String>()
+    var currIndex = numberOfVouchersIdx + 1
+
+    for (i in 0 until numberOfVouchers){
+        // Constants.UUID_SIZE is 36, so we extract 36 bytes for each voucher
+        val voucherIdx = numberOfVouchersIdx + 1 + i * Constants.UUID_SIZE
+        val voucher = String(content.sliceArray(voucherIdx until voucherIdx + Constants.UUID_SIZE))
+        vouchers.add(voucher)
+
+        currIndex += Constants.UUID_SIZE
+    }
+
+    return Pair(vouchers, currIndex)
+}
+
+fun extractProducts(content: ByteArray, idx: Int) : Pair<List<Product>,Int>{
+    var products = mutableListOf<Product>()
+    var numProducts = content[0]
+    var currIndex = idx
+
+    for (i in 0 until numProducts){
+        // NAME
+        var productNameLength = content[currIndex++].toInt()
+        var productName = String(content.sliceArray(currIndex until currIndex + productNameLength))
+        currIndex += productNameLength
+
+        // PRICE
+        var productPriceLength = content[currIndex++].toInt()
+        var productPrice = String(content.sliceArray(currIndex until currIndex + productPriceLength)).toDouble()
+        currIndex += productPriceLength
+
+        // Quantity
+        var productQuantity = content[currIndex++].toInt()
+
+        products.add(Product(productName, productPrice, productQuantity))
+    }
+
+    return Pair(products, currIndex)
 }
 
 @Composable
