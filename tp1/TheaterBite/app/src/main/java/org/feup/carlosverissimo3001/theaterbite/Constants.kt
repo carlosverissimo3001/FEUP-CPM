@@ -1,10 +1,13 @@
 package org.feup.carlosverissimo3001.theaterbite
 
+import android.nfc.NfcAdapter
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import java.text.SimpleDateFormat
 
-object Server {
+const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+
+object Constants {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
 }
 

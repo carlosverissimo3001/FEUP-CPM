@@ -1,5 +1,7 @@
 package org.feup.carlosverissimo3001.theaterbite
 
+import android.content.Context
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -46,9 +48,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import org.feup.carlosverissimo3001.theaterbite.api.APILayer
 
 
 class MainActivity : AppCompatActivity() {
+    private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
+    private val nfcReader by lazy { NFCReader(::nfcReceived) }
+    private var apiLayer = APILayer(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
@@ -64,9 +71,31 @@ class MainActivity : AppCompatActivity() {
             CafeteriaTerminal()
         }
     }
+
+    private fun nfcReceived(type: Int, content: ByteArray) {
+        runOnUiThread {
+            when (type) {
+                1 -> parseContent(content)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        nfc.enableReaderMode(this, nfcReader, READER_FLAGS, null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        nfc.disableReaderMode(this)
+    }
+
+    private fun parseContent(content: ByteArray){
+        val useridlength = content[1].toInt()
+        val userid  = String(content.sliceArray(2..useridlength+1))
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeteriaTerminal()
 {
@@ -94,6 +123,8 @@ fun CafeteriaTerminal()
             )
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
