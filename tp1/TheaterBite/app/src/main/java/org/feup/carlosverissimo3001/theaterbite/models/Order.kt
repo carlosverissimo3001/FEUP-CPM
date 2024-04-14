@@ -9,5 +9,6 @@ data class Product (
 data class Order(
     val products: List<Product>,
     val total: Double,
-    val vouchersUsed: List<String>
+    val vouchersUsed: List<String>,
+    var orderNo: Int = 0
 )
