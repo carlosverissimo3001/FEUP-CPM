@@ -1,8 +1,12 @@
 package org.feup.carlosverissimo3001.theaterbite
 
 import android.nfc.NfcAdapter
+import android.util.Base64
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
+import java.security.KeyFactory
+import java.security.PublicKey
+import java.security.spec.X509EncodedKeySpec
 import java.text.SimpleDateFormat
 
 const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
@@ -10,6 +14,8 @@ const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_
 object Constants {
     const val URL = "https://open-blowfish-cleanly.ngrok-free.app"
     const val UUID_SIZE = 36
+    const val KEY_SIZE = 512
+    const val SIGN_ALGO = "SHA256WithRSA"
 }
 
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
@@ -41,4 +47,18 @@ fun americanDateToNormal(date: String): String {
     val date = formatter.parse(date)
     val formatter2 = SimpleDateFormat("dd/MM/yyyy")
     return formatter2.format(date)
+}
+
+fun decodePublicKey(base64PublicKey: String): PublicKey {
+    // Decode the Base64 string into a byte array
+    val publicKeyBytes = Base64.decode(base64PublicKey, Base64.DEFAULT)
+
+    // Create an X509EncodedKeySpec using the byte array
+    val keySpec = X509EncodedKeySpec(publicKeyBytes)
+
+    // Initialize a KeyFactory for RSA
+    val keyFactory = KeyFactory.getInstance("RSA")
+
+    // Generate the public key from the X509EncodedKeySpec
+    return keyFactory.generatePublic(keySpec)
 }
