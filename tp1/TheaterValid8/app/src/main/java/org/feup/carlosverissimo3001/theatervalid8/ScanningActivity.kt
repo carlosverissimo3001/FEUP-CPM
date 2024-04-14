@@ -75,7 +75,7 @@ class ScanningActivity : AppCompatActivity() {
         val useridlength = content[1].toInt()
         val userid  = String(content.sliceArray(2..useridlength+1))
 
-        val (tickets, currIndex) = extractTicketsFromMessage(content)
+        val tickets  = extractTicketsFromMessage(content)
         var publicKey = ""
 
         var validated = false
@@ -125,7 +125,7 @@ class ScanningActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun extractTicketsFromMessage(content: ByteArray): Pair<MutableList<Ticket>, Int> {
+    private fun extractTicketsFromMessage(content: ByteArray): MutableList<Ticket> {
         // Start index: 2 (number of tickets + useridlength) + useridlength
         val numberOfTickets = content[0]
         var currentIndex = 2 + content[1].toInt()
@@ -174,7 +174,7 @@ class ScanningActivity : AppCompatActivity() {
         }
 
 
-        return Pair(tickets, currentIndex)
+        return tickets
     }
 
     private fun validateTickets(userid: String, tickets: MutableList<Ticket>) : List<Ticket> {

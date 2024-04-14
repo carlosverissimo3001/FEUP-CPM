@@ -30,10 +30,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,24 +41,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.R
-import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
-import org.feup.carlosverissimo3001.theaterpal.nfc.buildTicketMessage
-import java.math.BigInteger
-import java.security.KeyFactory
-import java.security.spec.RSAPublicKeySpec
 
 @Composable
 fun SendingTicketsFragment(
     ctx: Context,
-    isValidating: Boolean,
+    isSending: Boolean,
     onCancel: () -> Unit = {},
     tickets : List<Ticket> = emptyList(),
 ) {
     AnimatedVisibility (
-        visible = isValidating,
+        visible = isSending,
         enter = slideInVertically(
             // Slide in from the bottom
             initialOffsetY = { it },

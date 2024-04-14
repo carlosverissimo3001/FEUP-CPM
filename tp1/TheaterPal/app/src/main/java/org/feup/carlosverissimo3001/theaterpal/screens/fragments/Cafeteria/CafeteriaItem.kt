@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.CafeteriaItem
+import org.feup.carlosverissimo3001.theaterpal.models.itemIcons
+import java.util.Locale
 
 @Composable
 fun CafeteriaItem(
@@ -55,7 +57,7 @@ fun CafeteriaItem(
                 .padding(10.dp),
         ) {
             Icon(
-                imageVector = item.icon,
+                imageVector = itemIcons[item.name]!!,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier
@@ -172,5 +174,5 @@ fun CafeteriaItem(
 }
 
 fun formatPrice (price: Double) : String {
-    return String.format("%.2f", price) + "€"
+    return String.format(Locale.US, "%.2f", price) + "€"
 }

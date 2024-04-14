@@ -55,7 +55,7 @@ class SendTicketsActivity : AppCompatActivity() {
         setContent {
             SendingTicketsFragment(
                 ctx = this,
-                isValidating = true,
+                isSending = true,
                 onCancel = {
                     finish()
                 },

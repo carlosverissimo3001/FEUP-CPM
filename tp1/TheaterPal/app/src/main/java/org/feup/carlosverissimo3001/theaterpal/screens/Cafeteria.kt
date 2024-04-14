@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
+import android.content.Intent
 import android.nfc.NfcAdapter
 import android.widget.Toast
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
@@ -31,7 +33,9 @@ import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.setTotal
+import org.feup.carlosverissimo3001.theaterpal.nfc.buildOrderMessage
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendOrderActivity
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendingOrderFragment
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
 import java.io.ByteArrayOutputStream
@@ -52,6 +56,8 @@ fun Cafeteria(ctx: Context) {
 
     var barOrder by remember { mutableStateOf<BarOrder?>(null) }
     var order by remember { mutableStateOf<Order?>(null) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
@@ -108,7 +114,7 @@ fun Cafeteria(ctx: Context) {
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     // Handle swipe gestures to change tabs
-                    detectHorizontalDragGestures { change, dragAmount ->
+                    detectHorizontalDragGestures { _, dragAmount ->
                         if (dragAmount > 30) {
                             selectedTabIndex = 0
                         } else if (dragAmount < -30) {
@@ -146,6 +152,8 @@ fun Cafeteria(ctx: Context) {
                         },
                         isChoosingVoucher,
                         onSubmitted = { selectedVouchers, updatedTotal ->
+                            isSendingOrder = true
+
                             // update total, user might have selected vouchers for discount
                             setTotal(barOrder!!, updatedTotal)
 
@@ -157,34 +165,28 @@ fun Cafeteria(ctx: Context) {
                                 )
                             }
 
-                            isSendingOrder = true
+                            // nfc message
+                            val message = buildOrderMessage(order!!, ctx)
 
-                            if (nfcAdapter == null){
-                                Toast.makeText(ctx, "NFC is not supported on this device", Toast.LENGTH_SHORT).show()
-                            }
-                            else if (!nfcAdapter.isEnabled){
-                                Toast.makeText(ctx, "Please enable NFC", Toast.LENGTH_SHORT).show()
-                            }
-                            else {
-                                // TODO : Activate NFC
-                                sendOrder(ctx, order!!)
+                            // create intent and put the message and order
+                            val intent = Intent(context, SendOrderActivity::class.java)
+                            intent.putExtra("message", message)
+                            intent.putExtra("valuetype", 1)
+                            intent.putExtra("order", order)
 
-                                // Navigate to next step
-                                /*isChoosingVoucher = false
-                                selectedTabIndex = 0*/
-                            }
+                            context.startActivity(intent)
                         },
                         total = barOrder?.total ?: 0.00
                     )
                 }
 
-                SendingOrderFragment(
+                /*SendingOrderFragment(
                     isSending = isSendingOrder,
                     onCancel = {
                         isSendingOrder = false
                     },
                     order = order
-                )
+                )*/
             }
         }
     }

@@ -35,6 +35,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.parseVoucherType
+import java.util.Locale
 import kotlin.math.round
 
 @Composable
@@ -58,8 +59,7 @@ fun VouchersTab(
     val selectedVouchersIndices = remember { mutableStateListOf<Int>() }
     var updatedTotal by remember { mutableDoubleStateOf(total) }
 
-    val possibleDiscount = String.format("%.2f", total*0.05).toDouble()
-
+    val possibleDiscount = String.format(Locale.US, "%.2f", total*0.05).toDouble()
 
     Column(
         modifier = Modifier.fillMaxSize(),

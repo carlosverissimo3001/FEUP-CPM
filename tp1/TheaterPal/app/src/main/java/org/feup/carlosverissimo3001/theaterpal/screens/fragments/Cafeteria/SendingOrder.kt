@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -45,6 +46,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.parseVoucherType
 
 @Composable
 fun SendingOrderFragment(
+    ctx: Context,
     isSending: Boolean,
     onCancel: () -> Unit = {},
     order: Order? = null
