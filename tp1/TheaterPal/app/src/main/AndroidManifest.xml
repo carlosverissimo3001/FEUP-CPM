@@ -68,6 +68,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".screens.fragments.Cafeteria.SendOrderActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="org.feup.carlosverissimo3001.theaterpal.SEND_ORDER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
