@@ -43,7 +43,8 @@ fun buildOrderMessage(order: Order, ctx: Context) : ByteArray{
         // n bytes for the product name
         // 1 byte for the quantity
         // 1 byte for the length of the product price
-        productBytes += 1 + item.name.length + 1 + item.price.toString().length + 1 + qnt.toString().length
+        // n bytes for the product price
+        productBytes += 1 + item.name.length + 1 + item.price.toString().length + 1
     }
 
     // byte @index 0 is the number of products
@@ -80,10 +81,7 @@ fun buildOrderMessage(order: Order, ctx: Context) : ByteArray{
         messageBuilder.put(priceBytes)
 
         // QUANTITY
-        val qntBytes = qnt.toString().toByteArray()
-        val qntLength = qntBytes.size.toByte()
-        messageBuilder.put(qntLength)
-        messageBuilder.put(qntBytes)
+        messageBuilder.put(qnt.toByte())
     }
 
     //total
