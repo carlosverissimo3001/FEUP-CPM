@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.*
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -21,6 +22,7 @@ import java.security.PublicKey
 class MainActivity : AppCompatActivity() {
     private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
     private var nfcReader : NFCReader? = null
+    private var loading by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,8 @@ class MainActivity : AppCompatActivity() {
                 },
                 onDismissRequest = {
                     disableNFCReaderMode()
-                }
+                },
+                loading = loading
             )
         }
     }
@@ -64,8 +67,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun nfcReceived(type: Int, content: ByteArray) {
         runOnUiThread {
+            loading = true
             when (type) {
-                1 -> parseContent(content)
+                1 -> {
+                    parseContent(content)
+                    loading = false
+                }
             }
         }
     }
@@ -86,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         val userid  = String(content.sliceArray(2..useridlength+1))
 
         // get the public key
-        var publicKeyB64: String = ""
+        var publicKeyB64: String
         var publicKey : PublicKey
         var signatureVerified = false
         getPublicKey(userid) {
@@ -128,9 +135,9 @@ class MainActivity : AppCompatActivity() {
 
 fun extractVouchers(content: ByteArray) : Pair<List<String>, Int> {
     val numberOfVouchersIdx = 2 + content[1].toInt()
-    var numberOfVouchers = content[numberOfVouchersIdx].toInt()
+    val numberOfVouchers = content[numberOfVouchersIdx].toInt()
 
-    var vouchers = mutableListOf<String>()
+    val vouchers = mutableListOf<String>()
     var currIndex = numberOfVouchersIdx + 1
 
     for (i in 0 until numberOfVouchers){
@@ -146,23 +153,23 @@ fun extractVouchers(content: ByteArray) : Pair<List<String>, Int> {
 }
 
 fun extractProducts(content: ByteArray, idx: Int) : Pair<List<Product>,Int>{
-    var products = mutableListOf<Product>()
-    var numProducts = content[0]
+    val products = mutableListOf<Product>()
+    val numProducts = content[0]
     var currIndex = idx
 
     for (i in 0 until numProducts){
         // NAME
-        var productNameLength = content[currIndex++].toInt()
-        var productName = String(content.sliceArray(currIndex until currIndex + productNameLength))
+        val productNameLength = content[currIndex++].toInt()
+        val productName = String(content.sliceArray(currIndex until currIndex + productNameLength))
         currIndex += productNameLength
 
         // PRICE
-        var productPriceLength = content[currIndex++].toInt()
-        var productPrice = String(content.sliceArray(currIndex until currIndex + productPriceLength)).toDouble()
+        val productPriceLength = content[currIndex++].toInt()
+        val productPrice = String(content.sliceArray(currIndex until currIndex + productPriceLength)).toDouble()
         currIndex += productPriceLength
 
         // Quantity
-        var productQuantity = content[currIndex++].toInt()
+        val productQuantity = content[currIndex++].toInt()
 
         products.add(Product(productName, productPrice, productQuantity))
     }
