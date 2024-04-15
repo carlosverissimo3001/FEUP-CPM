@@ -3,58 +3,24 @@ package org.feup.carlosverissimo3001.theaterbite
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.feup.carlosverissimo3001.theaterbite.api.APILayer
-import org.feup.carlosverissimo3001.theaterbite.models.ConfirmedOrder
-import org.feup.carlosverissimo3001.theaterbite.models.Order
-import org.feup.carlosverissimo3001.theaterbite.models.Product
-import java.nio.ByteBuffer
-import java.security.Signature
+import org.feup.carlosverissimo3001.theaterbite.api.*
+import org.feup.carlosverissimo3001.theaterbite.models.*
+import org.feup.carlosverissimo3001.theaterbite.nfc.NFCReader
+import org.feup.carlosverissimo3001.theaterbite.screens.CafeteriaTerminalScreen
+import java.security.PublicKey
 
 
 class MainActivity : AppCompatActivity() {
     private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
     private var nfcReader : NFCReader? = null
-    private var apiLayer = APILayer(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         setContent {
-            CafeteriaTerminal(
+            CafeteriaTerminalScreen(
                 onStartScan = {
                     enableNFCReaderMode()
                 },
@@ -119,10 +85,24 @@ class MainActivity : AppCompatActivity() {
         val useridlength = content[1].toInt()
         val userid  = String(content.sliceArray(2..useridlength+1))
 
-        // Verify the signature
-        if (!verifySignature(content, userid)){
-            return
+        // get the public key
+        var publicKeyB64: String = ""
+        var publicKey : PublicKey
+        var signatureVerified = false
+        getPublicKey(userid) {
+            publicKeyB64 = it
+
+            // Decode the public key into a PublicKey object
+            publicKey = decodePublicKey(publicKeyB64)
+
+            // Verify the signature
+            if (verifySignature(content, publicKey)){
+                signatureVerified = true
+            }
         }
+
+       while (!signatureVerified)
+           Thread.sleep(10) // Avoid busy waiting
 
         // get the ids of the vouchers used
         val (vouchersUsed, currIndex) = extractVouchers(content)
@@ -136,80 +116,13 @@ class MainActivity : AppCompatActivity() {
 
         val order = Order(products, orderAmount, vouchersUsed)
 
-        // Submit the order
-        val confirmedOrder = submitOrder(userid, order)
+        // Send the order to the server
+        val confirmedOrder = sendOrder(userid, order)
 
         val intent = Intent(this, OrderConfirmationActivity::class.java)
 
         intent.putExtra("order", confirmedOrder)
         startActivity(intent)
-    }
-
-    private fun verifySignature(content: ByteArray, userid: String): Boolean {
-        var publicKey = ""
-
-        var validated = false
-        var isDoneValidating = false
-
-        val bb = ByteBuffer.wrap(content)
-        val sign = ByteArray(Constants.KEY_SIZE / 8)
-        val mess = ByteArray(content.size - sign.size)
-
-        // message
-        bb.get(mess, 0, mess.size)
-
-        // constant, 64 bytes (512/8)
-        bb.get(sign, 0, Constants.KEY_SIZE/8)
-
-        // retrieve the public key from the server
-        apiLayer.getPublicKey(userid) {
-            publicKey = it
-
-            val pkey = decodePublicKey(publicKey)
-
-            try{
-                validated = Signature.getInstance(Constants.SIGN_ALGO).run {
-                    initVerify(pkey)
-                    update(mess)
-                    verify(sign)
-                }
-            } catch (ex: Exception) {
-                println("Error verifying signature: ${ex.message}")
-            }
-
-            isDoneValidating = true
-
-            println("Signature verified: $validated")
-        }
-
-        while (!isDoneValidating){
-            Thread.sleep(10) // wait for the public key to be retrieved and to validate the signature
-        }
-
-        return validated
-    }
-
-    private fun submitOrder(userid: String, order: Order) : ConfirmedOrder{
-        var isOrderSubmitted = false
-
-        var confirmedOrder = ConfirmedOrder(
-            orderNo = 0,
-            products = emptyList(),
-            total = 0.0,
-            vouchersUsed = emptyList(),
-            vouchersGenerated = emptyList()
-        )
-
-        apiLayer.submitOrder(userid, order, onError = {}, onSuccess = {
-            confirmedOrder = it
-            isOrderSubmitted = true
-        })
-
-        while (!isOrderSubmitted){
-            Thread.sleep(10)
-        }
-
-        return confirmedOrder
     }
 }
 
@@ -257,153 +170,3 @@ fun extractProducts(content: ByteArray, idx: Int) : Pair<List<Product>,Int>{
     return Pair(products, currIndex)
 }
 
-@Composable
-fun CafeteriaTerminal(onStartScan: () -> Unit, onDismissRequest: () -> Unit)
-{
-    var showBottomSheet by remember { mutableStateOf(false) }
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CafeteriaTerminalTopBar()
-        CafeteriaTerminalDescription(
-            str = "Please approach your device to scan your order."
-        )
-        CafeteriaTerminalImage()
-        CafeteriaTerminalSubmitButton("Scan Order"){
-            showBottomSheet = true
-            onStartScan()
-        }
-        if (showBottomSheet)
-            CafeteriaTerminalBottomSheet(
-                imageID = R.drawable.nfc_scanning,
-                description = "Scanning your device...",
-                onDismissRequest = {
-                    showBottomSheet = false
-                    onDismissRequest()
-                },
-            )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CafeteriaTerminalTopBar() {
-    CenterAlignedTopAppBar(
-        modifier = Modifier.
-        padding(top = 25.dp, bottom = 15.dp),
-        title = {
-            Text("Validate your order",
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 33.sp,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold
-                ),
-                textAlign = TextAlign.Center
-            )
-        },
-
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-        ),
-    )
-}
-
-@Composable
-fun CafeteriaTerminalDescription(str: String)
-{
-    Text(
-        text = str,
-        modifier = Modifier
-            .padding(top = 0.dp, bottom = 5.dp, start = 60.dp, end = 60.dp),
-        style = TextStyle(
-            color = Color(0x77FFFFFF),
-            fontSize = 14.sp,
-            fontFamily = poppinsFontFamily,
-            fontWeight = FontWeight.Normal
-        ),
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
-fun CafeteriaTerminalImage()
-{
-    Image(
-        painter = painterResource(id = R.drawable.nfc_action),
-        contentDescription = null,
-        modifier = Modifier
-            .padding(top = 100.dp, bottom = 20.dp)
-            .border(5.dp, Color.White, CircleShape)
-            .background(Color.Gray, CircleShape)
-            .fillMaxWidth(0.8f)
-            .aspectRatio(1f)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun CafeteriaTerminalSubmitButton(str: String, onClick: () -> Unit)
-{
-    Button(
-        modifier = Modifier
-            .padding(top = 50.dp, bottom = 20.dp)
-            .fillMaxWidth(0.8f),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xBB00AA66),
-        ),
-        onClick = onClick
-    ) {
-        Text(
-            text = str,
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 20.sp,
-                fontFamily = poppinsFontFamily,
-                fontWeight = FontWeight.Bold
-            ),
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CafeteriaTerminalBottomSheet(imageID: Int, description: String, onDismissRequest: () -> Unit)
-{
-    val sheetState = rememberModalBottomSheetState()
-
-    ModalBottomSheet(
-        onDismissRequest = { onDismissRequest() },
-        sheetState = sheetState,
-        containerColor = Color(0xFF1F1F1F),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painter = painterResource(id = imageID),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clip(CircleShape)
-                    .fillMaxWidth(0.3f)
-                    .aspectRatio(1f)
-            )
-            Text(
-                text = description,
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontFamily = poppinsFontFamily,
-                ),
-                modifier = Modifier
-                    .padding(5.dp)
-            )
-            Spacer(
-                modifier = Modifier.padding(bottom = 20.dp)
-            )
-        }
-    }
-}
