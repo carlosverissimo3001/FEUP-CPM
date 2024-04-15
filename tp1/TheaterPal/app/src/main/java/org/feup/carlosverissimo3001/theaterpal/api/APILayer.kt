@@ -240,57 +240,6 @@ fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
     })
 }
 
-fun submitOrder(ctx: Context, order: Order, callback: (Boolean) -> Unit){
-    val client = OkHttpClient()
-
-    val jsonOrder = JSONObject()
-    jsonOrder.put("vouchers_used", JSONArray(order.vouchersUsed.map { it.voucherid }))
-    val barOrder = JSONObject()
-    val items = JSONArray()
-
-    for ((item, quantity) in order.barOrder.items) {
-        var itemJson = JSONObject()
-        itemJson.put("itemname", item.name)
-        itemJson.put("quantity", quantity)
-        itemJson.put("price", item.price)
-        items.put(itemJson)
-    }
-
-    barOrder.put("items", items)
-    barOrder.put("total", order.barOrder.total)
-    jsonOrder.put("order", barOrder)
-    jsonOrder.put("user_id", Authentication(ctx).getUserID())
-
-    val requestBody = jsonOrder.toString()
-        .toRequestBody("application/json".toMediaTypeOrNull())
-
-//    val requestBody = encrypt(jsonOrder.toString())
-//        .toRequestBody("application/json".toMediaTypeOrNull())
-
-    val request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/submit_order")
-        .post(requestBody)
-        .build()
-
-    client.newCall(request).enqueue(object : okhttp3.Callback {
-        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-            e.printStackTrace()
-            callback(false)
-        }
-
-        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-            when (response.code) {
-                200, 201 -> {
-                    callback(true)
-                }
-                else -> {
-                    callback(false)
-                }
-            }
-        }
-    })
-}
-
 fun purchaseTickets(
     ctx: Context,
     showDateId: Int,
