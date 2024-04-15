@@ -1,13 +1,21 @@
 package org.feup.carlosverissimo3001.theaterbite
 
+import android.content.Intent
 import android.nfc.NfcAdapter
+import android.os.Build
+import android.os.Parcelable
 import android.util.Base64
+import androidx.annotation.RequiresApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import java.security.KeyFactory
 import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
@@ -17,6 +25,15 @@ object Constants {
     const val KEY_SIZE = 512
     const val SIGN_ALGO = "SHA256WithRSA"
 }
+
+var itemIcons = mapOf(
+    "Popcorn" to Icons.Outlined.Fastfood,
+    "Soda" to Icons.Outlined.Fastfood,
+    "Coffee" to Icons.Outlined.Coffee,
+    "Sandwich" to Icons.Outlined.Fastfood,
+    "Free Coffee" to Icons.Outlined.Coffee,
+    "Free Popcorn" to Icons.Outlined.Fastfood
+)
 
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
     Font(R.font.poppins_light, FontWeight.W300),
@@ -61,4 +78,14 @@ fun decodePublicKey(base64PublicKey: String): PublicKey {
 
     // Generate the public key from the X509EncodedKeySpec
     return keyFactory.generatePublic(keySpec)
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
+    Build.VERSION.SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
+}
+
+fun formatPrice (price: Double) : String {
+    return String.format(Locale.US, "%.2f", price) + "€"
 }
