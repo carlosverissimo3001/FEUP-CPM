@@ -338,6 +338,37 @@ def create_voucher(conn: psycopg2.extensions.connection, user_id: str, voucher_t
         conn.rollback() # Rollback the transaction
         return None
 
+def get_voucher_by_id(conn: psycopg2.extensions.connection, voucher_id: str):
+    """
+    Get a voucher by its id
+
+    :param psycopg2.extensions.connection conn: connection to the database
+    :param str voucher_id: voucher's id
+
+    :return: tuple
+    """
+    cur = conn.cursor()
+
+    cur.execute('''
+        SELECT json_build_object(
+            'voucherid', voucherid,
+            'userid', userid,
+            'vouchertype', vouchertype,
+            'isUsed', isUsed
+        ) FROM vouchers WHERE voucherid = %s
+    ''', (voucher_id,))
+
+    row = cur.fetchone()
+
+    if row is None:
+        return None
+
+    data = []
+    data.append(row[0])
+
+    return data
+
+
 def mark_voucher_as_used(conn: psycopg2.extensions.connection, voucher_id: int):
     """
     Mark a voucher as used

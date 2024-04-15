@@ -44,7 +44,12 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
         if order_no is None:
             return jsonify({'message': 'Error submitting order!'})
 
-        return jsonify({'message': 'Order submitted successfully!', 'order_no': order_no}), 200
+        all_orders = build_user_orders(user_id)
+
+        # get only the current order
+        order = all_orders[-1]
+
+        return jsonify({'message': 'Order submitted successfully!', 'order': order}), 200
 
 
     @cafeteria_page.route('/orders', methods=['GET'])
@@ -62,16 +67,17 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         for transaction in caft_transactions:
             transaction["items"] = crud_ops.get_cafeteria_order_items(dbConn, transaction["order_id"])
-            transaction["vouchers"] = crud_ops.get_vouchers_used(dbConn, transaction["transaction_id"])
+            transaction["vouchers_used"] = crud_ops.get_vouchers_used(dbConn, transaction["transaction_id"])
+            transaction["vouchers_generated"] = crud_ops.get_vouchers_generated(dbConn, transaction["transaction_id"])
 
-            for voucher in transaction["vouchers"]:
+            for voucher in transaction["vouchers_used"]:
                 ## free coffee
                 if voucher["vouchertype"] == VOUCHER_TYPE[1]:
                     transaction["items"].append({"itemname": "Free Coffee", "price": 0, "quantity": 1})
                 elif voucher["vouchertype"] == VOUCHER_TYPE[2]:
                     transaction["items"].append({"itemname": "Free Popcorn", "price": 0, "quantity": 1})
 
-            transaction["vouchers"] = len(transaction["vouchers"])
+            """ transaction["vouchers"] = len(transaction["vouchers"]) """
 
         return caft_transactions
 
