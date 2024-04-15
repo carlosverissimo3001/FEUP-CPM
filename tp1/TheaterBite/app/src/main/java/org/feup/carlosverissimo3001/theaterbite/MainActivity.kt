@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.feup.carlosverissimo3001.theaterbite.api.APILayer
+import org.feup.carlosverissimo3001.theaterbite.models.ConfirmedOrder
 import org.feup.carlosverissimo3001.theaterbite.models.Order
 import org.feup.carlosverissimo3001.theaterbite.models.Product
 import java.nio.ByteBuffer
@@ -52,11 +53,14 @@ import java.security.Signature
 
 class MainActivity : AppCompatActivity() {
     private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
-    private val nfcReader by lazy { NFCReader(::nfcReceived) }
+    private var nfcReader : NFCReader? = null
     private var apiLayer = APILayer(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        nfc.disableReaderMode(this)
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(
                 Color.Transparent.toArgb()
@@ -67,8 +71,29 @@ class MainActivity : AppCompatActivity() {
         )
 
         setContent {
-            CafeteriaTerminal()
+            CafeteriaTerminal(
+                onStartScan = {
+                    enableNFCReaderMode()
+                },
+                onDismissRequest = {
+                    disableNFCReaderMode()
+                }
+            )
         }
+    }
+
+    private fun enableNFCReaderMode() {
+        // Initialize NFC reader if not already initialized
+        if (nfcReader == null) {
+            nfcReader = NFCReader(::nfcReceived)
+        }
+        // Enable NFC reader mode
+        nfc?.enableReaderMode(this, nfcReader, READER_FLAGS, null)
+    }
+
+    private fun disableNFCReaderMode() {
+        // Disable NFC reader mode if initialized
+        nfc?.disableReaderMode(this)
     }
 
     private fun nfcReceived(type: Int, content: ByteArray) {
@@ -112,9 +137,12 @@ class MainActivity : AppCompatActivity() {
         val order = Order(products, orderAmount, vouchersUsed)
 
         // Submit the order
-        //order.orderNo = submitOrder(userid, order)
+        val confirmedOrder = submitOrder(userid, order)
 
         val intent = Intent(this, OrderConfirmationActivity::class.java)
+
+        intent.putExtra("order", confirmedOrder)
+        startActivity(intent)
     }
 
     private fun verifySignature(content: ByteArray, userid: String): Boolean {
@@ -155,26 +183,33 @@ class MainActivity : AppCompatActivity() {
         }
 
         while (!isDoneValidating){
-            Thread.sleep(100) // wait for the public key to be retrieved and to validate the signature
+            Thread.sleep(10) // wait for the public key to be retrieved and to validate the signature
         }
 
         return validated
     }
 
-    fun submitOrder(userid: String, order: Order) : Int{
+    private fun submitOrder(userid: String, order: Order) : ConfirmedOrder{
         var isOrderSubmitted = false
-        var orderNo = 0
 
-        apiLayer.submitOrder(userid, order){
-            orderNo = it
+        var confirmedOrder = ConfirmedOrder(
+            orderNo = 0,
+            products = emptyList(),
+            total = 0.0,
+            vouchersUsed = emptyList(),
+            vouchersGenerated = emptyList()
+        )
+
+        apiLayer.submitOrder(userid, order, onError = {}, onSuccess = {
+            confirmedOrder = it
             isOrderSubmitted = true
-        }
+        })
 
         while (!isOrderSubmitted){
-            Thread.sleep(100)
+            Thread.sleep(10)
         }
 
-        return orderNo
+        return confirmedOrder
     }
 }
 
@@ -223,7 +258,7 @@ fun extractProducts(content: ByteArray, idx: Int) : Pair<List<Product>,Int>{
 }
 
 @Composable
-fun CafeteriaTerminal()
+fun CafeteriaTerminal(onStartScan: () -> Unit, onDismissRequest: () -> Unit)
 {
     var showBottomSheet by remember { mutableStateOf(false) }
     Column (
@@ -235,9 +270,8 @@ fun CafeteriaTerminal()
         )
         CafeteriaTerminalImage()
         CafeteriaTerminalSubmitButton("Scan Order"){
-            // API LAYER STUFF HERE
-            // ACTIVATE SCANNING OF NFC DEVICE
             showBottomSheet = true
+            onStartScan()
         }
         if (showBottomSheet)
             CafeteriaTerminalBottomSheet(
@@ -245,19 +279,18 @@ fun CafeteriaTerminal()
                 description = "Scanning your device...",
                 onDismissRequest = {
                     showBottomSheet = false
+                    onDismissRequest()
                 },
             )
     }
 }
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeteriaTerminalTopBar() {
     CenterAlignedTopAppBar(
         modifier = Modifier.
-            padding(top = 25.dp, bottom = 15.dp),
+        padding(top = 25.dp, bottom = 15.dp),
         title = {
             Text("Validate your order",
                 style = TextStyle(
@@ -336,11 +369,7 @@ fun CafeteriaTerminalSubmitButton(str: String, onClick: () -> Unit)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CafeteriaTerminalBottomSheet(
-    imageID: Int,
-    description: String,
-    onDismissRequest: () -> Unit
-)
+fun CafeteriaTerminalBottomSheet(imageID: Int, description: String, onDismissRequest: () -> Unit)
 {
     val sheetState = rememberModalBottomSheetState()
 
