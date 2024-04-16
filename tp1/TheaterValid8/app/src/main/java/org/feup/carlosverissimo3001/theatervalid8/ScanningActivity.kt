@@ -35,19 +35,14 @@ class ScanningActivity : AppCompatActivity() {
 
         setContent (
             content = {
-                val (isScanning, setIsScanning) = remember { mutableStateOf(true) }
-
                 NfcIsScanningFragment(
-                    isScanning = isScanning,
+                    isScanning = true,
                     onCancel = {
-                        // Stop scanning
-                        setIsScanning(false)
                         finish()
                     },
                     showName = show.name,
-                    date = showDate.date,
+                    date = showDate.date
                 )
-
             }
         )
     }

@@ -3,14 +3,7 @@ package org.feup.carlosverissimo3001.theatervalid8.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -73,7 +66,7 @@ fun NfcValidatorFragment(
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
-                    .border(3.dp, androidx.compose.ui.graphics.Color.White, CircleShape)
+                    .border(3.dp, Color.White, CircleShape)
             )
 
             Button(
@@ -82,7 +75,7 @@ fun NfcValidatorFragment(
                     .fillMaxWidth(0.8f),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color (android.graphics.Color.parseColor("#50bc64")),
-                    contentColor = androidx.compose.ui.graphics.Color.White
+                    contentColor = Color.White
                 )
             ) {
                 Text(

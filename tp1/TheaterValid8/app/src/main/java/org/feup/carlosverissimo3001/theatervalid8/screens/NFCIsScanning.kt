@@ -102,11 +102,11 @@ fun NfcIsScanningFragment(
 
                 Spacer(modifier = Modifier.size(5.dp))
 
-                Column (
+                Column(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +167,6 @@ fun NfcIsScanningFragment(
 
                 Spacer(modifier = Modifier.size(5.dp))
 
-
                 Text(
                     text = "Scanning for your tickets...",
                     style = TextStyle(
@@ -206,7 +205,6 @@ fun NfcIsScanningFragment(
                         color = Color.White,
                     )
                 }
-
             }
         }
     }
