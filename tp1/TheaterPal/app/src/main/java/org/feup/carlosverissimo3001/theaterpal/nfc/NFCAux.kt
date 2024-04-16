@@ -122,8 +122,12 @@ fun buildTicketMessage(tickets: List<Ticket>, ctx: Context): ByteArray {
 
     // byte @index 0 is the number of tickets
     // byte @index 1 is the length of the user_id
+
+    // NOTE: Use it.showname.toByteArray(Charsets.UTF_8).size instead of it.showname.length because
+    // of special characters like "´"
+
     val totalSize = 1 + 1 + user_id.length + tickets.sumOf {
-        1 + it.ticketid.length + 1 + it.userid.length + 1 + it.showName.length + 1 +
+        1 + it.ticketid.length + 1 + it.userid.length + 1 + it.showName.toByteArray(Charsets.UTF_8).size + 1 +
                 it.seat.length + 1 + 1 + it.date.length
     } + Constants.KEY_SIZE / 8
     // include the size of the signature and the size of the user_id
@@ -150,7 +154,6 @@ fun buildTicketMessage(tickets: List<Ticket>, ctx: Context): ByteArray {
         val useridLength = useridBytes.size.toByte()
         messageBuilder.put(useridLength)
         messageBuilder.put(useridBytes)
-
 
         // SHOWNAME
         val showNameBytes = ticket.showName.toByteArray()
