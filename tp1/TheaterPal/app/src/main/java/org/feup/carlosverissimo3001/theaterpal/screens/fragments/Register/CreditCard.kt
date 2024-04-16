@@ -135,6 +135,7 @@ fun Expiration(
 
             ) },
         colors = fieldColors(),
+        singleLine = true
     )
 }
 
@@ -145,6 +146,7 @@ fun CardNumber(
 ) {
     var number by remember { mutableStateOf("") }
     OutlinedTextField(
+        singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),
