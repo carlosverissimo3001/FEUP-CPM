@@ -61,13 +61,15 @@ fun parseOrderRcv(json: JSONObject): OrderRcv {
         items.add(parseOrderRcvItem(itemsJson.getJSONObject(i)))
     }
 
+    val vouchers = json.getJSONArray("vouchers_used")
+
     return OrderRcv(
         items,
         json.getString("order_id"),
         json.getInt("order_number"),
         json.getDouble("total"),
         json.getString("transaction_id"),
-        json.getInt("vouchers_used_cnt"),
+        vouchers.length(),
         json.getString("status").lowercase().capitalized()
     )
 }

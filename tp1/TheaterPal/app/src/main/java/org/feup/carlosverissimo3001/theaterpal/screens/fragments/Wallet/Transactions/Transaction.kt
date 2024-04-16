@@ -87,15 +87,29 @@ fun Transaction(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Total : ${formatPrice(transaction.total)}",
-                    style = TextStyle(
-                        color = Color.LightGray,
-                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-                        fontFamily = marcherFontFamily,
-                        fontWeight = FontWeight.Bold
+                Column (
+                    horizontalAlignment = Alignment.Start,
+                ){
+                    val date = americanDateToEuropean(transaction.timestamp.split("T")[0])
+                    Text(
+                        text = "Date : $date",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
-                )
+                    Text(
+                        text = "Total : ${formatPrice(transaction.total)}",
+                        style = TextStyle(
+                            color = Color.LightGray,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
 
                 Column(
                     horizontalAlignment = Alignment.End,

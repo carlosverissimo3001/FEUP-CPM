@@ -79,6 +79,8 @@ fun TransactionsFragment(
         getUserTransactions(Authentication(ctx).getUserID()) { fetchedTransactions ->
             transactions = fetchedTransactions
             areTransactionsLoaded = true
+
+            transactions = transactions.sortedBy { it.timestamp }
         }
     }
 
