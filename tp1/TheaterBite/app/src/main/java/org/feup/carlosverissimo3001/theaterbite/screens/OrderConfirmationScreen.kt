@@ -26,8 +26,6 @@ fun OrderConfirmationScreen(
     var secondsRemaining by remember { mutableIntStateOf(seconds) }
     var job by remember { mutableStateOf<Job?>(null) }
 
-    println("OrderConfirmationScreen: order: $order, seconds: $seconds")
-
     LaunchedEffect(secondsRemaining) {
         job?.cancel()
         job = CoroutineScope(Dispatchers.Default).launch {

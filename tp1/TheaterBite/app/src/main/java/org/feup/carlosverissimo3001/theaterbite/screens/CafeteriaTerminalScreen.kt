@@ -143,6 +143,7 @@ fun CafeteriaTerminalSubmitButton(str: String, onClick: () -> Unit)
 fun CafeteriaTerminalBottomSheet(imageID: Int, description: String, onDismissRequest: () -> Unit, loading: Boolean)
 {
     val sheetState = rememberModalBottomSheetState()
+    println("IS LOADING: $loading")
 
     ModalBottomSheet(
         onDismissRequest = { onDismissRequest() },

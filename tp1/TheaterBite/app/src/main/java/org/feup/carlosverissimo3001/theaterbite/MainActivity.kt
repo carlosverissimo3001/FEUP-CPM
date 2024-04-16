@@ -22,7 +22,6 @@ import java.security.PublicKey
 class MainActivity : AppCompatActivity() {
     private val nfc by lazy { NfcAdapter.getDefaultAdapter(applicationContext) }
     private var nfcReader : NFCReader? = null
-    private var loading by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 onDismissRequest = {
                     disableNFCReaderMode()
                 },
-                loading = loading
+                loading = false
             )
         }
     }
@@ -66,12 +65,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun nfcReceived(type: Int, content: ByteArray) {
-        runOnUiThread {
-            loading = true
+        setContent {
+            CafeteriaTerminalScreen(
+                onStartScan = {
+                    enableNFCReaderMode()
+                },
+                onDismissRequest = {
+                    disableNFCReaderMode()
+                },
+                loading = true
+            )
             when (type) {
                 1 -> {
                     parseContent(content)
-                    loading = false
                 }
             }
         }
@@ -79,6 +85,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        setContent {
+            CafeteriaTerminalScreen(
+                onStartScan = {
+                    enableNFCReaderMode()
+                },
+                onDismissRequest = {
+                    disableNFCReaderMode()
+                },
+                loading = false
+            )
+        }
+
         nfc.enableReaderMode(this, nfcReader, READER_FLAGS, null)
     }
 
@@ -96,6 +115,7 @@ class MainActivity : AppCompatActivity() {
         var publicKeyB64: String
         var publicKey : PublicKey
         var signatureVerified = false
+
         getPublicKey(userid) {
             publicKeyB64 = it
 
