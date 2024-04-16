@@ -2,22 +2,17 @@ package org.feup.carlosverissimo3001.theaterpal
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
 import org.feup.carlosverissimo3001.theaterpal.api.registerUser
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.models.User
 import org.feup.carlosverissimo3001.theaterpal.screens.Register
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Register.TopBar
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.register.TopBar
 
 class RegisterActivity : AppCompatActivity(){
-    var auth = Authentication(this)
+    private var auth = Authentication(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +37,8 @@ class RegisterActivity : AppCompatActivity(){
 
         // get the public key
         user.publicKey = auth.getPublicKeyB64()
+
+        Log.d("RegisterActivity", "USER: $user")
 
         registerUser(user, callback = {success, userid ->
             if (success) {

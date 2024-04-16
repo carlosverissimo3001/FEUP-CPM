@@ -1,11 +1,9 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Register
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.register
 
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCard
@@ -19,14 +17,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -34,33 +29,29 @@ import androidx.compose.ui.unit.dp
 import com.steliospapamichail.creditcardmasker.viewtransformations.CardNumberMask
 import com.steliospapamichail.creditcardmasker.viewtransformations.ExpirationDateMask
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.Card
-import org.feup.carlosverissimo3001.theaterpal.models.CardType
-import org.feup.carlosverissimo3001.theaterpal.models.CardValidity
+import org.feup.carlosverissimo3001.theaterpal.models.card.Card
+import org.feup.carlosverissimo3001.theaterpal.models.card.CardValidity
 
 
 @Composable
 fun CreditCard(
-    onCardChange: (Card) -> Unit
+    onCardChange: (Card) -> Unit,
+    onError: (String) -> Unit
 ) {
     var cardNumber by remember { mutableStateOf("") }
     var cardValidity by remember { mutableStateOf("") }
 
-    var defaultCard = Card(CardType.VISA, "", CardValidity(0, 0))
+    val defaultCard = Card("", "", CardValidity(0, 0))
 
-    var card by remember {
+    val card by remember {
         mutableStateOf(defaultCard)
     }
 
-    // TODO
-    /*var cardType by remember {
-        mutableStateOf<String>("")
-    }*/
-    var cardType = "Visa" // for now
-
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp)
     ){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -71,8 +62,11 @@ fun CreditCard(
 
                 if (it.length == 16)
                     onCardChange(card)
-            })
+            },
+                onError = onError
+            )
             Spacer(modifier = Modifier.height(10.dp))
+
             Expiration(onExpirationChange = { exp ->
                 cardValidity = exp
 
@@ -80,13 +74,19 @@ fun CreditCard(
                     card.validity = CardValidity(exp.substring(0, 2).toInt(), exp.substring(2, 4).toInt())
                     onCardChange(card)
                 }
-            })
+            },
+                onError = onError
+            )
+
             Spacer(modifier = Modifier.height(10.dp))
-            /*TypeDropdown {
-                cardType = it
-                card.type = CardType.valueOf(it)
-                onCardChange(card)
-            }*/
+
+            TypeDropdown (
+                onTypeSelected = {
+                    card.type = it
+                    onCardChange(card)
+                    println("Card : $card")
+                }
+            )
         }
     }
 }
@@ -95,10 +95,16 @@ fun CreditCard(
 @Composable
 fun Expiration(
     onExpirationChange: (String) -> Unit,
+    onError: (String) -> Unit
 ) {
     var expiration by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
+
+    error = isExpirationError(expiration)
+    onError(error)
+
     OutlinedTextField(
-        isError = !isExpirationError(expiration),
+        isError = isExpirationError(expiration) != "",
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),
@@ -134,7 +140,8 @@ fun Expiration(
 
 @Composable
 fun CardNumber(
-    onCardNumberChange: (String) -> Unit
+    onCardNumberChange: (String) -> Unit,
+    onError: (String) -> Unit
 ) {
     var number by remember { mutableStateOf("") }
     OutlinedTextField(
@@ -182,7 +189,10 @@ fun fieldColors() = OutlinedTextFieldDefaults.colors(
     errorLabelColor = Color.Red,
     errorLeadingIconColor = Color.Red,
     errorBorderColor = Color.Red,
-    errorTextColor = Color.Red
+    errorTextColor = Color.Red,
+    errorSupportingTextColor = Color.Red,
+    errorPlaceholderColor = Color.Red,
+    errorTrailingIconColor = Color.Red
 )
 
 fun isExpirationValid(expiration: String): Boolean {
@@ -195,14 +205,23 @@ fun isExpirationValid(expiration: String): Boolean {
     return month in 1..12 && year in 24..99
 }
 
-fun isExpirationError(expiration: String): Boolean {
+fun isExpirationError(expiration: String): String {
     if (expiration.isEmpty() || expiration.length < 4)
-        return true
+        return ""
 
-    val month = expiration.substring(0, 2).toIntOrNull() ?: return false
-    val year = expiration.substring(2, 4).toIntOrNull() ?: return false
+    val month = expiration.substring(0, 2).toIntOrNull() ?: return "Please enter a valid month"
+    val year = expiration.substring(2, 4).toIntOrNull() ?: return "Please enter a valid year"
 
-    return month in 1..12 && year in 24..99
+    if (month !in 1..12 && year !in 24..99)
+        return "Please enter a valid month and year"
+
+    else if (month !in 1..12)
+        return "Please enter a valid month"
+
+    else if (year !in 24..99)
+        return "Please enter a valid year"
+
+    return ""
 }
 
 
@@ -211,69 +230,85 @@ fun isExpirationError(expiration: String): Boolean {
 fun TypeDropdown(
     onTypeSelected: (String) -> Unit,
 ) {
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
+    val types = arrayOf("VISA", "MASTERCARD", "AMERICAN EXPRESS", "DISCOVER")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCardType by remember { mutableStateOf("") }
 
-    val types = CardType.entries.map { it.name }
-    var type by remember { mutableStateOf("") }
 
-    println(types)
-
-    ExposedDropdownMenuBox(
-        expanded = isExpanded,
-        onExpandedChange = {newVal ->
-            isExpanded = newVal
-            println("Expanded: $newVal")
-        }
+    Box(
+        contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()
     ) {
-        OutlinedTextField(
-            value = type,
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
             },
-            placeholder = {
-                Text(
-                    text = "Please select the card type",
-                    style = TextStyle(
-                        color = Color.White,
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                        textAlign = TextAlign.Center,
-                        fontFamily = marcherFontFamily
-                    )
+            modifier = Modifier.padding(10.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color.White,
+                    shape = MaterialTheme.shapes.small
                 )
-            }
-        )
-        ExposedDropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = {
-                isExpanded = false
-            }
         ) {
-            types.forEach { selectionOption ->
-                DropdownMenuItem(
-                    onClick = {
-                        val selected = types.find { it == selectionOption }
-                        selected?.let {
-                            type = selected
-                            onTypeSelected(selected)
-                            isExpanded = false
-                        }
-                    },
-                    text = {
-                        Text(
-                            text = selectionOption,
-                            style = TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                                textAlign = TextAlign.Center,
-                                fontFamily = marcherFontFamily
-                            )
+            OutlinedTextField(
+                value = selectedCardType,
+                onValueChange = {
+                    selectedCardType = it
+                },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                leadingIcon = @Composable {
+                    Icon(
+                        imageVector = Icons.Default.AddCard,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = "Please select the card type",
+                        style = TextStyle(
+                            color = Color.White,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                            textAlign = TextAlign.Center,
+                            fontFamily = marcherFontFamily
                         )
-                    }
+                    )
+                },
+                modifier = Modifier.menuAnchor(),
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                    fontFamily = marcherFontFamily
                 )
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = {expanded = false}
+            ) {
+                types.forEach { type ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedCardType = type
+                            expanded = false
+                            onTypeSelected(type)
+                        },
+                        text = {
+                            Text(
+                                text = type,
+                                style = TextStyle(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    textAlign = TextAlign.Center,
+                                    fontFamily = marcherFontFamily
+                                )
+                            )
+                        }
+                    )
+                }
             }
         }
     }
