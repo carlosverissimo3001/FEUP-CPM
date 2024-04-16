@@ -67,7 +67,7 @@ fun parseOrderRcv(json: JSONObject): OrderRcv {
         json.getInt("order_number"),
         json.getDouble("total"),
         json.getString("transaction_id"),
-        json.getInt("vouchers"),
+        json.getInt("vouchers_used_cnt"),
         json.getString("status").lowercase().capitalized()
     )
 }
