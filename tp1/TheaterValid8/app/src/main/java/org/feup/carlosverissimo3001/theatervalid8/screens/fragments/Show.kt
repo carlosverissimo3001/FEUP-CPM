@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theatervalid8.americanDateToNormal
 import org.feup.carlosverissimo3001.theatervalid8.models.*
+import org.feup.carlosverissimo3001.theatervalid8.models.show.Show
 import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 

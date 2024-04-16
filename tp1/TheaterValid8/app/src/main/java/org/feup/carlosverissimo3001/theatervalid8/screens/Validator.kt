@@ -21,7 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theatervalid8.file.decodeBase64ToBitmap
 import org.feup.carlosverissimo3001.theatervalid8.file.loadImageFromCache
-import org.feup.carlosverissimo3001.theatervalid8.models.*
+import org.feup.carlosverissimo3001.theatervalid8.models.show.*
 import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 import org.feup.carlosverissimo3001.theatervalid8.screens.fragments.Show
 
@@ -40,14 +40,13 @@ fun ValidatorScreen(
     )
 
     val imageb64 = show.pictureBase64
-    val bitmap : Bitmap?
 
-    if (imageb64 == "") {
+    val bitmap : Bitmap? = if (imageb64 == "") {
         // get image from cache
-        bitmap = loadImageFromCache(show.picture, ctx)
+        loadImageFromCache(show.picture, ctx)
     }
     else {
-        bitmap = decodeBase64ToBitmap(imageb64)
+        decodeBase64ToBitmap(imageb64)
     }
 
     Column (

@@ -8,8 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.feup.carlosverissimo3001.theatervalid8.api.APILayer
-import org.feup.carlosverissimo3001.theatervalid8.models.Show
-import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.models.show.*
 import org.feup.carlosverissimo3001.theatervalid8.screens.NfcIsScanningFragment
 import org.feup.carlosverissimo3001.theatervalid8.models.Ticket
 import org.feup.carlosverissimo3001.theatervalid8.screens.ValidationStatusActivity
@@ -76,7 +75,7 @@ class ScanningActivity : AppCompatActivity() {
         val userid  = String(content.sliceArray(2..useridlength+1))
 
         val tickets  = extractTicketsFromMessage(content)
-        var publicKey = ""
+        var publicKey: String
 
         var validated = false
 

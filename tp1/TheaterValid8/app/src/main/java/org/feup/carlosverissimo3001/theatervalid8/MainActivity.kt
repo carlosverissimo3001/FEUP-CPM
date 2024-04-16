@@ -25,8 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theatervalid8.api.APILayer
-import org.feup.carlosverissimo3001.theatervalid8.models.Show
-import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.models.show.*
 import org.feup.carlosverissimo3001.theatervalid8.screens.ShowDatesDropDownMenu
 import org.feup.carlosverissimo3001.theatervalid8.screens.ShowDropdownMenu
 import org.feup.carlosverissimo3001.theatervalid8.screens.ValidateButton

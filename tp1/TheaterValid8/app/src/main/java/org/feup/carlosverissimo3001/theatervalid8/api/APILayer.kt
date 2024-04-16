@@ -3,13 +3,13 @@ package org.feup.carlosverissimo3001.theatervalid8.api
 import android.content.Context
 import android.graphics.Bitmap
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import org.feup.carlosverissimo3001.theatervalid8.models.Show
+import org.feup.carlosverissimo3001.theatervalid8.models.show.Show
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theatervalid8.Constants
 import org.feup.carlosverissimo3001.theatervalid8.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theatervalid8.file.loadImageFromCache
-import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.models.show.ShowDate
 import org.feup.carlosverissimo3001.theatervalid8.file.saveImageToCache
 import org.feup.carlosverissimo3001.theatervalid8.models.TicketState
 import org.feup.carlosverissimo3001.theatervalid8.showNameImageMap
@@ -94,9 +94,9 @@ class APILayer (private val ctx: Context){
         })
     }
 
-    fun getPublicKey(user_id: String, callback: (String) -> Unit) {
+    fun getPublicKey(userId: String, callback: (String) -> Unit) {
         val request = okhttp3.Request.Builder()
-            .url("${Constants.URL}/get_user_pkey?user_id=$user_id")
+            .url("${Constants.URL}/get_user_pkey?user_id=$userId")
             .get()
             .build()
 
@@ -168,9 +168,9 @@ class APILayer (private val ctx: Context){
         return shows
     }
 
-    fun validateTicketsWithServer(user_id: String, ticketids: List<String>, callback: (List<TicketState>) -> Unit) {
+    fun validateTicketsWithServer(userId: String, ticketids: List<String>, callback: (List<TicketState>) -> Unit) {
         val json = JSONObject()
-        json.put("userid", user_id)
+        json.put("userid", userId)
         json.put("ticketids", JSONArray(ticketids))
 
         val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())

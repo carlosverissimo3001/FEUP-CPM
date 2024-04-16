@@ -10,9 +10,8 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import org.feup.carlosverissimo3001.theatervalid8.models.*
+import androidx.compose.runtime.*
+import org.feup.carlosverissimo3001.theatervalid8.models.show.*
 import org.feup.carlosverissimo3001.theatervalid8.screens.*
 
 const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
@@ -26,8 +25,6 @@ inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
 class ValidatorActivity : AppCompatActivity() {
     private lateinit var show : Show
     private lateinit var showDate : ShowDate
-    private var validationStatus: Boolean = false
-    private var isScanning: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +34,7 @@ class ValidatorActivity : AppCompatActivity() {
 
         setContent(
             content = {
-                val (isScanning, setIsScanning) = remember { mutableStateOf(false) }
+                val isScanning by remember { mutableStateOf(false) }
 
                 Column {
                     ValidatorScreen(

@@ -1,7 +1,5 @@
 package org.feup.carlosverissimo3001.theatervalid8.screens
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +12,7 @@ import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -24,15 +20,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import org.feup.carlosverissimo3001.theatervalid8.models.Show
+import org.feup.carlosverissimo3001.theatervalid8.models.show.Show
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import org.feup.carlosverissimo3001.theatervalid8.models.ShowDate
+import org.feup.carlosverissimo3001.theatervalid8.models.show.ShowDate
 import org.feup.carlosverissimo3001.theatervalid8.poppinsFontFamily
 
 
