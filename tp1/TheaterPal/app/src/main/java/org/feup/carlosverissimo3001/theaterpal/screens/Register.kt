@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,10 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCard
 import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -21,8 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +35,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.Card
+import org.feup.carlosverissimo3001.theaterpal.models.card.Card
 import org.feup.carlosverissimo3001.theaterpal.models.User
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Register.CreditCard
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Register.fieldColors
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.register.CreditCard
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.register.fieldColors
 
 @Composable
 fun Register(
@@ -57,6 +54,10 @@ fun Register(
 
     var card by remember {
         mutableStateOf<Card?>(null)
+    }
+
+    var error by remember {
+        mutableStateOf("")
     }
 
     Box (
@@ -122,7 +123,7 @@ fun Register(
                         )
                     )
                 },
-                colors = fieldColors()
+                colors = fieldColors(),
             )
 
             OutlinedTextField(
@@ -153,7 +154,6 @@ fun Register(
                 colors = fieldColors()
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 "Please enter your credit card information",
@@ -163,15 +163,35 @@ fun Register(
                     textAlign = TextAlign.Center,
                     fontFamily = marcherFontFamily,
                     fontWeight = FontWeight.Bold
-                )
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(vertical = 10.dp)
             )
 
             CreditCard(
                 onCardChange = {
                     println("Card changed")
                     card = it
+                },
+                onError = {
+                    error = it
                 }
             )
+
+            if (error != ""){
+                Text(
+                    error,
+                    style = TextStyle(
+                        color = Color.Red,
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        textAlign = TextAlign.Center,
+                        fontFamily = marcherFontFamily,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
 
             Button(
                 enabled = name.isNotEmpty() && nif.length == 9 && card != null,
@@ -198,7 +218,7 @@ fun Register(
                         fontFamily = marcherFontFamily,
                     ),
                     fontWeight = FontWeight.Bold,
-                    color = androidx.compose.ui.graphics.Color.White,
+                    color = Color.White,
                 )
             }
         }

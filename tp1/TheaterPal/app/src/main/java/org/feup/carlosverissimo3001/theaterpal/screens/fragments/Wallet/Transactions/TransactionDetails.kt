@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Transactions
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.transactions
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -27,9 +27,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.R
+import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.*
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.formatPrice
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucherType
+import org.feup.carlosverissimo3001.theaterpal.models.transaction.Transaction
+import org.feup.carlosverissimo3001.theaterpal.models.transaction.TransactionCafeteriaItem
+import org.feup.carlosverissimo3001.theaterpal.models.transaction.TransactionTicketItem
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -161,10 +165,10 @@ fun TransactionDetails(
                             )
 
                             if (transaction.transactiontype == "TICKET_PURCHASE") {
-                                val items = transaction.items.map { it as TicketItem }
+                                val items = transaction.items.map { it as TransactionTicketItem }
                                 TicketItems(items)
                             } else {
-                                val items = transaction.items.map { it as CafeteriaTransactionItem }
+                                val items = transaction.items.map { it as TransactionCafeteriaItem }
 
                                 discount =
                                     abs(transaction.total - items.sumOf { it.price * it.quantity })
@@ -436,7 +440,7 @@ fun TransactionDetails(
 }
 
 @Composable
-fun TicketItems(items: List<TicketItem>){
+fun TicketItems(items: List<TransactionTicketItem>){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -521,7 +525,7 @@ fun TicketItems(items: List<TicketItem>){
 }
 
 @Composable
-fun CafeteriaItems(items: List<CafeteriaTransactionItem>){
+fun CafeteriaItems(items: List<TransactionCafeteriaItem>){
     Column(
         modifier = Modifier
             .fillMaxWidth()

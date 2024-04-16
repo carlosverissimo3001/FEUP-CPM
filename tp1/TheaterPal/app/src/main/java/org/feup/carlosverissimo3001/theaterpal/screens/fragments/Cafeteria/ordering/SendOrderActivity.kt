@@ -1,44 +1,37 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.tickets
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.ordering
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.feup.carlosverissimo3001.theaterpal.Constants
-import org.feup.carlosverissimo3001.theaterpal.models.Ticket
-import org.feup.carlosverissimo3001.theaterpal.nfc.Card
-import org.feup.carlosverissimo3001.theaterpal.nfc.isNfcEnabled
-import org.feup.carlosverissimo3001.theaterpal.nfc.isNfcavailable
+import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.printOrder
+import org.feup.carlosverissimo3001.theaterpal.models.order.Order
+import org.feup.carlosverissimo3001.theaterpal.nfc.*
+import org.feup.carlosverissimo3001.theaterpal.parcelable
 
-@Suppress("DEPRECATION")
-inline fun <reified T: Parcelable>Intent.getParcelableArrayListExtraProvider(identifierParameter: String): java.util.ArrayList<T>? {
-    return if (Build.VERSION.SDK_INT >= 33) {
-        this.getParcelableArrayListExtra(identifierParameter, T::class.java)
-    } else {
-        this.getParcelableArrayListExtra(identifierParameter)
-    }
-}
 
-class SendTicketsActivity : AppCompatActivity() {
-    private lateinit var ticketsToSend: List<Ticket>
+class SendOrderActivity : AppCompatActivity() {
+    private lateinit var orderToSend: Order
 
     private val broadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(ctx: Context, intent: Intent) {
-            Toast.makeText(this@SendTicketsActivity, "NFC link lost", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@SendOrderActivity, "NFC link lost", Toast.LENGTH_LONG).show()
             finish()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ticketsToSend = intent.getParcelableArrayListExtraProvider<Ticket>("tickets")!!
+
+        orderToSend = intent.parcelable("order")!!
+
+        printOrder(orderToSend)
 
         // check if NFC is available
         if (!isNfcavailable(this)) {
@@ -53,13 +46,12 @@ class SendTicketsActivity : AppCompatActivity() {
         }
 
         setContent {
-            SendingTicketsFragment(
-                ctx = this,
+            SendingOrderFragment(
                 isSending = true,
                 onCancel = {
                     finish()
                 },
-                tickets = ticketsToSend
+                order = orderToSend
             )
         }
     }
@@ -70,8 +62,6 @@ class SendTicketsActivity : AppCompatActivity() {
         Card.type = intent.getIntExtra("valuetype", 0) // 1 for tickets
         val intentFilter = IntentFilter(Constants.ACTION_CARD_DONE)
         LocalBroadcastManager.getInstance(applicationContext).registerReceiver(broadcastReceiver, intentFilter)  // to receive 'link loss'
-
-        // println("Message: ${Card.contentMessage}")
     }
 
     override fun onPause() {

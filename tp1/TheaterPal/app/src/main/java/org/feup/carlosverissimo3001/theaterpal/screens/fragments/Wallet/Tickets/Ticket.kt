@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.tickets
 
 import android.graphics.Bitmap
 import android.graphics.Color.parseColor
@@ -89,14 +89,6 @@ fun Ticket(
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    Text(
-                        text = ticket.numTickets.toString(),
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontFamily = marcherFontFamily
-                        )
-                    )
                     Image(
                         painter = painterResource(id = R.drawable.tickets_icon),
                         contentDescription = "Ticket Icon",

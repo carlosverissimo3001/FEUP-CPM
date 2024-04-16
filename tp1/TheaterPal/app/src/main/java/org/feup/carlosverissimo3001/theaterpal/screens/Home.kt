@@ -2,7 +2,6 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
-import android.transition.Visibility
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -32,9 +31,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.feup.carlosverissimo3001.theaterpal.MyColors
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.ShowDetails
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.shows.ShowDetails
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows.Shows
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.shows.Shows
 
 sealed class NavRoutes(val route: String) {
     data object Shows : NavRoutes("shows")

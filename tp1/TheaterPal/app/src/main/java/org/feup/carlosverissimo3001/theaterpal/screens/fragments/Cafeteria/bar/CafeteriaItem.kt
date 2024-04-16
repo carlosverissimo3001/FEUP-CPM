@@ -1,13 +1,7 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.bar
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,19 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
+import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.CafeteriaItem
-import org.feup.carlosverissimo3001.theaterpal.models.itemIcons
-import java.util.Locale
+import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.itemIcons
+import org.feup.carlosverissimo3001.theaterpal.models.order.CafeteriaItem
 
 @Composable
 fun CafeteriaItem(
     item: CafeteriaItem,
     onIncrement: (CafeteriaItem) -> Unit,
-    onDecrement: (CafeteriaItem) -> Unit,
-    onRemove: (CafeteriaItem, Int) -> Unit
+    onDecrement: (CafeteriaItem) -> Unit
 ) {
     val (quantity, setQuantity) = remember { mutableIntStateOf(0) }
 
@@ -46,7 +38,6 @@ fun CafeteriaItem(
                 color = Color(android.graphics.Color.parseColor("#36363e")),
                 shape = RoundedCornerShape(16.dp)
             ),
-            /*.clickable { onItemClicked(item) }*/
         contentAlignment = Alignment.Center
     ) {
         // Icon, Name and Description
@@ -101,8 +92,6 @@ fun CafeteriaItem(
                         fontSize = MaterialTheme.typography.titleMedium.fontSize
                     )
                 )
-                // "+" and "-" buttons and quantity
-
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
@@ -157,22 +146,8 @@ fun CafeteriaItem(
                         )
                     }
                 }
-
-                /*IconButton(onClick = {
-                    onRemove(item, quantity)
-                    setQuantity(0)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.RestoreFromTrash,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }*/
             }
         }
     }
 }
 
-fun formatPrice (price: Double) : String {
-    return String.format(Locale.US, "%.2f", price) + "€"
-}

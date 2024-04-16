@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.orders
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

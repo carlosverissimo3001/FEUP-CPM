@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.shows
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -6,13 +6,7 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
@@ -37,14 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
-import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
-import org.feup.carlosverissimo3001.theaterpal.models.Show
+import org.feup.carlosverissimo3001.theaterpal.models.show.Show
 import org.feup.carlosverissimo3001.theaterpal.screens.NavRoutes
-import org.feup.carlosverissimo3001.theaterpal.file.loadShowsFromCache
-import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.json.JSONArray
 
 @Composable
 fun Shows(ctx: Context, navController: NavController) {
@@ -56,34 +46,6 @@ fun Shows(ctx: Context, navController: NavController) {
             showsState.value = shows
         }
     }
-//    if (!areShowsCached.value) {
-//        LaunchedEffect(Unit) {
-//            getShows(ctx) { shows ->
-//                showsState.value = shows
-//
-//                saveShowsToCache(shows, ctx){success ->
-//                    if (!success){
-//                    }
-//                    else{
-//                        areShowsCached.value = true
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    else {
-//        LaunchedEffect(Unit) {
-//            loadShowsFromCache(ctx) { shows ->
-//                // The file exists, but is still empty
-//                if (shows == emptyList<Show>()){
-//                    showsState.value = null
-//                }
-//                else {
-//                    showsState.value = shows
-//                }
-//            }
-//        }
-//    }
 
     val showList = showsState.value
     if (showList == null)
@@ -101,10 +63,10 @@ fun Shows(ctx: Context, navController: NavController) {
                 items(showList.size) { index ->
                     val show = showList[index]
 
-                    val bitmap: Bitmap? = if (show.picture_b64 == "")
+                    val bitmap: Bitmap? = if (show.pictureBase64 == "")
                         loadImageFromCache(show.picture, ctx)
                     else
-                        decodeBase64ToBitmap(show.picture_b64)
+                        decodeBase64ToBitmap(show.pictureBase64)
 
                     ShowCard(show, bitmap, navController)
                 }

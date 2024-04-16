@@ -2,23 +2,13 @@ package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
 import android.content.Intent
-import android.nfc.NfcAdapter
-import android.widget.Toast
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -28,22 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
-import org.feup.carlosverissimo3001.theaterpal.models.Order
+import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.setTotal
+import org.feup.carlosverissimo3001.theaterpal.models.order.*
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
-import org.feup.carlosverissimo3001.theaterpal.models.setTotal
 import org.feup.carlosverissimo3001.theaterpal.nfc.buildOrderMessage
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.BarTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendOrderActivity
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.SendingOrderFragment
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria.VouchersTab
-import java.io.ByteArrayOutputStream
-import java.io.ObjectOutputStream
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.bar.BarTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.ordering.SendOrderActivity
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.voucher.VouchersTab
 
 @Composable
 fun Cafeteria(ctx: Context) {
-    val nfcAdapter = NfcAdapter.getDefaultAdapter(ctx)
-
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val areVouchersLoaded = remember { mutableStateOf(false) }
     var isChoosingVoucher by remember { mutableStateOf(false) }
@@ -59,7 +43,7 @@ fun Cafeteria(ctx: Context) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        getUserVouchers(user_id = Authentication(ctx).getUserID()) { vouchers ->
+        getUserVouchers(userId = Authentication(ctx).getUserID()) { vouchers ->
             vouchersState = vouchers
             areVouchersLoaded.value = true
             filteredVouchers = vouchers.filter { !it.isUsed }
@@ -124,22 +108,18 @@ fun Cafeteria(ctx: Context) {
         ) {
             if (selectedTabIndex == 0) {
                 isChoosingVoucher = false
-                BarTab(
-                    ctx,
-                    onNextStepClick = { order ->
-                        // Navigate to next step
-                        barOrder = order
-                        isChoosingVoucher = true
-                        selectedTabIndex = 1
-                    },
-                )
+                BarTab { order ->
+                    // Navigate to next step
+                    barOrder = order
+                    isChoosingVoucher = true
+                    selectedTabIndex = 1
+                }
             } else {
                 if (!areVouchersLoaded.value) {
                     LoadingSpinner()
                 }
                 else {
                     VouchersTab(
-                        ctx,
                         vouchers = if (isChoosingVoucher) vouchersState.filter { !it.isUsed } else filteredVouchers,
                         onFilterChanged = { isChecked ->
                             // if checked, shows only active vouchers, else shows all vouchers
@@ -178,45 +158,7 @@ fun Cafeteria(ctx: Context) {
                         total = barOrder?.total ?: 0.00
                     )
                 }
-
-                /*SendingOrderFragment(
-                    isSending = isSendingOrder,
-                    onCancel = {
-                        isSendingOrder = false
-                    },
-                    order = order
-                )*/
             }
         }
     }
-}
-
-fun sendOrder(ctx: Context, order: Order) {
-    /*submitOrder(ctx, order = order, callback = { success ->
-        if (success) {
-            println("Order submitted successfully")
-        } else {
-            println("Error submitting order")
-        }
-    })*/
-
-    /*try {
-        // Serialize the Order object into a byte array
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val objectOutputStream = ObjectOutputStream(byteArrayOutputStream)
-        objectOutputStream.writeObject(order)
-        val orderByteArray = byteArrayOutputStream.toByteArray()
-
-        // Send the orderByteArray through NFC
-        // Example: NFC.sendData(orderByteArray)
-
-        // Close the streams
-        objectOutputStream.close()
-        byteArrayOutputStream.close()
-
-        println("Order sent successfully through NFC.")
-    } catch (e: Exception) {
-        println("Error sending order through NFC: $e")
-    }
-    println("I'm here")*/
 }

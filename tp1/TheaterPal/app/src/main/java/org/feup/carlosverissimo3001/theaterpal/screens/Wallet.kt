@@ -31,15 +31,15 @@ import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTickets
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
+import org.feup.carlosverissimo3001.theaterpal.models.order.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.nfc.buildTicketMessage
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders.NoOrders
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.NoTickets
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Orders.OrdersTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.SendTicketsActivity
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Tickets.TicketsTab
-import org.feup.carlosverissimo3001.theaterpal.screens.fragments.Wallet.Transactions.TransactionsFragment
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.orders.NoOrders
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.tickets.NoTickets
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.orders.OrdersTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.tickets.SendTicketsActivity
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.tickets.TicketsTab
+import org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.transactions.TransactionsFragment
 
 @Composable
 fun Wallet(ctx: Context, navController: NavController) {
@@ -60,7 +60,7 @@ fun Wallet(ctx: Context, navController: NavController) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        getUserTickets(user_id = Authentication(ctx).getUserID()) { tickets ->
+        getUserTickets(userId = Authentication(ctx).getUserID()) { tickets ->
             ticketsState = tickets
             areTicketsLoaded.value = true
 
@@ -70,7 +70,7 @@ fun Wallet(ctx: Context, navController: NavController) {
             /*// group tickets with the same show and date
             groupedTickets = groupTickets(tickets)*/
 
-            getUserOrders(user_id = Authentication(ctx).getUserID()) { fetchedOrders ->
+            getUserOrders(userId = Authentication(ctx).getUserID()) { fetchedOrders ->
                 orders = fetchedOrders
                 areOrdersLoaded = true
             }

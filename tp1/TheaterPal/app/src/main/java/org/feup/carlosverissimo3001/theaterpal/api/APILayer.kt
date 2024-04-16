@@ -8,31 +8,33 @@ import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
-import org.feup.carlosverissimo3001.theaterpal.models.Order
-import org.feup.carlosverissimo3001.theaterpal.models.OrderRcv
-import org.feup.carlosverissimo3001.theaterpal.models.Show
-import org.feup.carlosverissimo3001.theaterpal.models.Ticket
-import org.feup.carlosverissimo3001.theaterpal.models.Transaction
-import org.feup.carlosverissimo3001.theaterpal.models.User
-import org.feup.carlosverissimo3001.theaterpal.models.UserToJson
-import org.feup.carlosverissimo3001.theaterpal.models.parseShow
-import org.feup.carlosverissimo3001.theaterpal.models.Voucher
-import org.feup.carlosverissimo3001.theaterpal.models.parseOrderRcv
-import org.feup.carlosverissimo3001.theaterpal.models.parseTicket
-import org.feup.carlosverissimo3001.theaterpal.models.parseTransaction
-import org.feup.carlosverissimo3001.theaterpal.models.parseVoucher
-import org.json.JSONArray
+import org.feup.carlosverissimo3001.theaterpal.models.*
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.userToJson
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseOrderRcv
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseShow
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTicket
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTransaction
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucher
+import org.feup.carlosverissimo3001.theaterpal.models.order.*
+import org.feup.carlosverissimo3001.theaterpal.models.show.*
+import org.feup.carlosverissimo3001.theaterpal.models.transaction.*
 import org.json.JSONObject
 
+/**
+ * Function to register a user
+ * @param user user object to register
+ * @param callback callback function to handle the response
+ * @see User
+ */
 fun registerUser(user: User, callback: (Boolean, String) -> Unit){
-    var client = OkHttpClient()
+    val client = OkHttpClient()
 
-    var jsonObject = JSONObject(UserToJson(user))
+    val jsonObject = JSONObject(userToJson(user))
 
-    var requestBody = jsonObject.toString()
+    val requestBody = jsonObject.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
 
-    var request = okhttp3.Request.Builder()
+    val request = okhttp3.Request.Builder()
         .url("${Constants.URL}/register")
         .post(requestBody)
         .build()
@@ -60,9 +62,15 @@ fun registerUser(user: User, callback: (Boolean, String) -> Unit){
     })
 }
 
-fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
-    var request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/tickets?user_id=$user_id")
+/**
+ * Function to fetch the user's tickets
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ * @see Ticket
+ */
+fun getUserTickets(userId: String, callback: (List<Ticket>) -> Unit){
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/tickets?user_id=$userId")
         .build()
 
     val client = OkHttpClient()
@@ -81,7 +89,7 @@ fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
                     val tickets = jsonResponse?.getJSONArray("tickets")
 
                     if (tickets != null){
-                        var ticketsList = mutableListOf<Ticket>()
+                        val ticketsList = mutableListOf<Ticket>()
                         for (i in 0 until tickets.length()) {
                             // get the ticket object
                             val ticket = tickets.getJSONObject(i)
@@ -100,9 +108,15 @@ fun getUserTickets(user_id: String, callback: (List<Ticket>) -> Unit){
     })
 }
 
-fun getUserVouchers(user_id: String, callback: (List<Voucher>) -> Unit){
-    var request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/vouchers?user_id=$user_id")
+/**
+ * Function to fetch the user's vouchers
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ * @see Voucher
+ */
+fun getUserVouchers(userId: String, callback: (List<Voucher>) -> Unit){
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/vouchers?user_id=$userId")
         .build()
 
     val client = OkHttpClient()
@@ -121,7 +135,7 @@ fun getUserVouchers(user_id: String, callback: (List<Voucher>) -> Unit){
                     val vouchers = jsonResponse?.getJSONArray("vouchers")
 
                     if (vouchers != null){
-                        var vouchersList = mutableListOf<Voucher>()
+                        val vouchersList = mutableListOf<Voucher>()
                         for (i in 0 until vouchers.length()) {
                             // get the voucher object
                             val voucher = vouchers.getJSONObject(i)
@@ -140,6 +154,13 @@ fun getUserVouchers(user_id: String, callback: (List<Voucher>) -> Unit){
     })
 }
 
+/**
+ * Function to fetch the theater shows
+ * @param ctx context of the application
+ * @param callback callback function to handle the response
+ * @see Show
+
+ */
 fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
     val client = OkHttpClient()
 
@@ -168,10 +189,7 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
                 200 -> {
                     val responseBody = response.body?.string()
                     val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val shows = jsonResponse?.getJSONArray("shows")
-
-                    if (shows == null)
-                        return
+                    val shows = jsonResponse?.getJSONArray("shows") ?: return
 
                     val showsList = mutableListOf<Show>()
                     for (i in 0 until shows.length()) {
@@ -202,11 +220,17 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
     })
 }
 
-fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
+/**
+ * Function to fetch the user's orders
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ * @see OrderRcv
+ */
+fun getUserOrders(userId: String, callback: (List<OrderRcv>) -> Unit) {
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/orders?user_id=$user_id")
+        .url("${Constants.URL}/orders?user_id=$userId")
         .get()
         .build()
 
@@ -240,12 +264,14 @@ fun getUserOrders(user_id: String, callback: (List<OrderRcv>) -> Unit) {
     })
 }
 
-fun purchaseTickets(
-    ctx: Context,
-    showDateId: Int,
-    numTickets: Int,
-    totalCost: Int
-){
+/**
+ * Function to make a ticket purchase
+ * @param ctx context of the application
+ * @param showDateId id of the show date
+ * @param numTickets number of tickets to purchase
+ * @param totalCost total cost of the tickets
+ */
+fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: Int){
     val client = OkHttpClient()
 
     val jsonOrder = JSONObject()
@@ -283,11 +309,17 @@ fun purchaseTickets(
     })
 }
 
-fun getUserTransactions(user_id: String, callback: (List<Transaction>) -> Unit) {
+/**
+ * Function to fetch the user's transactions
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ * @see Transaction
+ */
+fun getUserTransactions(userId: String, callback: (List<Transaction>) -> Unit) {
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/transactions?user_id=$user_id")
+        .url("${Constants.URL}/transactions?user_id=$userId")
         .get()
         .build()
 

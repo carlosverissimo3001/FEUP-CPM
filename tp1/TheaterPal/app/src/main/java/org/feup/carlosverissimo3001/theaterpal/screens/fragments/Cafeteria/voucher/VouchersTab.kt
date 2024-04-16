@@ -1,46 +1,27 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Cafeteria
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.voucher
 
-import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.BarOrder
-import org.feup.carlosverissimo3001.theaterpal.models.Order
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucherType
 import org.feup.carlosverissimo3001.theaterpal.models.Voucher
-import org.feup.carlosverissimo3001.theaterpal.models.parseVoucherType
 import java.util.Locale
-import kotlin.math.round
 
 @Composable
 fun VouchersTab(
-    ctx: Context,
     vouchers: List<Voucher>,
     onFilterChanged: (Boolean) -> Unit,
     isChoosingVoucher: Boolean,
@@ -59,7 +40,7 @@ fun VouchersTab(
     val selectedVouchersIndices = remember { mutableStateListOf<Int>() }
     var updatedTotal by remember { mutableDoubleStateOf(total) }
 
-    val possibleDiscount = String.format(Locale.US, "%.2f", total*0.05).toDouble()
+    val possibleDiscount = String.format(Locale.US, "%.2f", total * 0.05).toDouble()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -68,7 +49,7 @@ fun VouchersTab(
         Spacer(modifier = Modifier.size(16.dp))
 
         if (!isChoosingVoucher) {
-            Row (
+            Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
@@ -78,18 +59,19 @@ fun VouchersTab(
                         onFilterChanged(it)
                     },
                 )
-                Text(text = "View only active vouchers", style = TextStyle(
-                    fontFamily = marcherFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize
-                ))
+                Text(
+                    text = "View only active vouchers", style = TextStyle(
+                        fontFamily = marcherFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize
+                    )
+                )
             }
-        }
-        else {
-            Row (
+        } else {
+            Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isSelectingMore){
+                if (isSelectingMore) {
                     Text(
                         text = "You can only select up to 2 vouchers", style = TextStyle(
                             fontFamily = marcherFontFamily,
@@ -98,8 +80,7 @@ fun VouchersTab(
                             color = Color.Red
                         )
                     )
-                }
-                else {
+                } else {
                     if (vouchers.isNotEmpty()) {
                         Text(
                             text = "Please select up to 2 vouchers", style = TextStyle(
@@ -108,8 +89,7 @@ fun VouchersTab(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize
                             )
                         )
-                    }
-                    else {
+                    } else {
                         Text(
                             text = "No vouchers available :(",
                             style = TextStyle(
@@ -132,13 +112,14 @@ fun VouchersTab(
         ) {
             items(vouchers.size) { index ->
                 val vch = vouchers[index]
-                var isSelected = selectedVouchers.value.contains(vch)
 
                 Voucher(
                     voucher = vch,
                     // Can select a new one if there are less than 2 selected
                     // Second condition to prevent the case where 2 vouchers are selected and the user tries to unslect one
-                    canSelect = selectedVouchers.value.size < 2 || selectedVouchers.value.contains(vch),
+                    canSelect = selectedVouchers.value.size < 2 || selectedVouchers.value.contains(
+                        vch
+                    ),
                     selectionMode = isChoosingVoucher,
                     onSelected = { voucher, success ->
                         // Voucher already selected, remove it
@@ -164,7 +145,9 @@ fun VouchersTab(
 
                         setSelectingMore(!success)
                     },
-                    isDiscountAlreadyApplied = isDiscountAlreadyApplied && !selectedVouchers.value.contains(vch)
+                    isDiscountAlreadyApplied = isDiscountAlreadyApplied && !selectedVouchers.value.contains(
+                        vch
+                    )
                 )
             }
         }
@@ -208,8 +191,4 @@ fun VouchersTab(
             }
         }
     }
-}
-
-fun findAppliedVoucher(vouchers: List<Voucher>): Voucher? {
-    return vouchers.find { parseVoucherType(it.voucherType) == "5% Discount" }
 }

@@ -1,4 +1,4 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Shows
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.shows
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -57,8 +57,8 @@ import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.MyColors
 import org.feup.carlosverissimo3001.theaterpal.api.purchaseTickets
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.Date
-import org.feup.carlosverissimo3001.theaterpal.models.Show
+import org.feup.carlosverissimo3001.theaterpal.models.show.Show
+import org.feup.carlosverissimo3001.theaterpal.models.show.ShowDate
 
 @Composable
 fun ShowDetails(ctx: Context, navController: NavController) {
@@ -96,7 +96,7 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			item {
 				ShowDatesDropdown(
 					show,
-					onDateSelected = { date : Date ->
+					onDateSelected = { date : ShowDate ->
 						showdateid = date.showdateid
 					},
 					onDecrement = { quantity -= 1 },
@@ -200,10 +200,10 @@ fun ShowDescription(show: Show) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ShowDatesDropdown(
-	show: Show,
-	onDateSelected: (Date) -> Unit,
-	onDecrement: () -> Unit,
-	onIncrement: () -> Unit
+    show: Show,
+    onDateSelected: (ShowDate) -> Unit,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit
 ){
 	val (quantity, setQuantity) = remember { mutableIntStateOf(0) }
 
@@ -215,7 +215,7 @@ fun ShowDatesDropdown(
 		mutableStateOf("")
 	}
 
-	var avaliableDates = show.dates.map { it.date }
+	val availableDates = show.dates.map { it.date }
 
 
 	Row(
@@ -266,7 +266,7 @@ fun ShowDatesDropdown(
 					.background(Color(0xFF444444))
 			) {
 
-				avaliableDates.forEach{ selectionOption  ->
+				availableDates.forEach{ selectionOption  ->
 					DropdownMenuItem(
 						modifier = Modifier
 							.background(Color(0xFF444444)),

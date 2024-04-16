@@ -1,6 +1,5 @@
-package org.feup.carlosverissimo3001.theaterpal.screens.fragments.Register
+package org.feup.carlosverissimo3001.theaterpal.screens.fragments.register
 
-import android.graphics.Color.parseColor
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily

@@ -5,7 +5,7 @@ import android.nfc.NfcAdapter
 import android.util.Log
 import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
-import org.feup.carlosverissimo3001.theaterpal.models.Order
+import org.feup.carlosverissimo3001.theaterpal.models.order.Order
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import java.nio.ByteBuffer
 import java.security.KeyStore
