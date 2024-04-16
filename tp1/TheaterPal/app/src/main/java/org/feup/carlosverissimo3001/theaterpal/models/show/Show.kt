@@ -1,5 +1,8 @@
 package org.feup.carlosverissimo3001.theaterpal.models.show
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * Data class representing a show
  * @property showId id of the show
@@ -12,6 +15,7 @@ package org.feup.carlosverissimo3001.theaterpal.models.show
  * @property price price of the show
  * @property dates list of show dates
  */
+@Parcelize
 data class Show(
 	val showId: Int,
 	val name: String,
@@ -22,5 +26,5 @@ data class Show(
 	val duration: Int,
 	val price: Int,
 	val dates: List<ShowDate>
-)
+) : Parcelable
 
