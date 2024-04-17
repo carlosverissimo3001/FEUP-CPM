@@ -29,11 +29,8 @@ import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.R
 import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.*
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucherType
-import org.feup.carlosverissimo3001.theaterpal.models.transaction.Transaction
-import org.feup.carlosverissimo3001.theaterpal.models.transaction.TransactionCafeteriaItem
-import org.feup.carlosverissimo3001.theaterpal.models.transaction.TransactionTicketItem
+import org.feup.carlosverissimo3001.theaterpal.models.transaction.*
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
