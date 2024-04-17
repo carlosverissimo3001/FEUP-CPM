@@ -22,7 +22,7 @@ fun TopBar() {
         title = {
             Text("TheaterPal",
                 style = TextStyle(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontSize = MaterialTheme.typography.titleLarge.fontSize,
                     fontFamily = marcherFontFamily,
                     fontWeight = FontWeight.W700
@@ -30,8 +30,7 @@ fun TopBar() {
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         scrollBehavior = scrollBehavior,
     )
