@@ -167,7 +167,6 @@ fun Register(
 
             CreditCard(
                 onCardChange = {
-                    println("Card changed")
                     card = it
                 },
                 onError = {
