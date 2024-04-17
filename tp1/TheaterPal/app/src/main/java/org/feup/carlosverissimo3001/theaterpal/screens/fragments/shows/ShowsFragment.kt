@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,7 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
+import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.loadShowsFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
 import org.feup.carlosverissimo3001.theaterpal.models.show.Show
 import org.feup.carlosverissimo3001.theaterpal.screens.NavRoutes
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
@@ -39,11 +43,27 @@ import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 @Composable
 fun Shows(ctx: Context, navController: NavController) {
     val showsState = remember { mutableStateOf<List<Show>?>(null) }
-    val areShowsCached = remember { mutableStateOf(false)}
+
+    // Check if shows are cached
+    val areShowsCached = areShowsStoreInCache(ctx)
 
     LaunchedEffect(Unit) {
+        if (areShowsCached){
+            loadShowsFromCache(ctx) { shows ->
+                showsState.value = shows
+            }
+            return@LaunchedEffect
+        }
+
         getShows(ctx) { shows ->
             showsState.value = shows
+
+            // Save shows to cache
+            saveShowsToCache(shows, ctx) { isSuccess ->
+                if (!isSuccess) {
+                    Log.e("ShowsFragment", "Failed to save shows to cache")
+                }
+            }
         }
     }
 

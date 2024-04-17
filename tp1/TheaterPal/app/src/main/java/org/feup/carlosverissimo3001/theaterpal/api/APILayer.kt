@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
+import android.util.Log
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -204,9 +205,7 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
 
                         saveImageToCache(imageB64, imageName, ctx){success ->
                             if (!success)
-                                print("Error saving $imageName to cache")
-                            else
-                                print("Saved $imageName to cache")
+                                Log.e("API Layer", "Failed to save image to cache")
                         }
                     }
 

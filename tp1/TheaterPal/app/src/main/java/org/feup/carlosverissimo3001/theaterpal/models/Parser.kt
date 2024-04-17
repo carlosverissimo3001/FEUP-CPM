@@ -95,6 +95,71 @@ object Parser {
         )
     }
 
+    /**
+     * Converts a list of Show objects into a JSON string
+     * @param shows List of Show objects to convert
+     * @return JSON string
+     * @see Show
+     */
+    fun showsToJson(shows: List<Show>) : String {
+        val showsJson = StringBuilder()
+
+        for (show in shows) {
+            showsJson.append(showToJson(show))
+            showsJson.append(",")
+        }
+
+        return """
+        {
+            "shows": [
+                $showsJson
+            ]
+        }
+    """.trimIndent()
+    }
+
+    /**
+     * Converts a Show object into a JSON string
+     * @param show Show object to convert
+     * @return JSON string
+     * @see Show
+     */
+    private fun showToJson (show: Show) : String {
+        // note picture_b64 is not included
+        // the image is cached when the shows are first fetched from the server
+        // then, only the picture path is used to load the image
+        return """
+        {
+            "showid": ${show.showId},
+            "name": "${show.name}",
+            "description": "${show.description}",
+            "picture": "${show.picture}",
+            "picture_b64": "",
+            "releasedate": "${show.releasedate}",
+            "duration": ${show.duration},
+            "price": ${show.price},
+            "dates": [
+                ${show.dates.joinToString(",") { showDateToJson(it) }}
+            ]
+        }
+    """.trimIndent()
+    }
+
+    /**
+     * Converts a ShowDate object into a JSON string
+     * @param showDate ShowDate object to convert
+     * @return JSON string
+     * @see ShowDate
+     */
+    private fun showDateToJson (showDate: ShowDate) : String {
+        return """
+        {
+            "date": "${showDate.date}",
+            "showdateid": ${showDate.showdateid}
+        }
+    """.trimIndent()
+    }
+
     /**** SHOWS TAB ****/
 
     /**** TICKETS TAB ****/
