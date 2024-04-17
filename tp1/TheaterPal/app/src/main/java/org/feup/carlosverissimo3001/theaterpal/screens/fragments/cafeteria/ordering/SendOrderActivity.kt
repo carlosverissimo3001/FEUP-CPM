@@ -8,7 +8,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import org.feup.carlosverissimo3001.theaterpal.BottomBarTheme
 import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.printOrder
 import org.feup.carlosverissimo3001.theaterpal.models.order.Order
@@ -46,13 +51,17 @@ class SendOrderActivity : AppCompatActivity() {
         }
 
         setContent {
-            SendingOrderFragment(
-                isSending = true,
-                onCancel = {
-                    finish()
-                },
-                order = orderToSend
-            )
+            BottomBarTheme {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background){
+                    SendingOrderFragment(
+                        isSending = true,
+                        onCancel = {
+                            finish()
+                        },
+                        order = orderToSend
+                    )
+                }
+            }
         }
     }
 

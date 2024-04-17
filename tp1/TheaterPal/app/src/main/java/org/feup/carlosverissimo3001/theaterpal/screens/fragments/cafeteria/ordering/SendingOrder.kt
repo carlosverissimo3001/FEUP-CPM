@@ -64,7 +64,14 @@ fun SendingOrderFragment(
                     Color(android.graphics.Color.parseColor("#302c2c")),
                     RoundedCornerShape(15.dp)
                 )
-                .fillMaxSize()
+                .fillMaxSize().pointerInput(Unit) {
+                    // draw down == go back
+                    detectDragGestures { _, dragAmount ->
+                        if (dragAmount.y > 50) {
+                            onCancel()
+                        }
+                    }
+                }
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
