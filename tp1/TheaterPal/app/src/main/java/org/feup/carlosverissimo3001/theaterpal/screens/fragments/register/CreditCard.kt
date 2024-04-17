@@ -84,7 +84,6 @@ fun CreditCard(
                 onTypeSelected = {
                     card.type = it
                     onCardChange(card)
-                    println("Card : $card")
                 }
             )
         }
