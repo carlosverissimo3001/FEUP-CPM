@@ -4,27 +4,22 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import org.feup.carlosverissimo3001.theaterpal.BottomBarTheme
 import org.feup.carlosverissimo3001.theaterpal.Constants
+import org.feup.carlosverissimo3001.theaterpal.getParcelableArrayListExtraProvider
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.nfc.Card
 import org.feup.carlosverissimo3001.theaterpal.nfc.isNfcEnabled
 import org.feup.carlosverissimo3001.theaterpal.nfc.isNfcavailable
-
-@Suppress("DEPRECATION")
-inline fun <reified T: Parcelable>Intent.getParcelableArrayListExtraProvider(identifierParameter: String): java.util.ArrayList<T>? {
-    return if (Build.VERSION.SDK_INT >= 33) {
-        this.getParcelableArrayListExtra(identifierParameter, T::class.java)
-    } else {
-        this.getParcelableArrayListExtra(identifierParameter)
-    }
-}
 
 class SendTicketsActivity : AppCompatActivity() {
     private lateinit var ticketsToSend: List<Ticket>
@@ -53,14 +48,18 @@ class SendTicketsActivity : AppCompatActivity() {
         }
 
         setContent {
-            SendingTicketsFragment(
-                ctx = this,
-                isSending = true,
-                onCancel = {
-                    finish()
-                },
-                tickets = ticketsToSend
-            )
+            BottomBarTheme(){
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background){
+                    SendingTicketsFragment(
+                        ctx = this,
+                        isSending = true,
+                        onCancel = {
+                            finish()
+                        },
+                        tickets = ticketsToSend
+                    )
+                }
+            }
         }
     }
 

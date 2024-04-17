@@ -79,7 +79,7 @@ fun SendingTicketsFragment(
                 )
                 .fillMaxSize().pointerInput(Unit) {
                     // draw down == go back
-                    detectDragGestures { change, dragAmount ->
+                    detectDragGestures { _, dragAmount ->
                         if (dragAmount.y > 50) {
                             onCancel()
                         }
@@ -90,8 +90,7 @@ fun SendingTicketsFragment(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
+                    .fillMaxWidth().padding(top = 25.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -175,8 +174,8 @@ fun SendingTicketsFragment(
                         modifier = Modifier
                             .fillMaxWidth(0.6f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     ) {
                         Text(
