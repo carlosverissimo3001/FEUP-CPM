@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
 import org.feup.carlosverissimo3001.theaterpal.api.registerUser
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.models.User
@@ -18,16 +22,19 @@ class RegisterActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
         setContent {
-            CenteredContent {
-                TopBar()
+            BottomBarTheme {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    CenteredContent {
+                        TopBar()
 
-                Register(
-                    onSubmit = { user ->
-                        handleButtonClick(user)
+                        Register(
+                            onSubmit = { user ->
+                                handleButtonClick(user)
+                            }
+                        )
                     }
-                )
+                }
             }
-
         }
     }
 

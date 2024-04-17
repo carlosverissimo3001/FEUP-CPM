@@ -62,9 +62,6 @@ fun Register(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                color = MaterialTheme.colorScheme.onBackground
-            )
     ){
         Column(
             modifier = Modifier.align(Alignment.TopCenter).padding(20.dp)
@@ -205,9 +202,9 @@ fun Register(
                 modifier = Modifier
                     .fillMaxWidth(0.6f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContainerColor = Color.Gray,
                     disabledContentColor = MaterialTheme.colorScheme.onErrorContainer
                 )
             ) {
