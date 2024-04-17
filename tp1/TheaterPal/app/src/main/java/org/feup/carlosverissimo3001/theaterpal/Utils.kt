@@ -177,3 +177,20 @@ inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
     // else use the deprecated getParcelableExtra method
     else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
 }
+
+/**
+ * Define extension function to get a parcelable array list extra from an Intent
+ * @param identifierParameter key of the parcelable array list extra
+ * @return parcelable array list extra
+ */
+@Suppress("DEPRECATION")
+inline fun <reified T: Parcelable>Intent.getParcelableArrayListExtraProvider(identifierParameter: String): java.util.ArrayList<T>? {
+    // If the device is running SDK 33 or higher, use the new getParcelableArrayListExtra method
+    return if (Build.VERSION.SDK_INT >= 33) {
+        this.getParcelableArrayListExtra(identifierParameter, T::class.java)
+    }
+    // Otherwise, use the deprecated getParcelableArrayListExtra method
+    else {
+        this.getParcelableArrayListExtra(identifierParameter)
+    }
+}
