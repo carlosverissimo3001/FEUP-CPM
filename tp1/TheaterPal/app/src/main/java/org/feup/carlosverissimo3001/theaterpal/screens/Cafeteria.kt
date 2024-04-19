@@ -15,6 +15,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
@@ -27,7 +28,7 @@ import org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.order
 import org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.voucher.VouchersTab
 
 @Composable
-fun Cafeteria(ctx: Context) {
+fun Cafeteria(ctx: Context, navController: NavController) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val areVouchersLoaded = remember { mutableStateOf(false) }
     var isChoosingVoucher by remember { mutableStateOf(false) }
@@ -120,6 +121,7 @@ fun Cafeteria(ctx: Context) {
                 }
                 else {
                     VouchersTab(
+                        navController = navController,
                         vouchers = if (isChoosingVoucher) vouchersState.filter { !it.isUsed } else filteredVouchers,
                         onFilterChanged = { isChecked ->
                             // if checked, shows only active vouchers, else shows all vouchers
@@ -129,7 +131,7 @@ fun Cafeteria(ctx: Context) {
                                 vouchersState
                             }
                         },
-                        isChoosingVoucher,
+                        isChoosingVoucher = isChoosingVoucher,
                         onSubmitted = { selectedVouchers, updatedTotal ->
                             isSendingOrder = true
 

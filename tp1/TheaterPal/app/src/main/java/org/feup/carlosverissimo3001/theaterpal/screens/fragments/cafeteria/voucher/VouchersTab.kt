@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucherType
@@ -26,7 +27,8 @@ fun VouchersTab(
     onFilterChanged: (Boolean) -> Unit,
     isChoosingVoucher: Boolean,
     onSubmitted: (List<Voucher>, Double) -> Unit,
-    total : Double = 0.0
+    total : Double = 0.0,
+    navController: NavController
 ) {
     val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
 
@@ -49,23 +51,25 @@ fun VouchersTab(
         Spacer(modifier = Modifier.size(16.dp))
 
         if (!isChoosingVoucher) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = {
-                        setFilterChecked(it)
-                        onFilterChanged(it)
-                    },
-                )
-                Text(
-                    text = "View only active vouchers", style = TextStyle(
-                        fontFamily = marcherFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize
+            if (vouchers.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = {
+                            setFilterChecked(it)
+                            onFilterChanged(it)
+                        },
                     )
-                )
+                    Text(
+                        text = "View only active vouchers", style = TextStyle(
+                            fontFamily = marcherFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize
+                        )
+                    )
+                }
             }
         } else {
             Row(
@@ -80,7 +84,8 @@ fun VouchersTab(
                             color = Color.Red
                         )
                     )
-                } else {
+                }
+                else {
                     if (vouchers.isNotEmpty()) {
                         Text(
                             text = "Please select up to 2 vouchers", style = TextStyle(
@@ -89,7 +94,9 @@ fun VouchersTab(
                                 fontSize = MaterialTheme.typography.titleMedium.fontSize
                             )
                         )
-                    } else {
+                    }
+
+                    else {
                         Text(
                             text = "No vouchers available :(",
                             style = TextStyle(
@@ -106,55 +113,68 @@ fun VouchersTab(
 
         }
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            contentPadding = PaddingValues(10.dp)
-        ) {
-            items(vouchers.size) { index ->
-                val vch = vouchers[index]
+        if (vouchers.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                contentPadding = PaddingValues(10.dp)
+            ) {
+                items(vouchers.size) { index ->
+                    val vch = vouchers[index]
 
-                Voucher(
-                    voucher = vch,
-                    // Can select a new one if there are less than 2 selected
-                    // Second condition to prevent the case where 2 vouchers are selected and the user tries to unslect one
-                    canSelect = selectedVouchers.value.size < 2 || selectedVouchers.value.contains(
-                        vch
-                    ),
-                    selectionMode = isChoosingVoucher,
-                    onSelected = { voucher, success ->
-                        // Voucher already selected, remove it
-                        if (selectedVouchers.value.contains(voucher)) {
-                            selectedVouchers.value = selectedVouchers.value.filter { it != voucher }
-                            selectedVouchersIndices.remove(index)
+                    Voucher(
+                        voucher = vch,
+                        // Can select a new one if there are less than 2 selected
+                        // Second condition to prevent the case where 2 vouchers are selected and the user tries to unslect one
+                        canSelect = selectedVouchers.value.size < 2 || selectedVouchers.value.contains(
+                            vch
+                        ),
+                        selectionMode = isChoosingVoucher,
+                        onSelected = { voucher, success ->
+                            // Voucher already selected, remove it
+                            if (selectedVouchers.value.contains(voucher)) {
+                                selectedVouchers.value =
+                                    selectedVouchers.value.filter { it != voucher }
+                                selectedVouchersIndices.remove(index)
 
-                            if (parseVoucherType(voucher.voucherType) == "5% Discount") {
-                                updatedTotal += possibleDiscount
-                                setDiscountAlreadyApplied(false)
+                                if (parseVoucherType(voucher.voucherType) == "5% Discount") {
+                                    updatedTotal += possibleDiscount
+                                    setDiscountAlreadyApplied(false)
+                                }
+
+                            } else {
+                                if (selectedVouchers.value.size < 2) {
+                                    selectedVouchers.value += voucher
+                                    selectedVouchersIndices.add(index)
+                                }
+                                if (parseVoucherType(voucher.voucherType) == "5% Discount") {
+                                    updatedTotal -= possibleDiscount
+                                    setDiscountAlreadyApplied(true)
+                                }
                             }
 
-                        } else {
-                            if (selectedVouchers.value.size < 2) {
-                                selectedVouchers.value += voucher
-                                selectedVouchersIndices.add(index)
-                            }
-                            if (parseVoucherType(voucher.voucherType) == "5% Discount") {
-                                updatedTotal -= possibleDiscount
-                                setDiscountAlreadyApplied(true)
-                            }
-                        }
-
-                        setSelectingMore(!success)
-                    },
-                    isDiscountAlreadyApplied = isDiscountAlreadyApplied && !selectedVouchers.value.contains(
-                        vch
+                            setSelectingMore(!success)
+                        },
+                        isDiscountAlreadyApplied = isDiscountAlreadyApplied && !selectedVouchers.value.contains(
+                            vch
+                        )
                     )
-                )
+                }
             }
         }
+        else {
+            NoVouchers(
+                onClick = {route ->
+                    navController.navigate(route)
+                },
+            )
+        }
     }
+
     if (isChoosingVoucher) {
         Box(
-            modifier = Modifier.fillMaxSize().padding(10.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
             contentAlignment = Alignment.BottomCenter,
         ) {
             FloatingActionButton(
