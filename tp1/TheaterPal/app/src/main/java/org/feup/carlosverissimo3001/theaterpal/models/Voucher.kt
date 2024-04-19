@@ -16,4 +16,20 @@ data class Voucher (
     val voucherType: String,
     val isUsed: Boolean,
     val userid: String,
-) : Parcelable
+) : Parcelable {
+    /**
+     * Converts a Voucher object into a JSON string
+     * @return JSON string
+     * @see Voucher
+     */
+    fun toJson(): String {
+        return """
+        {
+            "voucherid": "$voucherid",
+            "voucherType": "$voucherType",
+            "isUsed": $isUsed,
+            "userid": "$userid"
+        }
+    """.trimIndent()
+    }
+}
