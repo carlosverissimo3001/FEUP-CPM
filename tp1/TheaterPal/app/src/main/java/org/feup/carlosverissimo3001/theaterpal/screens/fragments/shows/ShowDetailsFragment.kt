@@ -3,6 +3,7 @@ package org.feup.carlosverissimo3001.theaterpal.screens.fragments.shows
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -108,7 +109,9 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 					isVisible = (showdateid > -1 && quantity > 0),
 				) {
 					purchaseTickets(ctx, showdateid, quantity, quantity*show.price)
-					navController.navigate("wallet")
+					Toast.makeText(ctx, "Tickets bought successfully", Toast.LENGTH_LONG).show()
+
+					navController.popBackStack()
 				}
 			}
 			item {
