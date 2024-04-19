@@ -2,6 +2,7 @@ package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserVouchers
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.file.areVouchersStoredInCache
+import org.feup.carlosverissimo3001.theaterpal.file.loadVouchersFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveVouchersToCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.setTotal
 import org.feup.carlosverissimo3001.theaterpal.models.order.*
@@ -43,11 +47,30 @@ fun Cafeteria(ctx: Context, navController: NavController) {
 
     val context = LocalContext.current
 
+    val areVouchersCache = areVouchersStoredInCache(ctx)
+
     LaunchedEffect(Unit) {
+        if (areVouchersCache) {
+            loadVouchersFromCache(ctx) { vouchers ->
+                vouchersState = vouchers
+                areVouchersLoaded.value = true
+                filteredVouchers = vouchers.filter { !it.isUsed }
+            }
+            return@LaunchedEffect
+        }
+
         getUserVouchers(userId = Authentication(ctx).getUserID()) { vouchers ->
             vouchersState = vouchers
             areVouchersLoaded.value = true
             filteredVouchers = vouchers.filter { !it.isUsed }
+
+            if (vouchersState.isNotEmpty()) {
+                saveVouchersToCache(vouchers, ctx) { isSuccess ->
+                    if (!isSuccess) {
+                        Log.e("Cafeteria", "Failed to save vouchers to cache.")
+                    }
+                }
+            }
         }
     }
 

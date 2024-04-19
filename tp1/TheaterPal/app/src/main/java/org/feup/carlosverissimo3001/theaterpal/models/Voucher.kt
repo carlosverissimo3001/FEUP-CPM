@@ -26,7 +26,7 @@ data class Voucher (
         return """
         {
             "voucherid": "$voucherid",
-            "voucherType": "$voucherType",
+            "vouchertype": "$voucherType",
             "isUsed": $isUsed,
             "userid": "$userid"
         }
