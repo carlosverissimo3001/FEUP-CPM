@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import okhttp3.OkHttpClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.feup.carlosverissimo3001.theaterpal.api.getUserName
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.json.JSONObject
 
@@ -41,15 +40,10 @@ class LauncherActivity : AppCompatActivity() {
             // get the user_id from the keystore
             val userId = Authentication(this).getUserID()
 
-            // use the server to know the user's name
-            getUserName(userId) { name ->
-                // pass the user's name to the next activity
-                intent.putExtra("name", name)
-                // start the MainActivity after receiving the user's name
-                startActivity(intent)
-                // finish the current activity
-                finish()
-            }
+            // start the MainActivity
+            startActivity(intent)
+            // finish the current activity
+            finish()
         }
 
         else {

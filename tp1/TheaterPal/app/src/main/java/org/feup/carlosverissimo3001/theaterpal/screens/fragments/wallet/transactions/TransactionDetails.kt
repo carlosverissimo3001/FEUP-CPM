@@ -179,7 +179,7 @@ fun TransactionDetails(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
+                                    .padding(vertical = 8.dp)
                             ) {
                                 Text(
                                     text = "TOTAL",
@@ -263,6 +263,7 @@ fun TransactionDetails(
 
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
@@ -295,8 +296,7 @@ fun TransactionDetails(
                                         fontFamily = marcherFontFamily,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    color = Color.Black
                                 )
                                 Text(
                                     // use the current date and time
@@ -309,7 +309,6 @@ fun TransactionDetails(
                                         fontWeight = FontWeight.Normal
                                     ),
                                     color = Color.Black,
-                                    modifier = Modifier.padding(top = 4.dp),
                                     textAlign = TextAlign.Center
                                 )
                             }
