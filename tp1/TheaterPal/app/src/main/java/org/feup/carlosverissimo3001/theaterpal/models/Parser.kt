@@ -182,6 +182,49 @@ object Parser {
         )
     }
 
+    /**
+     * Converts a list of Ticket objects into a JSON string
+     * @param tickets List of Ticket objects to convert
+     * @return JSON string
+     * @see Ticket
+     */
+    fun ticketsToJson(tickets: List<Ticket>): String {
+        val ticketsJson = StringBuilder()
+
+        for (ticket in tickets) {
+            ticketsJson.append(ticketToJson(ticket))
+            ticketsJson.append(",")
+        }
+
+        return """
+        {
+            "tickets": [
+                $ticketsJson
+            ]
+        }
+    """.trimIndent()
+    }
+
+    /**
+     * Converts a Ticket object into a JSON string
+     * @param ticket Ticket object to convert
+     * @return JSON string
+     * @see Ticket
+     */
+    private fun ticketToJson(ticket: Ticket): String {
+        return """
+        {
+            "ticketid": "${ticket.ticketid}",
+            "userid": "${ticket.userid}",
+            "showName": "${ticket.showName}",
+            "seat": "${ticket.seat}",
+            "isUsed": ${ticket.isUsed},
+            "date": "${ticket.date}",
+            "imagePath": "${ticket.imagePath}"
+        }
+    """.trimIndent()
+    }
+
     /**** TICKETS TAB ****/
 
     /**** TRANSACTIONS TAB ****/
