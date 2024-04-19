@@ -2,6 +2,7 @@ package org.feup.carlosverissimo3001.theaterpal.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import org.json.JSONObject
 
 /**
  * Data class representing a ticket
@@ -22,4 +23,24 @@ data class Ticket (
     val isUsed: Boolean,
     val date: String,
     val imagePath: String = "",
-) : Parcelable
+) : Parcelable {
+
+    /**
+     * Converts a Ticket object into a JSON string
+     * @return JSON string
+     * @see Ticket
+     */
+    fun toJson(): String {
+        return """
+        {
+            "ticketid": "$ticketid",
+            "userid": "$userid",
+            "showName": "$showName",
+            "seat": "$seat",
+            "isUsed": $isUsed,
+            "date": "$date",
+            "imagePath": "$imagePath"
+        }
+    """.trimIndent()
+    }
+}
