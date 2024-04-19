@@ -65,7 +65,7 @@ fun NoOrders(
             )
         ) {
             Text(
-                text = "Buy products",
+                text = "\uD83D\uDC49 Buy food",
                 style = TextStyle(
                     fontFamily = marcherFontFamily,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,

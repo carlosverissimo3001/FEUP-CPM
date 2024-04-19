@@ -65,7 +65,7 @@ fun NoTickets(
             )
         ) {
             Text(
-                text = "Buy tickets",
+                text = "\uD83D\uDC49 Buy tickets",
                 style = TextStyle(
                     fontFamily = marcherFontFamily,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,

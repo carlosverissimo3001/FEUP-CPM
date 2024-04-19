@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 
 @Composable
@@ -32,19 +33,20 @@ fun NoTransactions(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "You haven't made any transactions yet :( ",
+            text = "You haven't made any transactions yet",
             style = TextStyle(
                 fontFamily = marcherFontFamily,
                 color = Color.White,
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
                 fontWeight = FontWeight.Bold
-            )
+            ),
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.padding(16.dp))
 
         Text(
-            text = "You can start by buying products in the Cafeteria tab",
+            text = "You can start by:",
             style = TextStyle(
                 fontFamily = marcherFontFamily,
                 color = Color.White,
@@ -53,39 +55,19 @@ fun NoTransactions(
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.padding(50.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(0.7f),
-            onClick = {
-                onClick("cafeteria")
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        ) {
-            Text(
-                text = "Buy products",
-                style = TextStyle(
-                    fontFamily = marcherFontFamily,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+        Spacer(modifier = Modifier.padding(12.dp))
 
         Text(
-            text = "... or by buying tickets in the Shows tab",
+            text = "\uD83C\uDF9F\uFE0F Buying tickets to shows",
             style = TextStyle(
                 fontFamily = marcherFontFamily,
                 color = Color.White,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize
+                fontSize = 15.sp,
             ),
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.padding(50.dp))
+        Spacer(modifier = Modifier.padding(4.dp))
 
         Button(
             modifier = Modifier.fillMaxWidth(0.7f),
@@ -97,7 +79,53 @@ fun NoTransactions(
             )
         ) {
             Text(
-                text = "Buy Tickets",
+                text = "\uD83D\uDC49 Buy tickets",
+                style = TextStyle(
+                    fontFamily = marcherFontFamily,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(7.dp))
+
+        Text(
+            text = "or",
+            style = TextStyle(
+                fontFamily = marcherFontFamily,
+                color = Color.White,
+                fontSize = 15.sp,
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.padding(7.dp))
+
+        Text(
+            text = "☕ Spending money in the cafeteria",
+            style = TextStyle(
+                fontFamily = marcherFontFamily,
+                color = Color.White,
+                fontSize = 15.sp,
+            ),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(0.7f),
+            onClick = {
+                onClick("cafeteria")
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            )
+        ) {
+            Text(
+                text = "\uD83D\uDC49 Buy food",
                 style = TextStyle(
                     fontFamily = marcherFontFamily,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
