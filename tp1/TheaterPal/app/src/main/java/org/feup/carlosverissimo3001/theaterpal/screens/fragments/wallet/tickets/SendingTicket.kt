@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.R
+import org.feup.carlosverissimo3001.theaterpal.api.fetchShowImage
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
@@ -131,12 +132,11 @@ fun SendingTicketsFragment(
                     contentPadding = PaddingValues(10.dp),
                 ) {
                     items(tickets.size) { index ->
-                        val imagePath = tickets[index].imagePath
-                        val bitmap: Bitmap? = loadImageFromCache(imagePath, ctx)
+                        val image = fetchShowImage(tickets[index].showName, ctx)
 
                         TicketValidate(
                             ticket = tickets[index],
-                            image = bitmap,
+                            image = image,
                         )
                     }
                 }

@@ -1,13 +1,16 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.file.appendTicketsToCache
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
+import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
 import org.feup.carlosverissimo3001.theaterpal.models.*
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.userToJson
@@ -19,6 +22,7 @@ import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucher
 import org.feup.carlosverissimo3001.theaterpal.models.order.*
 import org.feup.carlosverissimo3001.theaterpal.models.show.*
 import org.feup.carlosverissimo3001.theaterpal.models.transaction.*
+import org.feup.carlosverissimo3001.theaterpal.showNameImageMap
 import org.json.JSONObject
 
 /**
@@ -195,6 +199,7 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
                     val showsList = mutableListOf<Show>()
                     for (i in 0 until shows.length()) {
                         val show = shows.getJSONObject(i)
+                        val showName = show.getString("name")
 
                         showsList.add(parseShow(show))
                         if (areImagesCached)
@@ -202,6 +207,8 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
 
                         val imageName = show.getString("picture")
                         val imageB64 = show.getString("picture_b64")
+
+                        showNameImageMap[showName] = imageName
 
                         saveImageToCache(imageB64, imageName, ctx){success ->
                             if (!success)
@@ -299,6 +306,21 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
             when (response.code) {
                 200, 201 -> {
                     print("Tickets purchased")
+
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val tickets = jsonResponse?.getJSONArray("tickets")
+
+                    if (tickets != null) {
+                        appendTicketsToCache(tickets, ctx) { success ->
+                            if (!success)
+                                Log.e("API Layer", "Failed to save tickets to cache")
+                            else
+                                Log.d("API Layer", "Tickets saved to cache")
+                        }
+                    }
+
+                    // TODO: Same logic, but for vouchers
                 }
                 else -> {
                     print("Error purchasing tickets")
@@ -391,3 +413,10 @@ fun getUserName(userId: String, callback: (String) -> Unit) {
         }
     })
 }
+
+fun fetchShowImage(showname: String, ctx: Context): Bitmap? {
+    val imageName = showNameImageMap[showname]
+
+    return loadImageFromCache(imageName!!, ctx)
+}
+

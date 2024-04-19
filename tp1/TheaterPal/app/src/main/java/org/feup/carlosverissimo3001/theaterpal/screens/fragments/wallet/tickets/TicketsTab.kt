@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import org.feup.carlosverissimo3001.theaterpal.api.fetchShowImage
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
@@ -45,12 +46,10 @@ fun TicketsTab(
     ctx: Context,
     tickets: List<Ticket>,
     onFilterChanged: (Boolean) -> Unit,
-    /*onGroupingChanged: (Boolean) -> Unit,*/
     onValidate: (List<Ticket>) -> Unit,
     onConsultTransactionsClicked: () -> Unit
 ) {
     val (isChecked, setFilterChecked) = remember { mutableStateOf(true) }
-    val (isGrouped, setGroupingChecked) = remember { mutableStateOf(true) }
 
     var selectedTickets by remember { mutableStateOf(emptyList<Ticket>()) }
 
@@ -116,11 +115,11 @@ fun TicketsTab(
 
                 // Display ticket
                 // Use the ticket fragment to display the ticket
-                val imagePath = tickets[index].imagePath
-                val bitmap: Bitmap? = loadImageFromCache(imagePath, ctx)
+                val image = fetchShowImage(tickets[index].showName, ctx)
+
                 Ticket(
                     ticket = tickets[index],
-                    image = bitmap,
+                    image = image,
                     isSelected = isSelected,
                     onClick = {ticket ->
                         if (isSelected) {

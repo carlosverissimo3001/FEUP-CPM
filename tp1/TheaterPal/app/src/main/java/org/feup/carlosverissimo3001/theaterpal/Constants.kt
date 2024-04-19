@@ -4,6 +4,7 @@ package org.feup.carlosverissimo3001.theaterpal
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.*
 
+val showNameImageMap = mutableMapOf<String, String>()
 object Constants {
     const val KEY_SIZE = 512
     const val ANDROID_KEYSTORE = "AndroidKeyStore"
