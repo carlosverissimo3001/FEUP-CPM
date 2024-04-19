@@ -195,9 +195,6 @@ def get_user_by_user_id(conn: psycopg2.extensions.connection, user_id: str):
             'userid', userid,
             'name', name,
             'nif', nif,
-            'creditcardtype', creditcardtype,
-            'creditcardnumber', creditcardnumber,
-            'creditcardvalidity', creditcardvalidity,
             'publickey', publickey
         ) FROM users WHERE userid = %s
     ''', (user_id,))

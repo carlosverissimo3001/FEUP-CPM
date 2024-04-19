@@ -49,7 +49,7 @@ def construct_blueprint(dbConn):
         else:
             user = user[0]
 
-        return jsonify({'name': user["name"]}), 200
+        return jsonify(user), 200
 
     @user_page.route('/get_user_pkey', methods=['GET'])
     def get_public_key():
