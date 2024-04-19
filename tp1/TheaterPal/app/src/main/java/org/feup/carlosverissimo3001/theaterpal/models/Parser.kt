@@ -320,6 +320,28 @@ object Parser {
         }
     }
 
+    /**
+     * Converts a list of Voucher objects into a JSON string
+     * @param vouchers List of Voucher objects to convert
+     * @return JSON string
+     * @see Voucher
+     */
+    fun vouchersToJson(vouchers: List<Voucher>): String {
+        val vouchersJson = StringBuilder()
+
+        for (voucher in vouchers) {
+            vouchersJson.append(voucher.toJson())
+            vouchersJson.append(",")
+        }
+
+        return """
+        [
+            $vouchersJson
+        ]
+        
+    """.trimIndent()
+    }
+
     /****** VOUCHERS TAB ****/
 
 
