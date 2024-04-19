@@ -192,7 +192,7 @@ object Parser {
         val ticketsJson = StringBuilder()
 
         for (ticket in tickets) {
-            ticketsJson.append(ticketToJson(ticket))
+            ticketsJson.append(ticket.toJson())
             ticketsJson.append(",")
         }
 
@@ -201,26 +201,6 @@ object Parser {
             "tickets": [
                 $ticketsJson
             ]
-        }
-    """.trimIndent()
-    }
-
-    /**
-     * Converts a Ticket object into a JSON string
-     * @param ticket Ticket object to convert
-     * @return JSON string
-     * @see Ticket
-     */
-    private fun ticketToJson(ticket: Ticket): String {
-        return """
-        {
-            "ticketid": "${ticket.ticketid}",
-            "userid": "${ticket.userid}",
-            "showName": "${ticket.showName}",
-            "seat": "${ticket.seat}",
-            "isUsed": ${ticket.isUsed},
-            "date": "${ticket.date}",
-            "imagePath": "${ticket.imagePath}"
         }
     """.trimIndent()
     }

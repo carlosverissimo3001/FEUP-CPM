@@ -2,6 +2,7 @@ package org.feup.carlosverissimo3001.theaterpal.screens
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,9 @@ import androidx.navigation.NavController
 import org.feup.carlosverissimo3001.theaterpal.api.getUserOrders
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTickets
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.file.areTicketsStoredInCache
+import org.feup.carlosverissimo3001.theaterpal.file.loadTicketsFromCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveTicketsToCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.order.OrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Ticket
@@ -48,18 +52,35 @@ fun Wallet(ctx: Context, navController: NavController) {
 
     var ticketsState by remember { mutableStateOf(emptyList<Ticket>()) }
     var filteredTickets by remember { mutableStateOf(emptyList<Ticket>()) }
-    /*var groupedTickets by remember { mutableStateOf(emptyList<Ticket>()) }*/
 
     var orders by remember { mutableStateOf(emptyList<OrderRcv>()) }
     var areOrdersLoaded by remember { mutableStateOf(false) }
 
     var isValidatingTickets by remember { mutableStateOf(false) }
-
     var isViewingTransactions by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val areTicketsCached = areTicketsStoredInCache(context)
+
+    println("Are tickets cached: $areTicketsCached")
 
     LaunchedEffect(Unit) {
+        // Get user orders
+        getUserOrders(userId = Authentication(ctx).getUserID()) { fetchedOrders ->
+            orders = fetchedOrders
+            areOrdersLoaded = true
+        }
+
+        if (areTicketsCached){
+            // Load from cache
+            loadTicketsFromCache(context) { tickets ->
+                ticketsState = tickets
+                areTicketsLoaded.value = true
+            }
+            return@LaunchedEffect
+        }
+
+        // Load from server if not cached
         getUserTickets(userId = Authentication(ctx).getUserID()) { tickets ->
             ticketsState = tickets
             areTicketsLoaded.value = true
@@ -67,15 +88,17 @@ fun Wallet(ctx: Context, navController: NavController) {
             // filter out used tickets
             filteredTickets = tickets.filter { !it.isUsed }
 
-            /*// group tickets with the same show and date
-            groupedTickets = groupTickets(tickets)*/
-
-            getUserOrders(userId = Authentication(ctx).getUserID()) { fetchedOrders ->
-                orders = fetchedOrders
-                areOrdersLoaded = true
+            if (ticketsState.isNotEmpty()) {
+                // Save to cache
+                saveTicketsToCache(tickets, context) { isSuccess ->
+                    if (!isSuccess) {
+                        Log.e("Wallet", "Failed to save tickets to cache")
+                    }
+                }
             }
         }
     }
+
 
     if (!isViewingTransactions) {
         Column(modifier = Modifier.fillMaxSize()) {

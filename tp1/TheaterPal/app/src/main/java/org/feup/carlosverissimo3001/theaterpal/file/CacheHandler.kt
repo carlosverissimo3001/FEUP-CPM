@@ -6,11 +6,15 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseShow
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTicket
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.showsToJson
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.ticketsToJson
+import org.feup.carlosverissimo3001.theaterpal.models.Ticket
 import org.feup.carlosverissimo3001.theaterpal.models.show.Show
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
@@ -60,6 +64,7 @@ fun saveShowsToCache(shows: List<Show>, context: Context, isSuccess: (Boolean) -
     }
 }
 
+
 fun loadShowsFromCache(context: Context, callback: (List<Show>) -> Unit) {
     val cacheDir = context.cacheDir
     val showsCacheDir = File(cacheDir, "shows")
@@ -94,7 +99,7 @@ fun areImagesStoreInCache(context: Context): Boolean {
     return imagesCacheDir.exists()
 }
 
-fun areShowsStoreInCache(context: Context): Boolean {
+fun areShowsStoredInCache(context: Context): Boolean {
     val cacheDir = context.cacheDir
     val showsCacheDir = File(cacheDir, "shows")
 
@@ -117,4 +122,108 @@ fun loadImageFromCache(filename: String, context: Context): Bitmap? {
 fun decodeBase64ToBitmap(base64String: String): Bitmap? {
     val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
     return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+}
+
+fun appendTicketsToCache(tickets: List<Ticket>, context: Context, isSuccess: (Boolean) -> Unit){
+    val cacheDir = context.cacheDir
+    val ticketsCacheDir = File(cacheDir, "tickets")
+    val ticketsFile = File(ticketsCacheDir, "tickets.json")
+
+    // First check if the file exists
+    if (!ticketsFile.exists()) {
+        saveTicketsToCache(tickets, context, isSuccess)
+        return
+    }
+
+    try {
+        // Read existing JSON content from file
+        val existingJsonArray = if (ticketsFile.exists()) {
+            val inputStream = FileInputStream(ticketsFile)
+            val buffer = ByteArray(inputStream.available())
+            inputStream.read(buffer)
+            inputStream.close()
+            JSONArray(String(buffer))
+        } else {
+            JSONArray()
+        }
+
+        // Convert new tickets to JSON array
+        val newTicketsArray = JSONArray()
+        for (ticket in tickets) {
+            newTicketsArray.put(ticket.toJson())
+        }
+
+        // Append new tickets to existing JSON array
+        for (i in 0 until newTicketsArray.length()) {
+            existingJsonArray.put(newTicketsArray.getJSONObject(i))
+        }
+
+        // Write updated JSON content back to file
+        val outputStream = FileOutputStream(ticketsFile)
+        outputStream.write(existingJsonArray.toString().toByteArray())
+        outputStream.close()
+        isSuccess(true)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+        isSuccess(false)
+    }
+}
+
+fun saveTicketsToCache(tickets: List<Ticket>, context: Context, isSuccess: (Boolean) -> Unit){
+    val cacheDir = context.cacheDir
+    val ticketsCacheDir = File(cacheDir, "tickets")
+    val ticketsString = ticketsToJson(tickets)
+
+    if(!ticketsCacheDir.exists()){
+        ticketsCacheDir.mkdirs()
+    }
+
+    val ticketsFile = File(ticketsCacheDir, "tickets.json")
+
+    // append to the file
+    try {
+        val stream = FileOutputStream(ticketsFile)
+        stream.write(ticketsString.toByteArray())
+        stream.close()
+        isSuccess(true)
+    }
+    catch (e: Exception) {
+        e.printStackTrace()
+        isSuccess(false)
+    }
+}
+
+fun areTicketsStoredInCache(context: Context): Boolean {
+    val cacheDir = context.cacheDir
+    val ticketsCacheDir = File(cacheDir, "tickets")
+
+    return ticketsCacheDir.exists()
+}
+
+fun loadTicketsFromCache(context: Context, callback: (List<Ticket>) -> Unit) {
+    val cacheDir = context.cacheDir
+    val ticketsCacheDir = File(cacheDir, "tickets")
+    val tickets = mutableListOf<Ticket>()
+
+    if (!ticketsCacheDir.exists()) {
+        callback(emptyList())
+    }
+
+    val ticketsFile = File(ticketsCacheDir, "tickets.json")
+    val ticketsString = ticketsFile.readText()
+
+    if (ticketsString == "") {
+        callback(emptyList())
+    }
+
+    // Parse the string to a list of tickets
+    val ticketsJsonArray = JSONObject(ticketsString).getJSONArray("tickets")
+    for (i in 0 until ticketsJsonArray.length()){
+        if (ticketsJsonArray.isNull(i)) continue
+        val ticketJson = ticketsJsonArray.getJSONObject(i)
+        tickets.add(parseTicket(ticketJson))
+    }
+
+    callback(tickets)
 }

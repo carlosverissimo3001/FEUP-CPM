@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import org.feup.carlosverissimo3001.theaterpal.api.getShows
-import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoreInCache
+import org.feup.carlosverissimo3001.theaterpal.file.areShowsStoredInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadShowsFromCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
@@ -45,7 +45,7 @@ fun Shows(ctx: Context, navController: NavController) {
     val showsState = remember { mutableStateOf<List<Show>?>(null) }
 
     // Check if shows are cached
-    val areShowsCached = areShowsStoreInCache(ctx)
+    val areShowsCached = areShowsStoredInCache(ctx)
 
     LaunchedEffect(Unit) {
         if (areShowsCached){
