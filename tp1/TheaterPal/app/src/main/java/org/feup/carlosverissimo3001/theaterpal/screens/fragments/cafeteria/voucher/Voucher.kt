@@ -82,6 +82,15 @@ fun Voucher(
                             fontFamily = marcherFontFamily
                         ),
                     )
+                    Text(
+                        text = getEmoji(parseVoucherType(voucher.voucherType)),
+                        style = TextStyle(
+                            color = ComposeColor.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontFamily = marcherFontFamily
+                        ),
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -103,4 +112,12 @@ fun Voucher(
     }
 }
 
+fun getEmoji(type: String) : String {
+    return when (type) {
+        "5% Discount" -> " \uD83C\uDFF7\uFE0F"
+        "Free Popcorn" -> " 🍿"
+        "Free Coffee" -> " ☕"
+        else -> "🎟️"
+    }
+}
 
