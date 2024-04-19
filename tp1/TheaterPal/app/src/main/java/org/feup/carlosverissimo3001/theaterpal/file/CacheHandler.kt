@@ -124,14 +124,27 @@ fun decodeBase64ToBitmap(base64String: String): Bitmap? {
     return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 }
 
-fun appendTicketsToCache(tickets: List<Ticket>, context: Context, isSuccess: (Boolean) -> Unit){
+/**
+ * When the user purchases tickets, the server will return a list of tickets.
+ * We want to append these tickets to the cache
+ * @param tickets List of tickets to append to the cache
+ * @param context Context of the application
+ * @param isSuccess Callback function to be called when the operation is done
+ * @see saveTicketsToCache
+ */
+fun appendTicketsToCache(tickets: JSONArray, context: Context, isSuccess: (Boolean) -> Unit){
     val cacheDir = context.cacheDir
     val ticketsCacheDir = File(cacheDir, "tickets")
     val ticketsFile = File(ticketsCacheDir, "tickets.json")
 
     // First check if the file exists
     if (!ticketsFile.exists()) {
-        saveTicketsToCache(tickets, context, isSuccess)
+        val ticketList = mutableListOf<Ticket>()
+        for (i in 0 until tickets.length()) {
+            ticketList.add(parseTicket(tickets.getJSONObject(i)))
+        }
+
+        saveTicketsToCache(ticketList, context, isSuccess)
         return
     }
 
@@ -147,15 +160,9 @@ fun appendTicketsToCache(tickets: List<Ticket>, context: Context, isSuccess: (Bo
             JSONArray()
         }
 
-        // Convert new tickets to JSON array
-        val newTicketsArray = JSONArray()
-        for (ticket in tickets) {
-            newTicketsArray.put(ticket.toJson())
-        }
-
         // Append new tickets to existing JSON array
-        for (i in 0 until newTicketsArray.length()) {
-            existingJsonArray.put(newTicketsArray.getJSONObject(i))
+        for (i in 0 until tickets.length()) {
+            existingJsonArray.put(tickets.getJSONObject(i))
         }
 
         // Write updated JSON content back to file
@@ -218,7 +225,8 @@ fun loadTicketsFromCache(context: Context, callback: (List<Ticket>) -> Unit) {
     }
 
     // Parse the string to a list of tickets
-    val ticketsJsonArray = JSONObject(ticketsString).getJSONArray("tickets")
+    val ticketsJsonArray = JSONArray(ticketsString)
+
     for (i in 0 until ticketsJsonArray.length()){
         if (ticketsJsonArray.isNull(i)) continue
         val ticketJson = ticketsJsonArray.getJSONObject(i)

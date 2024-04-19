@@ -176,9 +176,8 @@ object Parser {
             jsonObject.getString("userid"),
             jsonObject.getString("showName"),
             jsonObject.getString("seat"),
-            jsonObject.getBoolean("isUsed"),
-            jsonObject.getString("date"),
-            jsonObject.getString("imagePath"),
+            if (jsonObject.has("isUsed")) jsonObject.getBoolean("isUsed") else false,
+            jsonObject.getString("date")
         )
     }
 
@@ -197,11 +196,10 @@ object Parser {
         }
 
         return """
-        {
-            "tickets": [
-                $ticketsJson
-            ]
-        }
+        [
+            $ticketsJson
+        ]
+        
     """.trimIndent()
     }
 

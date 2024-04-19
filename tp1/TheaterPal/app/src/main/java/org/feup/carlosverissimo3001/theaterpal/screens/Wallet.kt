@@ -76,6 +76,9 @@ fun Wallet(ctx: Context, navController: NavController) {
             loadTicketsFromCache(context) { tickets ->
                 ticketsState = tickets
                 areTicketsLoaded.value = true
+
+                // filter out used tickets
+                filteredTickets = tickets.filter { !it.isUsed}
             }
             return@LaunchedEffect
         }

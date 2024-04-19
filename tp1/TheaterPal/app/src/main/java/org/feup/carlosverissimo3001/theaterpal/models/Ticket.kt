@@ -21,8 +21,7 @@ data class Ticket (
     val showName: String,
     val seat: String,
     val isUsed: Boolean,
-    val date: String,
-    val imagePath: String = "",
+    val date: String
 ) : Parcelable {
 
     /**
@@ -38,8 +37,7 @@ data class Ticket (
             "showName": "$showName",
             "seat": "$seat",
             "isUsed": $isUsed,
-            "date": "$date",
-            "imagePath": "$imagePath"
+            "date": "$date"
         }
     """.trimIndent()
     }
