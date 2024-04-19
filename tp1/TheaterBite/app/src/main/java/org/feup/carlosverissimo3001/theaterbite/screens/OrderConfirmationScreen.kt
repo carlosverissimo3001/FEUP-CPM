@@ -21,6 +21,7 @@ import org.feup.carlosverissimo3001.theaterbite.poppinsFontFamily
 @Composable
 fun OrderConfirmationScreen(
     order: ConfirmedOrder,
+    user: User,
     seconds: Int
 ) {
     var secondsRemaining by remember { mutableIntStateOf(seconds) }

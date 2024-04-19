@@ -41,16 +41,19 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.*
 import org.feup.carlosverissimo3001.theaterbite.models.ConfirmedOrder
 import org.feup.carlosverissimo3001.theaterbite.models.Order
+import org.feup.carlosverissimo3001.theaterbite.models.User
 import org.feup.carlosverissimo3001.theaterbite.screens.OrderConfirmationScreen
 
 class OrderConfirmationActivity : AppCompatActivity() {
     private val delayMillis = 10000L // 10 seconds
     private lateinit var job: Job
     private lateinit var order: ConfirmedOrder
+    private lateinit var user : User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         order = intent.parcelable("order")!!
+        user = intent.parcelable("user")!!
 
         job = CoroutineScope(Dispatchers.Main).launch {
             delay(delayMillis)
@@ -60,7 +63,8 @@ class OrderConfirmationActivity : AppCompatActivity() {
         setContent {
             OrderConfirmationScreen(
                 order,
-                seconds = 10
+                user,
+                10
             )
         }
     }

@@ -111,16 +111,15 @@ class MainActivity : AppCompatActivity() {
         val useridlength = content[1].toInt()
         val userid  = String(content.sliceArray(2..useridlength+1))
 
-        // get the public key
-        var publicKeyB64: String
+        var user : User? = null
         var publicKey : PublicKey
         var signatureVerified = false
 
-        getPublicKey(userid) {
-            publicKeyB64 = it
+        getUser(userid) {
+            user = it
 
             // Decode the public key into a PublicKey object
-            publicKey = decodePublicKey(publicKeyB64)
+            publicKey = decodePublicKey(it.publicKey)
 
             // Verify the signature
             if (verifySignature(content, publicKey)){
@@ -149,6 +148,7 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, OrderConfirmationActivity::class.java)
 
         intent.putExtra("order", confirmedOrder)
+        intent.putExtra("user", user)
         startActivity(intent)
     }
 }

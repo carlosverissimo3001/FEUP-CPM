@@ -31,4 +31,13 @@ object Parser {
             jsonObject.getString("userid"),
         )
     }
+
+    fun parseUser (jsonObject: JSONObject): User {
+        return User(
+            jsonObject.getString("name"),
+            jsonObject.getString("nif"),
+            jsonObject.getString("publicKey"),
+            jsonObject.getString("userid")
+        )
+    }
 }
