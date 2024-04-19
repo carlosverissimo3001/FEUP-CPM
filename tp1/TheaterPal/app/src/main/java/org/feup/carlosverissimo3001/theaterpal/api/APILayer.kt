@@ -9,6 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.Constants
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.appendTicketsToCache
+import org.feup.carlosverissimo3001.theaterpal.file.appendVouchersToCache
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
 import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
@@ -319,6 +320,15 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
                     }
 
                     // TODO: Same logic, but for vouchers
+                    val vouchers = jsonResponse?.getJSONArray("vouchers")
+                    if (vouchers != null){
+                        appendVouchersToCache(vouchers, ctx) { success ->
+                            if (!success)
+                                Log.e("API Layer", "Failed to save vouchers to cache")
+                            else
+                                Log.d("API Layer", "Vouchers saved to cache")
+                        }
+                    }
                 }
                 else -> {
                     print("Error purchasing tickets")

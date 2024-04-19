@@ -301,7 +301,7 @@ object Parser {
         return Voucher(
             jsonObject.getString("voucherid"),
             jsonObject.getString("vouchertype"),
-            jsonObject.getBoolean("isUsed"),
+            if (jsonObject.has("isUsed")) jsonObject.getBoolean("isUsed") else false,
             jsonObject.getString("userid"),
         )
     }

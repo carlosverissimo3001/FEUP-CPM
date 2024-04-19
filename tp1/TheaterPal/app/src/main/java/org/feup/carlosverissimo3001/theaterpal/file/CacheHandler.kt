@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseShow
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTicket
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucher
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.showsToJson
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.ticketsToJson
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.vouchersToJson
@@ -247,6 +248,13 @@ fun loadTicketsFromCache(context: Context, callback: (List<Ticket>) -> Unit) {
 
 /**** VOUCHERS ****/
 
+/**
+ * Save a list of vouchers to the cache
+ * @param vouchers List of vouchers to save to the cache
+ * @param context Context of the application
+ * @param isSuccess Callback function to be called when the operation is done
+ * @see Voucher
+ */
 fun saveVouchersToCache(vouchers: List<Voucher>, context: Context, isSuccess: (Boolean) -> Unit){
     val cacheDir = context.cacheDir
     val vouchersCacheDir = File(cacheDir, "vouchers")
@@ -268,6 +276,104 @@ fun saveVouchersToCache(vouchers: List<Voucher>, context: Context, isSuccess: (B
         e.printStackTrace()
         isSuccess(false)
     }
+}
+
+/**
+ * When the user purchases tickets, the server will return a list of vouchers that were generated.
+ * We want to append these vouchers to the cache
+ * @param vouchers List of vouchers to append to the cache
+ * @param context Context of the application
+ * @param isSuccess Callback function to be called when the operation is done
+ * @see saveVouchersToCache
+ */
+fun appendVouchersToCache(vouchers: JSONArray, context: Context, isSuccess: (Boolean) -> Unit){
+    val cacheDir = context.cacheDir
+    val vouchersCacheDir = File(cacheDir, "vouchers")
+    val vouchersFile = File(vouchersCacheDir, "vouchers.json")
+
+    // First check if the file exists
+    if (!vouchersFile.exists()) {
+        val voucherList = mutableListOf<Voucher>()
+        for (i in 0 until vouchers.length()) {
+            voucherList.add(parseVoucher(vouchers.getJSONObject(i)))
+        }
+
+        saveVouchersToCache(voucherList, context, isSuccess)
+        return
+    }
+
+    try {
+        // Read existing JSON content from file
+        val existingJsonArray = if (vouchersFile.exists()) {
+            val inputStream = FileInputStream(vouchersFile)
+            val buffer = ByteArray(inputStream.available())
+            inputStream.read(buffer)
+            inputStream.close()
+            JSONArray(String(buffer))
+        } else {
+            JSONArray()
+        }
+
+        // Append new vouchers to existing JSON array
+        for (i in 0 until vouchers.length()) {
+            existingJsonArray.put(vouchers.getJSONObject(i))
+        }
+
+        // Write updated JSON content back to file
+        val outputStream = FileOutputStream(vouchersFile)
+        outputStream.write(existingJsonArray.toString().toByteArray())
+        outputStream.close()
+        isSuccess(true)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+        isSuccess(false)
+    }
+}
+
+/**
+ * Load the vouchers from the cache
+ * @param context Context of the application
+ * @param callback Callback function to be called when the vouchers are loaded
+ * @see Voucher
+ */
+fun loadVouchersFromCache(context: Context, callback: (List<Voucher>) -> Unit) {
+    val cacheDir = context.cacheDir
+    val vouchersCacheDir = File(cacheDir, "vouchers")
+    val vouchers = mutableListOf<Voucher>()
+
+    if (!vouchersCacheDir.exists()) {
+        callback(emptyList())
+    }
+
+    val vouchersFile = File(vouchersCacheDir, "vouchers.json")
+    val vouchersString = vouchersFile.readText()
+
+    if (vouchersString == "") {
+        callback(emptyList())
+    }
+
+    // Parse the string to a list of vouchers
+    val vouchersJsonArray = JSONArray(vouchersString)
+    for (i in 0 until vouchersJsonArray.length()){
+        if (vouchersJsonArray.isNull(i)) continue
+        val voucherJson = vouchersJsonArray.getJSONObject(i)
+        vouchers.add(parseVoucher(voucherJson))
+    }
+
+    callback(vouchers)
+}
+
+/**
+ * Check if the vouchers are stored in the cache
+ * @param context Context of the application
+ * @return True if the vouchers are stored in the cache, false otherwise
+ */
+fun areVouchersStoredInCache(context: Context): Boolean {
+    val cacheDir = context.cacheDir
+    val vouchersCacheDir = File(cacheDir, "vouchers")
+
+    return vouchersCacheDir.exists()
 }
 
 /**** VOUCHERS ****/
