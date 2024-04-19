@@ -73,7 +73,7 @@ object NavBarItems {
 fun Navigator(navController: NavHostController, ctx: Context) {
     NavHost(navController=navController, startDestination=NavRoutes.Shows.route) {
         composable(NavRoutes.Cafeteria.route) {
-            Cafeteria(ctx)
+            Cafeteria(ctx, navController)
         }
         composable(NavRoutes.Shows.route) {
             Shows(ctx, navController)
