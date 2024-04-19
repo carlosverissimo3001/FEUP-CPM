@@ -17,8 +17,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,6 +41,7 @@ import org.feup.carlosverissimo3001.theaterpal.file.saveShowsToCache
 import org.feup.carlosverissimo3001.theaterpal.models.show.Show
 import org.feup.carlosverissimo3001.theaterpal.screens.NavRoutes
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.showNameImageMap
 
 @Composable
 fun Shows(ctx: Context, navController: NavController) {
@@ -47,11 +50,22 @@ fun Shows(ctx: Context, navController: NavController) {
     // Check if shows are cached
     val areShowsCached = areShowsStoredInCache(ctx)
 
+    var isImageMapSet by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(Unit) {
         if (areShowsCached){
             loadShowsFromCache(ctx) { shows ->
                 showsState.value = shows
             }
+
+            if (!isImageMapSet){
+                showsState.value?.forEach {
+                    showNameImageMap[it.name] = it.picture
+                }
+                isImageMapSet = true
+            }
+
             return@LaunchedEffect
         }
 
@@ -63,6 +77,13 @@ fun Shows(ctx: Context, navController: NavController) {
                 if (!isSuccess) {
                     Log.e("ShowsFragment", "Failed to save shows to cache")
                 }
+            }
+
+            if (!isImageMapSet){
+                showsState.value?.forEach {
+                    showNameImageMap[it.name] = it.picture
+                }
+                isImageMapSet = true
             }
         }
     }

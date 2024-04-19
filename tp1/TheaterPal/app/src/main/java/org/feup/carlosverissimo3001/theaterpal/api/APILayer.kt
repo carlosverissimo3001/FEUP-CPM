@@ -208,8 +208,6 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
                         val imageName = show.getString("picture")
                         val imageB64 = show.getString("picture_b64")
 
-                        showNameImageMap[showName] = imageName
-
                         saveImageToCache(imageB64, imageName, ctx){success ->
                             if (!success)
                                 Log.e("API Layer", "Failed to save image to cache")
