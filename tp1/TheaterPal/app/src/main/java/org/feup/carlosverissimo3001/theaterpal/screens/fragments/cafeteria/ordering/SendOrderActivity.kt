@@ -27,7 +27,7 @@ class SendOrderActivity : AppCompatActivity() {
 
     private val broadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(ctx: Context, intent: Intent) {
-            setVouchersAsUsed(orderToSend.vouchersUsed, applicationContext) {
+            setVouchersAsUsed(orderToSend.vouchersUsed, ctx) {
                 Toast.makeText(this@SendOrderActivity, "Order sent successfully", Toast.LENGTH_LONG).show()
                 finish()
             }

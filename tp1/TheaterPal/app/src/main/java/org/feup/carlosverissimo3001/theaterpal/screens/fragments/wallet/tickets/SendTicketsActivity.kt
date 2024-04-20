@@ -28,7 +28,7 @@ class SendTicketsActivity : AppCompatActivity() {
     private val broadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(ctx: Context, intent: Intent) {
             // Mark tickets as used in the cache
-            setTicketsAsUsed(ticketsToSend,applicationContext) {
+            setTicketsAsUsed(ticketsToSend, ctx) {
                 Toast.makeText(this@SendTicketsActivity, "Tickets sent successfully", Toast.LENGTH_LONG).show()
                 finish()
             }
