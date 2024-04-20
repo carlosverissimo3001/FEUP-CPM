@@ -1,6 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.screens.fragments.wallet.transactions
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +31,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.api.getUserTransactions
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.file.saveTicketsToCache
+import org.feup.carlosverissimo3001.theaterpal.file.saveVouchersToCache
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.createDefaultTransaction
+import org.feup.carlosverissimo3001.theaterpal.models.Parser
+import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTransaction
+import org.feup.carlosverissimo3001.theaterpal.models.Ticket
+import org.feup.carlosverissimo3001.theaterpal.models.Voucher
 import org.feup.carlosverissimo3001.theaterpal.models.transaction.Transaction
 import org.feup.carlosverissimo3001.theaterpal.screens.LoadingSpinner
 
@@ -57,11 +64,51 @@ fun TransactionsFragment(
     var selectedTransaction by remember { mutableStateOf(transactionDefault) }
 
     LaunchedEffect(Unit) {
-        getUserTransactions(Authentication(ctx).getUserID()) { fetchedTransactions ->
-            transactions = fetchedTransactions
+        getUserTransactions(Authentication(ctx).getUserID()) { data ->
+            val transactionsArr = data.getJSONArray("transactions")
+            val ticketsArr = data.getJSONArray("tickets")
+            val vouchersArr = data.getJSONArray("vouchers")
+
+            val transactionList = mutableListOf<Transaction>()
+            val ticketsList = mutableListOf<Ticket>()
+            val vouchersList = mutableListOf<Voucher>()
+
+            for (i in 0 until data.getJSONArray("transactions").length()) {
+                val transaction = transactionsArr.getJSONObject(i)
+
+                transactionList.add(parseTransaction(transaction))
+            }
+
+            for (i in 0 until data.getJSONArray("tickets").length()) {
+                val ticket = ticketsArr.getJSONObject(i)
+
+                ticketsList.add(Parser.parseTicket(ticket))
+            }
+
+            for (i in 0 until data.getJSONArray("vouchers").length()) {
+                val voucher = vouchersArr.getJSONObject(i)
+
+                vouchersList.add(Parser.parseVoucher(voucher))
+            }
+
+
+            transactions = transactionList
             areTransactionsLoaded = true
 
             transactions = transactions.sortedBy { it.timestamp }
+
+            // replaces the local info in the cache
+            saveTicketsToCache(ticketsList, ctx) {
+                if (!it){
+                    Log.e("TransactionsFragment", "Failed to save tickets to cache")
+                }
+            }
+
+            saveVouchersToCache(vouchersList, ctx) {
+                if (!it) {
+                    Log.e("TransactionsFragment", "Failed to save vouchers to cache")
+                }
+            }
         }
     }
 
