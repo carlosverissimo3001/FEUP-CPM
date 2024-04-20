@@ -65,19 +65,11 @@ fun TicketValidate(
             Column(
                 modifier = Modifier
                     .padding(7.dp)
-                    .fillMaxWidth(0.65f)
+                    .fillMaxWidth(0.75f)
             ) {
                 Row (
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    /*Text(
-                        text = ticket.numTickets.toString(),
-                        style = TextStyle(
-                            color = androidx.compose.ui.graphics.Color.White,
-                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                            fontFamily = marcherFontFamily
-                        )
-                    )*/
                     Image(
                         painter = painterResource(id = R.drawable.tickets_icon),
                         contentDescription = "Ticket Icon",
