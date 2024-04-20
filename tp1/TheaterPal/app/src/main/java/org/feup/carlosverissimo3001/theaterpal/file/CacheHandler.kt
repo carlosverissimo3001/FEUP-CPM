@@ -244,6 +244,23 @@ fun loadTicketsFromCache(context: Context, callback: (List<Ticket>) -> Unit) {
     callback(tickets)
 }
 
+fun setTicketsAsUsed(ticketsUsed: List<Ticket>, context: Context, callback: (Boolean) -> Unit){
+    // first need to load the tickets from the cache
+    loadTicketsFromCache(context) { tickets ->
+        // then set the tickets as used
+        val updatedTickets = tickets.map { ticket ->
+            if (ticketsUsed.contains(ticket)) {
+                ticket.isUsed = true
+            }
+            ticket
+        }
+
+        saveTicketsToCache(updatedTickets, context) { isSuccess ->
+            callback(isSuccess)
+        }
+    }
+}
+
 /**** TICKETS ****/
 
 /**** VOUCHERS ****/

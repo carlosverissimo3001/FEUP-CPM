@@ -20,7 +20,7 @@ data class Ticket (
     val userid: String,
     val showName: String,
     val seat: String,
-    val isUsed: Boolean,
+    var isUsed: Boolean,
     val date: String
 ) : Parcelable {
 
