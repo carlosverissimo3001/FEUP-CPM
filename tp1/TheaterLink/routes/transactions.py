@@ -16,6 +16,12 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
         transactions = crud_ops.get_user_transactions(DB_CONN, user_id)
 
+        tickets = crud_ops.get_user_tickets(DB_CONN, user_id)
+        vouchers = crud_ops.get_user_vouchers(DB_CONN, user_id)
+
+        tickets = [ticket for ticket in tickets if ticket["isUsed"] == False]
+        vouchers = [voucher for voucher in vouchers if voucher["isUsed"] == False]
+
         for transaction in transactions:
             transaction["vouchers_used"] = crud_ops.get_vouchers_used(DB_CONN, transaction["transaction_id"])
             transaction["vouchers_generated"] = crud_ops.get_vouchers_generated(DB_CONN, transaction["transaction_id"])
@@ -56,7 +62,7 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
             """ transactions["nif"] = crud_ops.get_user_nif(DB_CONN, user_id) """
 
-        return jsonify({'message': 'Transactions retrieved successfully!', 'transactions':  transactions}), 200
+        return jsonify({'message': 'Transactions retrieved successfully!', 'transactions':  transactions, 'tickets': tickets, 'vouchers': vouchers}), 200
 
     return transaction_page
 
