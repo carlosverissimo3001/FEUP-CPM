@@ -1,6 +1,5 @@
 package org.feup.carlosverissimo3001.theaterpal.file
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -393,16 +392,12 @@ fun areVouchersStoredInCache(context: Context): Boolean {
     return vouchersCacheDir.exists()
 }
 
-fun setVouchersAsUsed(vouchersUsed: List<Voucher>, context: Context, callback: (Boolean) -> Unit){
+fun deleteVouchers(vouchersUsed: List<Voucher>, context: Context, callback: (Boolean) -> Unit){
     // first need to load the vouchers from the cache
     loadVouchersFromCache(context) { vouchers ->
-        // then set the vouchers as used
-        val updatedVouchers = vouchers.map { voucher ->
-            if (vouchersUsed.contains(voucher)) {
-                voucher.isUsed = true
-            }
-            voucher
-        }
+        // then delete the ones that were used
+        val updatedVouchers = vouchers.filter { voucher ->
+            !vouchersUsed.contains(voucher)}
 
         saveVouchersToCache(updatedVouchers, context) { isSuccess ->
             callback(isSuccess)

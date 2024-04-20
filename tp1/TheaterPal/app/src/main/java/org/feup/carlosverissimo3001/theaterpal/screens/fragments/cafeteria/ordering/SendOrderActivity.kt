@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.feup.carlosverissimo3001.theaterpal.BottomBarTheme
 import org.feup.carlosverissimo3001.theaterpal.Constants
-import org.feup.carlosverissimo3001.theaterpal.file.setVouchersAsUsed
+import org.feup.carlosverissimo3001.theaterpal.file.deleteVouchers
 import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.printOrder
 import org.feup.carlosverissimo3001.theaterpal.models.order.Order
 import org.feup.carlosverissimo3001.theaterpal.nfc.*
@@ -27,7 +27,7 @@ class SendOrderActivity : AppCompatActivity() {
 
     private val broadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(ctx: Context, intent: Intent) {
-            setVouchersAsUsed(orderToSend.vouchersUsed, ctx) {
+            deleteVouchers(orderToSend.vouchersUsed, ctx) {
                 Toast.makeText(this@SendOrderActivity, "Order sent successfully", Toast.LENGTH_LONG).show()
                 finish()
             }

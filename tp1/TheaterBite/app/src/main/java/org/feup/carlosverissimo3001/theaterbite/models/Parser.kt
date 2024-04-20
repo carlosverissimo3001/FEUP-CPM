@@ -36,7 +36,7 @@ object Parser {
         return User(
             jsonObject.getString("name"),
             jsonObject.getString("nif"),
-            jsonObject.getString("publicKey"),
+            jsonObject.getString("publickey"),
             jsonObject.getString("userid")
         )
     }
