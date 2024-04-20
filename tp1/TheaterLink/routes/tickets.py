@@ -20,8 +20,6 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
     def purchase_tickets():
         data = request.json
 
-        print("Data: ", data)
-
         # extract parameters from the data
         show_date_id = data.get('show_date_id')
         num_tickets = data.get('num_tickets')
