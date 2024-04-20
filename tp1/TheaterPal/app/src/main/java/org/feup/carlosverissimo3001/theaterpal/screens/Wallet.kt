@@ -1,5 +1,6 @@
 package org.feup.carlosverissimo3001.theaterpal.screens
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -204,7 +205,19 @@ fun Wallet(ctx: Context, navController: NavController) {
                                     context.startActivity(intent)
                                 },
                                 onConsultTransactionsClicked = {
-                                    isViewingTransactions = true
+                                    // TODO: SHOW DIALOG BOX CONFIRMING THE ACTION
+                                    showYesNoDialog(
+                                        ctx,
+                                        "Consult Transactions",
+                                        "This action will delete used tickets and vouchers from your local storage" +
+                                                "\n\nAre you sure you want to proceed?",
+                                        {
+                                            isViewingTransactions = true
+                                        },
+                                        {
+                                            // Do nothing
+                                        }
+                                    )
                                 }
                             )
                         }
@@ -251,5 +264,23 @@ fun LoadingSpinner() {
             strokeWidth = 2.dp
         )
     }
+}
+
+fun showYesNoDialog(context: Context, title: String, message: String, onYesClicked: () -> Unit, onNoClicked: () -> Unit) {
+    AlertDialog.Builder(context)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton("Yes") { dialog, _ ->
+            onYesClicked()
+            dialog.dismiss()
+        }
+        .setNegativeButton("No") { dialog, _ ->
+            onNoClicked()
+            dialog.dismiss()
+        }
+        .setIcon(
+            android.R.drawable.ic_dialog_alert
+        )
+        .show()
 }
 
