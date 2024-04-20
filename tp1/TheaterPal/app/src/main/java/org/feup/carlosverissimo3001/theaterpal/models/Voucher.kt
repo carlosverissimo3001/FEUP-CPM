@@ -14,7 +14,7 @@ import kotlinx.parcelize.Parcelize
 data class Voucher (
     val voucherid: String,
     val voucherType: String,
-    val isUsed: Boolean,
+    var isUsed: Boolean,
     val userid: String,
 ) : Parcelable {
     /**

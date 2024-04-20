@@ -393,6 +393,23 @@ fun areVouchersStoredInCache(context: Context): Boolean {
     return vouchersCacheDir.exists()
 }
 
+fun setVouchersAsUsed(vouchersUsed: List<Voucher>, context: Context, callback: (Boolean) -> Unit){
+    // first need to load the vouchers from the cache
+    loadVouchersFromCache(context) { vouchers ->
+        // then set the vouchers as used
+        val updatedVouchers = vouchers.map { voucher ->
+            if (vouchersUsed.contains(voucher)) {
+                voucher.isUsed = true
+            }
+            voucher
+        }
+
+        saveVouchersToCache(updatedVouchers, context) { isSuccess ->
+            callback(isSuccess)
+        }
+    }
+}
+
 /**** VOUCHERS ****/
 
 
