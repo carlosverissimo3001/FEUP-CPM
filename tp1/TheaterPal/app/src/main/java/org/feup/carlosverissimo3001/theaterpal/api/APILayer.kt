@@ -319,7 +319,6 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
                         }
                     }
 
-                    // TODO: Same logic, but for vouchers
                     val vouchers = jsonResponse?.getJSONArray("vouchers")
                     if (vouchers != null){
                         appendVouchersToCache(vouchers, ctx) { success ->
@@ -344,7 +343,7 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
  * @param callback callback function to handle the response
  * @see Transaction
  */
-fun getUserTransactions(userId: String, callback: (List<Transaction>) -> Unit) {
+fun getUserTransactions(userId: String, callback: (JSONObject) -> Unit) {
     val client = OkHttpClient()
 
     val request = okhttp3.Request.Builder()
@@ -355,7 +354,7 @@ fun getUserTransactions(userId: String, callback: (List<Transaction>) -> Unit) {
     client.newCall(request).enqueue(object : okhttp3.Callback {
         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
             e.printStackTrace()
-            callback(emptyList())
+            callback(JSONObject())
         }
 
         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
@@ -363,16 +362,9 @@ fun getUserTransactions(userId: String, callback: (List<Transaction>) -> Unit) {
                 200 -> {
                     val responseBody = response.body?.string()
                     val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val transactions = jsonResponse?.getJSONArray("transactions") ?: return
-
-                    val transactionsList = mutableListOf<Transaction>()
-                    for (i in 0 until transactions.length()) {
-                        val transaction = transactions.getJSONObject(i)
-
-                        transactionsList.add(parseTransaction(transaction))
+                    if (jsonResponse != null) {
+                        callback(jsonResponse)
                     }
-
-                    callback(transactionsList)
                 }
                 else -> {
                     print("Error getting transactions")
