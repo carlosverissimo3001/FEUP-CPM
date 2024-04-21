@@ -40,11 +40,11 @@ class Authentication (private val context: Context){
                 // sign(....)
             }
             val signedBytes = signature.sign()
-            Log.d("Encryption", "Signature size = $signedBytes bytes.")
+            Log.d("Auth", "Signature size = $signedBytes bytes.")
             result = signedBytes
 
         } catch (ex: Exception) {
-            Log.d("Encryption", ex.toString())
+            Log.d("Auth", ex.toString())
         }
 
         return result
