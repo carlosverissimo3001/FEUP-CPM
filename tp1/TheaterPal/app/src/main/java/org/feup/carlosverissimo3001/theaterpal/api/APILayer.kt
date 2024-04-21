@@ -92,7 +92,14 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
     jsonOrder.put("total_cost", totalCost)
     jsonOrder.put("user_id", Authentication(ctx).getUserID())
 
-    val requestBody = jsonOrder.toString()
+    val jsonStr = jsonOrder.toString()
+    val signature = encrypt(jsonStr)
+
+    // Create JSON object containing data and signature
+    val signedJson = JSONObject()
+    signedJson.put("data", jsonStr)
+
+    val requestBody = signedJson.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
 
 //    val requestBody = encrypt(jsonOrder.toString())
