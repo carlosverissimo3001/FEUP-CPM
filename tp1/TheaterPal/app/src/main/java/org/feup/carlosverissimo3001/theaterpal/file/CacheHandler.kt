@@ -410,6 +410,29 @@ fun deleteVouchers(vouchersUsed: List<Voucher>, context: Context, callback: (Boo
 
 /**** OTHER ****/
 
+
+/**
+ * Deletes the local ticket and voucher cache
+ * @param context Context of the application
+ * @param callback Callback function to be called when the operation is done
+
+ */
+fun deleteCache(context: Context, callback: (Boolean) -> Unit){
+    val cacheDir = context.cacheDir
+    val ticketsCacheDir = File(cacheDir, "tickets")
+    val vouchersCacheDir = File(cacheDir, "vouchers")
+
+    try {
+        ticketsCacheDir.deleteRecursively()
+        vouchersCacheDir.deleteRecursively()
+        callback(true)
+    }
+    catch (e: Exception) {
+        e.printStackTrace()
+        callback(false)
+    }
+}
+
 fun loadImageFromCache(filename: String, context: Context): Bitmap? {
     val cacheDir = context.cacheDir
     val imagesCacheDir = File(cacheDir, "images")
