@@ -47,7 +47,7 @@ class RegisterActivity : AppCompatActivity(){
 
         Log.d("RegisterActivity", "USER: $user")
 
-        registerUser(user, callback = {success, userid ->
+        registerUser(applicationContext, user, callback = {success, userid ->
             if (success) {
                 println("User registered successfully")
                 auth.storeUserID(userid)

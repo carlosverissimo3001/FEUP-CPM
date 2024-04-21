@@ -27,18 +27,19 @@ import org.json.JSONObject
 
 /**
  * Function to register a user
+ * @param ctx context of the application
  * @param user user object to register
  * @param callback callback function to handle the response
  * @see User
  */
-fun registerUser(user: User, callback: (Boolean, String) -> Unit){
+fun registerUser(ctx: Context, user: User, callback: (Boolean, String) -> Unit){
     val client = OkHttpClient()
 
     val jsonObject = JSONObject(userToJson(user))
 
     // Sign the message with the private key
     val jsonStr = jsonObject.toString()
-    val signature = encrypt(jsonStr)
+    val signature = Authentication(ctx).sign(jsonStr)
 
     // Create JSON object containing data and signature
     val signedJson = JSONObject()
@@ -92,11 +93,18 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
     jsonOrder.put("total_cost", totalCost)
     jsonOrder.put("user_id", Authentication(ctx).getUserID())
 
-    val requestBody = jsonOrder.toString()
-        .toRequestBody("application/json".toMediaTypeOrNull())
+    val jsonStr = jsonOrder.toString()
 
-//    val requestBody = encrypt(jsonOrder.toString())
-//        .toRequestBody("application/json".toMediaTypeOrNull())
+    // Signature bytes
+    val signature = Authentication(ctx).sign(jsonStr)
+
+    // Create JSON object containing data and signature
+    val signedJson = JSONObject()
+    signedJson.put("data", jsonStr)
+    signedJson.put("signature", Base64.encodeToString(signature, Base64.DEFAULT))
+
+    val requestBody = signedJson.toString()
+        .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
         .url("${Constants.URL}/purchase_tickets")

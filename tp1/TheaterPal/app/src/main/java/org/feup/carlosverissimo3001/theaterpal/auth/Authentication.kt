@@ -14,49 +14,42 @@ import java.security.interfaces.RSAPublicKey
 import java.util.Calendar
 import java.util.GregorianCalendar
 import javax.security.auth.x500.X500Principal
-
-const val logTag = "TheaterPal"
-
+import java.security.Signature
 
 class Authentication (private val context: Context){
-    inner class PubKey {
-        var modulus = ByteArray(0)
-        var exponent = ByteArray(0)
+    /**
+     * Signs a given content with the private key stored in the Android KeyStore.
+     * @param content The content to be signed (NOTE, the content is not changed, only the signature is returned).
+     * @return The signature of the content.
+     */
+    fun sign(content: String) : ByteArray {
+        var result = ByteArray(0)
+
+        if (content.isEmpty())
+            return (ByteArray(0))
+
+        try {
+            val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
+                load(null)
+                getEntry(Constants.KEY_NAME, null)
+            }
+            val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
+            val signature = Signature.getInstance(Constants.SIGN_ALGO).apply {
+                initSign(privateKey)
+                update(content.toByteArray())
+                // sign(....)
+            }
+            val signedBytes = signature.sign()
+            Log.d("Auth", "Signature size = $signedBytes bytes.")
+            result = signedBytes
+
+        } catch (ex: Exception) {
+            Log.d("Auth", ex.toString())
+        }
+
+        return result
     }
 
-    // Public key field
-    val pubKey: PubKey
-        get() {
-            val pKey = PubKey()
-            try {
-                val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
-                    load(null)
-                    getEntry(Constants.KEY_NAME, null)
-                }
-                val pub = (entry as KeyStore.PrivateKeyEntry).certificate.publicKey
-                pKey.modulus = (pub as RSAPublicKey).modulus.toByteArray()
-                pKey.exponent = pub.publicExponent.toByteArray()
-            } catch (ex: Exception) {
-                Log.d(logTag, ex.toString())
-            }
-            return pKey
-        }
-
-    // Private exponent field
-    val privExp: ByteArray
-        get() {
-            var exp = ByteArray(0)
-            try {
-                val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
-                    load(null)
-                    getEntry(Constants.KEY_NAME, null)
-                }
-                exp = ((entry as KeyStore.PrivateKeyEntry).privateKey as RSAPrivateKey).privateExponent.toByteArray()
-            } catch (ex: Exception) {
-                Log.d(logTag, ex.toString())
-            }
-            return exp
-        }
 
     fun generateRSAKeyPair() {
         try {
@@ -81,7 +74,7 @@ class Authentication (private val context: Context){
             }
         }
         catch (ex: Exception) {
-            Log.d(logTag, ex.toString())
+            Log.d("Auth", ex.toString())
         }
     }
 
@@ -152,3 +145,4 @@ class Authentication (private val context: Context){
         return keyStore.containsAlias(Constants.KEY_NAME)
     }
 }
+
