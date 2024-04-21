@@ -93,17 +93,17 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
     jsonOrder.put("user_id", Authentication(ctx).getUserID())
 
     val jsonStr = jsonOrder.toString()
+
+    // Signature bytes
     val signature = encrypt(jsonStr)
 
     // Create JSON object containing data and signature
     val signedJson = JSONObject()
     signedJson.put("data", jsonStr)
+    signedJson.put("signature", Base64.encodeToString(signature, Base64.DEFAULT))
 
     val requestBody = signedJson.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
-
-//    val requestBody = encrypt(jsonOrder.toString())
-//        .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
         .url("${Constants.URL}/purchase_tickets")
