@@ -1,8 +1,5 @@
 package org.feup.carlosverissimo3001.theaterpal.models
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Coffee
-import androidx.compose.material.icons.outlined.Fastfood
 import org.feup.carlosverissimo3001.theaterpal.models.order.BarOrder
 import org.feup.carlosverissimo3001.theaterpal.models.order.CafeteriaItem
 import org.feup.carlosverissimo3001.theaterpal.models.order.Order
@@ -16,11 +13,12 @@ object Auxiliary {
      * Mapping of cafeteria items to icons
      * @see CafeteriaItem
      */
-    var itemIcons = mapOf(
-        "Popcorn" to Icons.Outlined.Fastfood,
-        "Soda" to Icons.Outlined.Fastfood,
-        "Coffee" to Icons.Outlined.Coffee,
-        "Sandwich" to Icons.Outlined.Fastfood)
+    var itemEmojis = mapOf(
+        "Popcorn" to "\uD83C\uDF7F",
+        "Soda" to "\uD83E\uDD64",
+        "Coffee" to "☕",
+        "Sandwich" to "\uD83C\uDF54"
+    )
 
     /**
      * Prints an order

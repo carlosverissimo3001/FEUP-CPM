@@ -3,7 +3,6 @@ package org.feup.carlosverissimo3001.theaterpal.screens.fragments.cafeteria.bar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -15,10 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
-import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.itemIcons
+import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.itemEmojis
 import org.feup.carlosverissimo3001.theaterpal.models.order.CafeteriaItem
 
 @Composable
@@ -47,13 +47,15 @@ fun CafeteriaItem(
                 .fillMaxWidth()
                 .padding(10.dp),
         ) {
-            Icon(
-                imageVector = itemIcons[item.name]!!,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(30.dp)
-                    .padding(end = 8.dp)
+            Text(
+                text = itemEmojis[item.name]!!,
+                style = TextStyle(
+                    fontFamily = marcherFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.size(30.dp).padding(end = 8.dp)
             )
 
             // Name and Description
