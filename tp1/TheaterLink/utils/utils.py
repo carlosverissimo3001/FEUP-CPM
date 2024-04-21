@@ -62,3 +62,37 @@ def decode_public_key(base64_public_key: str) -> rsa.RSAPublicKey:
 
     return public_key
 
+def verify_signature(signature_str: str, public_key_str: str, message: str) -> bool :
+    '''
+    Verify a signature against a message and a public key
+
+        Parameters:
+            signature_str (str): signature to verify (in base64 format)
+            public_key_str (str): public key to use for verification (in base64 format)
+            message (str): message to verify
+
+        Returns:
+            bool: True if the signature is valid, False otherwise
+    '''
+
+    # Create a RSAPublicKey object from the public key string
+    public_key = decode_public_key(public_key_str)
+
+    # Convert the signature string to bytes
+    signature = base64.b64decode(signature_str)
+
+    # Convert the message to bytes
+    # First convert to base64string
+    message_bytes = message.encode('utf-8')
+
+    try:
+        public_key.verify(
+            signature,
+            message_bytes,
+            padding.PKCS1v15(),
+            hashes.SHA256()
+        )
+        return True
+    except:
+        print('Error verifying signature')
+        return False
