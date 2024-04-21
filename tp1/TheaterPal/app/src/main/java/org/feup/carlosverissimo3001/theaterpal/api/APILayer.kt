@@ -149,6 +149,39 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
 
 /**** GET REQUESTS ****/
 
+
+/**
+ * Check if a user is registered
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ */
+fun isUserRegistered(userId: String, callback: (Boolean) -> Unit){
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/get_user?user_id=$userId")
+        .get()
+        .build()
+
+    val client = OkHttpClient()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(false)
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    callback(true)
+                }
+                else -> {
+                    callback(false)
+                }
+            }
+        }
+    })
+}
+
 /**
  * Function to fetch the user's tickets
  * @param userId id of the user
