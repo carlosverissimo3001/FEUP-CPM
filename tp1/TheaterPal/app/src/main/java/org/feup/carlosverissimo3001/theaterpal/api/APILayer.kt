@@ -430,3 +430,36 @@ fun getUserTransactions(userId: String, callback: (JSONObject) -> Unit) {
 /**** GET REQUESTS ****/
 
 
+/**** PING REQUESTS ****/
+/**
+ * Checks if the server is up
+ * @param callback callback function to handle the response
+ */
+fun pingServer(callback: (Boolean) -> Unit){
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/ping")
+        .get()
+        .build()
+
+    val client = OkHttpClient()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(false)
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    callback(true)
+                }
+                else -> {
+                    callback(false)
+                }
+            }
+        }
+    })
+}
+
+
