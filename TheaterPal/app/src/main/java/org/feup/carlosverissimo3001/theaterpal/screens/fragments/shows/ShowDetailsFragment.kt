@@ -4,18 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.Toast
+import androidx.biometric.BiometricManager.Authenticators.*
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -45,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
@@ -55,12 +49,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.feup.carlosverissimo3001.theaterpal.MyColors
 import org.feup.carlosverissimo3001.theaterpal.api.purchaseTickets
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
 import org.feup.carlosverissimo3001.theaterpal.models.show.Show
 import org.feup.carlosverissimo3001.theaterpal.models.show.ShowDate
+import java.util.concurrent.Executor
 
 @Composable
 fun ShowDetails(ctx: Context, navController: NavController) {
@@ -71,9 +72,58 @@ fun ShowDetails(ctx: Context, navController: NavController) {
 
 }
 
+// Function to handle biometric authentication asynchronously
+fun authenticateWithBiometric(
+	biometricPrompt: BiometricPrompt,
+	promptInfo: BiometricPrompt.PromptInfo,
+	onAuthenticated: () -> Unit
+) {
+	biometricPrompt.authenticate(promptInfo)
+}
+
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: NavController) {
+	lateinit var biometricPrompt: BiometricPrompt
+
+	// Get the activity from the context (used to create the BiometricPrompt)
+	val activity = ctx as? FragmentActivity
+
+	val executor: Executor = ContextCompat.getMainExecutor(ctx)
+	val promptInfo: BiometricPrompt.PromptInfo = BiometricPrompt.PromptInfo.Builder()
+		.setTitle("Please confirm your identity to buy tickets")
+		.setSubtitle("Log in using your biometric credential")
+		.setAllowedAuthenticators(BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
+		/*.setNegativeButtonText("Use account password")*/
+		.build()
+
+	var authenticated by remember { mutableStateOf(false) }
+	var purchaseSuccess by remember { mutableStateOf(false) }
+
+	activity?.let {
+		biometricPrompt = BiometricPrompt(it, executor,
+			object : BiometricPrompt.AuthenticationCallback() {
+				override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+					super.onAuthenticationError(errorCode, errString)
+					Toast.makeText(ctx, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
+				}
+
+				override fun onAuthenticationSucceeded(
+					result: BiometricPrompt.AuthenticationResult) {
+					super.onAuthenticationSucceeded(result)
+					/*Toast.makeText(ctx, "Authentication succeeded!", Toast.LENGTH_SHORT).show()*/
+					authenticated = true
+				}
+
+				override fun onAuthenticationFailed() {
+					super.onAuthenticationFailed()
+					Toast.makeText(ctx, "Authentication failed", Toast.LENGTH_SHORT).show()
+				}
+			}
+		)
+	}
+
 	var showdateid by remember { mutableIntStateOf(-1) }
 	var quantity by remember { mutableIntStateOf(0) }
 
@@ -82,9 +132,10 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			GoBackButton(navController)
 		}
 	) {
-
 		LazyColumn(
 			horizontalAlignment = Alignment.CenterHorizontally,
+			// set the opacity of the content to 0.9
+			modifier = if (authenticated) Modifier.alpha(0.3f) else Modifier.alpha(1.0f)
 		){
 			item {
 				ShowImage(bitmap, navController)
@@ -107,25 +158,41 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			}
 			item{
 				BuyButton (
+					isPurchasing  = authenticated,
 					isVisible = (showdateid > -1 && quantity > 0),
-
 					onSubmit = {
+						var requestSubmitted = false
 						var success = false
-						var submitted = false
-						purchaseTickets(ctx, showdateid, quantity, quantity*show.price){
-							success = it
-							submitted = true
-						}
 
-						while (!submitted)
-							Thread.sleep(100)
+						// Launch a coroutine to handle the authentication process
+						CoroutineScope(Dispatchers.Main).launch {
+							// Authenticate using biometricPrompt asynchronously
+							authenticateWithBiometric(biometricPrompt, promptInfo) {
+								authenticated = true
+							}
 
-						if (!success){
-							Toast.makeText(ctx, "Error buying tickets", Toast.LENGTH_LONG).show()
-						}
-						else{
-							Toast.makeText(ctx, "Tickets bought successfully", Toast.LENGTH_LONG).show()
-							navController.popBackStack()
+							// Wait for authentication to complete
+							while (!authenticated) {
+								delay(100)
+							}
+
+							// Purchase tickets asynchronously
+							purchaseTickets(ctx, showdateid, quantity, quantity * show.price) {
+								success = it
+								requestSubmitted = true
+							}
+
+							// Wait for the purchase request to complete
+							while (!requestSubmitted) {
+								delay(100)
+							}
+
+							if (!success) {
+								Toast.makeText(ctx, "Error buying tickets", Toast.LENGTH_LONG).show()
+							} else {
+								Toast.makeText(ctx, "Tickets bought successfully", Toast.LENGTH_LONG).show()
+								navController.popBackStack()
+							}
 						}
 					}
 				)
@@ -137,6 +204,9 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 				)
 			}
 		}
+
+		if(authenticated)
+			LoadingSpinner()
 	}
 
 }
@@ -360,12 +430,14 @@ fun ShowDatesDropdown(
 
 @Composable
 fun BuyButton(
+	isPurchasing: Boolean,
 	isVisible: Boolean,
 	onSubmit: () -> Unit)
 {
 	if (!isVisible)
 		return
 	Button(
+		enabled = !isPurchasing,
 		colors = ButtonDefaults.buttonColors(
 			containerColor = MaterialTheme.colorScheme.primaryContainer,
 			contentColor = MaterialTheme.colorScheme.onPrimaryContainer
