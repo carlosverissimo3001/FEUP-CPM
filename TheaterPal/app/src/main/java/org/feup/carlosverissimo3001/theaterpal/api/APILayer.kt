@@ -84,7 +84,7 @@ fun registerUser(ctx: Context, user: User, callback: (Boolean, String) -> Unit){
  * @param numTickets number of tickets to purchase
  * @param totalCost total cost of the tickets
  */
-fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: Int){
+fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: Int, callback: (Boolean) -> Unit){
     val client = OkHttpClient()
 
     val jsonOrder = JSONObject()
@@ -143,9 +143,12 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
                                 Log.d("API Layer", "Vouchers saved to cache")
                         }
                     }
+
+                    callback(true)
                 }
                 else -> {
-                    print("Error purchasing tickets")
+                    Log.e("API Layer", "Failed to purchase tickets")
+                    callback(false)
                 }
             }
         }
