@@ -1,13 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, Blueprint
+import base64, psycopg2, random, json
+from flask import request, jsonify, Blueprint
 from db import crud_ops
 from utils import utils
 from routes import transactions
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives import hashes
-import base64, psycopg2, random
 
 VOUCHER_TYPE = ["FIVE_PERCENT", "FREE_COFFEE", "FREE_POPCORN"]
 
@@ -18,19 +14,31 @@ def construct_blueprint(dbConn: psycopg2.extensions.connection):
 
     @ticket_page.route('/purchase_tickets', methods=['POST'])
     def purchase_tickets():
-        data = request.json
+        # Get data from the request
+        jsonData = request.json
 
-        # extract parameters from the data
-        show_date_id = data.get('show_date_id')
-        num_tickets = data.get('num_tickets')
-        total_cost = data.get('total_cost')
-        user_id = data.get('user_id')
-        signature = data.get('signature')
+        # Get the data and signature fields from the request
+        data = jsonData.get('data')
+        signature = jsonData.get('signature')
 
+        # Load the data into a json object
+        data_json = json.loads(data)
+
+        # extract user_id from the data
+        user_id = data_json["user_id"]
         # Get the public key of the user
         public_key = utils.get_public_key(dbConn, user_id)
 
-        # TODO: VERIFY SIGNATURE
+        # Validate the signature against the public key
+        verified = utils.verify_signature(signature, public_key, data)
+
+        if (not verified):
+            return jsonify({'error': 'Invalid signature'}), 403
+
+        # Extract the rest of the parameters from the data
+        show_date_id = data_json["show_date_id"]
+        num_tickets = data_json["num_tickets"]
+        total_cost = data_json["total_cost"]
 
         # need to add a row to the tickets table for each ticket
         # for each ticket purchased, a voucher is also created
