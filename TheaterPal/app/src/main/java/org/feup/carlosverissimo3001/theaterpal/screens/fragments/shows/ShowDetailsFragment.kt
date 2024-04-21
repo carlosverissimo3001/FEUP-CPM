@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -107,12 +108,27 @@ fun ShowDetailsScreen(ctx: Context, show: Show, bitmap: Bitmap, navController: N
 			item{
 				BuyButton (
 					isVisible = (showdateid > -1 && quantity > 0),
-				) {
-					purchaseTickets(ctx, showdateid, quantity, quantity*show.price)
-					Toast.makeText(ctx, "Tickets bought successfully", Toast.LENGTH_LONG).show()
 
-					navController.popBackStack()
-				}
+					onSubmit = {
+						var success = false
+						var submitted = false
+						purchaseTickets(ctx, showdateid, quantity, quantity*show.price){
+							success = it
+							submitted = true
+						}
+
+						while (!submitted)
+							Thread.sleep(100)
+
+						if (!success){
+							Toast.makeText(ctx, "Error buying tickets", Toast.LENGTH_LONG).show()
+						}
+						else{
+							Toast.makeText(ctx, "Tickets bought successfully", Toast.LENGTH_LONG).show()
+							navController.popBackStack()
+						}
+					}
+				)
 			}
 			item {
 				Spacer(
@@ -351,7 +367,8 @@ fun BuyButton(
 		return
 	Button(
 		colors = ButtonDefaults.buttonColors(
-			MyColors.tertiaryColor,
+			containerColor = MaterialTheme.colorScheme.primaryContainer,
+			contentColor = MaterialTheme.colorScheme.onPrimaryContainer
 		),
 		modifier = Modifier
 			.padding(16.dp)
