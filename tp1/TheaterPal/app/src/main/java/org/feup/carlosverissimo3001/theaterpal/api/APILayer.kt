@@ -1,7 +1,7 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -11,20 +11,19 @@ import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.appendTicketsToCache
 import org.feup.carlosverissimo3001.theaterpal.file.appendVouchersToCache
 import org.feup.carlosverissimo3001.theaterpal.file.areImagesStoreInCache
-import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
 import org.feup.carlosverissimo3001.theaterpal.file.saveImageToCache
 import org.feup.carlosverissimo3001.theaterpal.models.*
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.userToJson
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseOrderRcv
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseShow
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTicket
-import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseTransaction
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucher
 import org.feup.carlosverissimo3001.theaterpal.models.order.*
 import org.feup.carlosverissimo3001.theaterpal.models.show.*
 import org.feup.carlosverissimo3001.theaterpal.models.transaction.*
-import org.feup.carlosverissimo3001.theaterpal.showNameImageMap
 import org.json.JSONObject
+
+/**** POST REQUESTS ****/
 
 /**
  * Function to register a user
@@ -37,7 +36,16 @@ fun registerUser(user: User, callback: (Boolean, String) -> Unit){
 
     val jsonObject = JSONObject(userToJson(user))
 
-    val requestBody = jsonObject.toString()
+    // Sign the message with the private key
+    val jsonStr = jsonObject.toString()
+    val signature = encrypt(jsonStr)
+
+    // Create JSON object containing data and signature
+    val signedJson = JSONObject()
+    signedJson.put("data", jsonStr)
+    signedJson.put("signature", Base64.encodeToString(signature, Base64.DEFAULT))
+
+    val requestBody = signedJson.toString()
         .toRequestBody("application/json".toMediaTypeOrNull())
 
     val request = okhttp3.Request.Builder()
@@ -62,6 +70,112 @@ fun registerUser(user: User, callback: (Boolean, String) -> Unit){
                 }
                 else -> {
                     callback(false, "")
+                }
+            }
+        }
+    })
+}
+
+/**
+ * Function to make a ticket purchase
+ * @param ctx context of the application
+ * @param showDateId id of the show date
+ * @param numTickets number of tickets to purchase
+ * @param totalCost total cost of the tickets
+ */
+fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: Int){
+    val client = OkHttpClient()
+
+    val jsonOrder = JSONObject()
+    jsonOrder.put("show_date_id", showDateId)
+    jsonOrder.put("num_tickets", numTickets)
+    jsonOrder.put("total_cost", totalCost)
+    jsonOrder.put("user_id", Authentication(ctx).getUserID())
+
+    val requestBody = jsonOrder.toString()
+        .toRequestBody("application/json".toMediaTypeOrNull())
+
+//    val requestBody = encrypt(jsonOrder.toString())
+//        .toRequestBody("application/json".toMediaTypeOrNull())
+
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/purchase_tickets")
+        .post(requestBody)
+        .build()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200, 201 -> {
+                    print("Tickets purchased")
+
+                    val responseBody = response.body?.string()
+                    val jsonResponse = responseBody?.let { JSONObject(it) }
+                    val tickets = jsonResponse?.getJSONArray("tickets")
+
+                    if (tickets != null) {
+                        appendTicketsToCache(tickets, ctx) { success ->
+                            if (!success)
+                                Log.e("API Layer", "Failed to save tickets to cache")
+                            else
+                                Log.d("API Layer", "Tickets saved to cache")
+                        }
+                    }
+
+                    val vouchers = jsonResponse?.getJSONArray("vouchers")
+                    if (vouchers != null){
+                        appendVouchersToCache(vouchers, ctx) { success ->
+                            if (!success)
+                                Log.e("API Layer", "Failed to save vouchers to cache")
+                            else
+                                Log.d("API Layer", "Vouchers saved to cache")
+                        }
+                    }
+                }
+                else -> {
+                    print("Error purchasing tickets")
+                }
+            }
+        }
+    })
+}
+
+/**** POST REQUESTS ****/
+
+
+/**** GET REQUESTS ****/
+
+
+/**
+ * Check if a user is registered
+ * @param userId id of the user
+ * @param callback callback function to handle the response
+ */
+fun isUserRegistered(userId: String, callback: (Boolean) -> Unit){
+    val request = okhttp3.Request.Builder()
+        .url("${Constants.URL}/get_user?user_id=$userId")
+        .get()
+        .build()
+
+    val client = OkHttpClient()
+
+    client.newCall(request).enqueue(object : okhttp3.Callback {
+        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+            e.printStackTrace()
+            callback(false)
+        }
+
+        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+            when (response.code) {
+                200 -> {
+                    callback(true)
+                }
+                else -> {
+                    callback(false)
                 }
             }
         }
@@ -200,7 +314,6 @@ fun getShows(ctx: Context, callback: (List<Show>) -> Unit) {
                     val showsList = mutableListOf<Show>()
                     for (i in 0 until shows.length()) {
                         val show = shows.getJSONObject(i)
-                        val showName = show.getString("name")
 
                         showsList.add(parseShow(show))
                         if (areImagesCached)
@@ -270,74 +383,6 @@ fun getUserOrders(userId: String, callback: (List<OrderRcv>) -> Unit) {
 }
 
 /**
- * Function to make a ticket purchase
- * @param ctx context of the application
- * @param showDateId id of the show date
- * @param numTickets number of tickets to purchase
- * @param totalCost total cost of the tickets
- */
-fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: Int){
-    val client = OkHttpClient()
-
-    val jsonOrder = JSONObject()
-    jsonOrder.put("show_date_id", showDateId)
-    jsonOrder.put("num_tickets", numTickets)
-    jsonOrder.put("total_cost", totalCost)
-    jsonOrder.put("user_id", Authentication(ctx).getUserID())
-
-    val requestBody = jsonOrder.toString()
-        .toRequestBody("application/json".toMediaTypeOrNull())
-
-//    val requestBody = encrypt(jsonOrder.toString())
-//        .toRequestBody("application/json".toMediaTypeOrNull())
-
-    val request = okhttp3.Request.Builder()
-        .url("${Constants.URL}/purchase_tickets")
-        .post(requestBody)
-        .build()
-
-    client.newCall(request).enqueue(object : okhttp3.Callback {
-        override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-            e.printStackTrace()
-        }
-
-        override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-            when (response.code) {
-                200, 201 -> {
-                    print("Tickets purchased")
-
-                    val responseBody = response.body?.string()
-                    val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val tickets = jsonResponse?.getJSONArray("tickets")
-
-                    if (tickets != null) {
-                        appendTicketsToCache(tickets, ctx) { success ->
-                            if (!success)
-                                Log.e("API Layer", "Failed to save tickets to cache")
-                            else
-                                Log.d("API Layer", "Tickets saved to cache")
-                        }
-                    }
-
-                    val vouchers = jsonResponse?.getJSONArray("vouchers")
-                    if (vouchers != null){
-                        appendVouchersToCache(vouchers, ctx) { success ->
-                            if (!success)
-                                Log.e("API Layer", "Failed to save vouchers to cache")
-                            else
-                                Log.d("API Layer", "Vouchers saved to cache")
-                        }
-                    }
-                }
-                else -> {
-                    print("Error purchasing tickets")
-                }
-            }
-        }
-    })
-}
-
-/**
  * Function to fetch the user's transactions
  * @param userId id of the user
  * @param callback callback function to handle the response
@@ -374,9 +419,6 @@ fun getUserTransactions(userId: String, callback: (JSONObject) -> Unit) {
     })
 }
 
-fun fetchShowImage(showname: String, ctx: Context): Bitmap? {
-    val imageName = showNameImageMap[showname]
+/**** GET REQUESTS ****/
 
-    return loadImageFromCache(imageName!!, ctx)
-}
 
