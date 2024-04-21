@@ -27,18 +27,19 @@ import org.json.JSONObject
 
 /**
  * Function to register a user
+ * @param ctx context of the application
  * @param user user object to register
  * @param callback callback function to handle the response
  * @see User
  */
-fun registerUser(user: User, callback: (Boolean, String) -> Unit){
+fun registerUser(ctx: Context, user: User, callback: (Boolean, String) -> Unit){
     val client = OkHttpClient()
 
     val jsonObject = JSONObject(userToJson(user))
 
     // Sign the message with the private key
     val jsonStr = jsonObject.toString()
-    val signature = encrypt(jsonStr)
+    val signature = Authentication(ctx).sign(jsonStr)
 
     // Create JSON object containing data and signature
     val signedJson = JSONObject()
@@ -95,7 +96,7 @@ fun purchaseTickets(ctx: Context, showDateId: Int, numTickets: Int, totalCost: I
     val jsonStr = jsonOrder.toString()
 
     // Signature bytes
-    val signature = encrypt(jsonStr)
+    val signature = Authentication(ctx).sign(jsonStr)
 
     // Create JSON object containing data and signature
     val signedJson = JSONObject()
