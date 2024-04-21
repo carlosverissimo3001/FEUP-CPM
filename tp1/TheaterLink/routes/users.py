@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Blueprint
 from db import crud_ops
-import uuid
+from utils import utils
+import uuid, json
 
 def construct_blueprint(dbConn):
     user_page = Blueprint('user_page', __name__)
@@ -14,17 +15,22 @@ def construct_blueprint(dbConn):
     @user_page.route('/register', methods=['POST'])
     def register_user():
         # Get data from the request
-        data = request.json
+        jsonData = request.json
+
+        data = jsonData.get('data')
+        data_json = json.loads(data)
+        signature = jsonData.get('signature')
+        public_key = data_json['public_key']
+
+        # Validate the signature against the public key
+        """ verified = utils.decrypt_body(signature, public_key, data) """
+
 
         # extract parameters from the data
         # NIF is used for unique identification
-        nif = data.get('nif')
-
-        name = data.get('name')
-        public_key = data.get('public_key')     #
-        card = data.get('card')                 # assum card is a dictionary with the following keys: number, expiration_date, cvv
-
-        # TODO: Decide if validation is going to be done by the server or in the client
+        nif  = data_json.get('nif')
+        name = data_json.get('name')
+        card = data_json.get('card')
 
         # Add the user to the database
         row = crud_ops.add_user(dbConn, name, nif, card, public_key)

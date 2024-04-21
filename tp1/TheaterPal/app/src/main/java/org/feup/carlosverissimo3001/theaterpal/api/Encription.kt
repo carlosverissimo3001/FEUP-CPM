@@ -1,7 +1,10 @@
 package org.feup.carlosverissimo3001.theaterpal.api
 
+import android.util.Log
 import org.feup.carlosverissimo3001.theaterpal.Constants
+import org.feup.carlosverissimo3001.theaterpal.nfc.logTag
 import java.security.KeyStore
+import java.security.Signature
 import javax.crypto.Cipher
 
 fun encrypt(content: String) : ByteArray {
@@ -9,20 +12,25 @@ fun encrypt(content: String) : ByteArray {
 
 	if (content.isEmpty())
 		return (ByteArray(0))
-
-	val privateKey = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
-		load(null)
-		getKey(Constants.KEY_NAME, null)
-	}
-
+	
 	try {
-		result = Cipher.getInstance(Constants.KEY_ALGO).run {
-			init(Cipher.ENCRYPT_MODE, privateKey)
-			doFinal(content.toByteArray())
+		val entry = KeyStore.getInstance(Constants.ANDROID_KEYSTORE).run {
+			load(null)
+			getEntry(Constants.KEY_NAME, null)
 		}
+		val privateKey = (entry as KeyStore.PrivateKeyEntry).privateKey
+		val signature = Signature.getInstance(Constants.SIGN_ALGO).apply {
+			initSign(privateKey)
+			update(content.toByteArray())
+			// sign(....)
+		}
+		val signedBytes = signature.sign()
+		Log.d(logTag, "Signature size = $signedBytes bytes.")
+		result = signedBytes
+		
+	} catch (ex: Exception) {
+		Log.d(logTag, ex.toString())
 	}
-	catch (e: Exception) {
-		e.printStackTrace()
-	}
-	return (result)
+
+	return result
 }

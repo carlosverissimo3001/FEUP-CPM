@@ -1,6 +1,8 @@
 package org.feup.carlosverissimo3001.theaterpal
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Parcelable
 import androidx.annotation.RequiresApi
@@ -14,6 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import org.feup.carlosverissimo3001.theaterpal.file.loadImageFromCache
+import java.security.PrivateKey
+import java.security.Signature
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -153,6 +158,20 @@ fun ParseOrderState(state: String) {
 fun toTitleCase(input: String): String {
     return input.replaceFirstChar { it.titlecase() }
 }
+
+
+/**
+ * Returns the bitmap representation of the show image
+ * @param showname name of the show
+ * @param ctx context of the application
+ * @return bitmap representation of the show image
+ */
+fun fetchShowImage(showname: String, ctx: Context): Bitmap? {
+    val imageName = showNameImageMap[showname]
+
+    return loadImageFromCache(imageName!!, ctx)
+}
+
 
 /**
  * Format a price into a string with 2 decimal places and the currency symbol
