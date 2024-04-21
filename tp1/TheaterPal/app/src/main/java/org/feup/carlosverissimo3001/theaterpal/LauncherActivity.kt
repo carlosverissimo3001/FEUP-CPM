@@ -2,12 +2,14 @@ package org.feup.carlosverissimo3001.theaterpal
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import okhttp3.OkHttpClient
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.api.isUserRegistered
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
+import org.feup.carlosverissimo3001.theaterpal.file.deleteCache
 import org.json.JSONObject
 
 class LauncherActivity : AppCompatActivity() {
@@ -43,7 +45,6 @@ class LauncherActivity : AppCompatActivity() {
         var intent = Intent(this, RegisterActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-
         if (rsaPairExists && serverACK) {
             // already authenticated, instead of RegisterActivity, start MainActivity
             intent = Intent(this, MainActivity::class.java)
@@ -57,6 +58,22 @@ class LauncherActivity : AppCompatActivity() {
 
         // Not authenticated, start RegisterActivity
         else {
+            // clear cache
+            // Why? Because if the server deletes the user, the app will still have the user's data (tickets, etc)
+            // And, even with a new user id, the app will still have the old user's data
+            var isCacheDeleted = false
+            deleteCache(applicationContext){
+                if (!it){
+                    Log.e("LauncherActivity", "Failed to delete cache")
+                }
+                else {
+                    isCacheDeleted = true
+                }
+            }
+            
+            while (!isCacheDeleted)
+                Thread.sleep(100)
+
             // Start the RegisterActivity
             startActivity(intent)
 
