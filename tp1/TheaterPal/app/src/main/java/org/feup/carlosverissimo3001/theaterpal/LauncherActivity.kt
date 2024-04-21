@@ -4,13 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.OkHttpClient
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.api.isUserRegistered
+import org.feup.carlosverissimo3001.theaterpal.api.pingServer
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.deleteCache
-import org.json.JSONObject
 
 class LauncherActivity : AppCompatActivity() {
     // This activity is just a launcher activity
@@ -20,6 +17,20 @@ class LauncherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Ping the server to check if it is up
+        var serverPinged = false
+        pingServer {
+            // Server is down
+            if (!it){
+                startActivity(Intent(this, ServerDown::class.java))
+            }
+
+            serverPinged = true
+        }
+
+        while (!serverPinged)
+            Thread.sleep(100)
 
         // Check if the user has authenticated before
         val rsaPairExists = Authentication(this).doesRSAKeyPairExist()
