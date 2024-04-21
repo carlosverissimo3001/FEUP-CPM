@@ -19,11 +19,15 @@ def construct_blueprint(dbConn):
 
         data = jsonData.get('data')
         data_json = json.loads(data)
+
         signature = jsonData.get('signature')
         public_key = data_json['public_key']
 
         # Validate the signature against the public key
-        """ verified = utils.decrypt_body(signature, public_key, data) """
+        verified = utils.verify_signature(signature, public_key, data)
+
+        if (not verified):
+            return jsonify({'error': 'Invalid signature'}), 403
 
 
         # extract parameters from the data
