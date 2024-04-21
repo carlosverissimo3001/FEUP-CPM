@@ -1,4 +1,6 @@
-# TheaterPal
+# TheaterConnect
+
+A music and event theater wants to provide to its customers an integrated system for easy acquisition and validation of tickets and cafeteria vouchers to be used on premises.
 
 ## Folder Structure
 
