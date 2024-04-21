@@ -77,7 +77,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ServerDown"
+        <activity android:name=".ServerDownActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="org.feup.carlosverissimo3001.theaterpal.SERVER_DOWN" />
