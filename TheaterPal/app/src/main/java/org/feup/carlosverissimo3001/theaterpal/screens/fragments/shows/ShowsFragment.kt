@@ -175,11 +175,12 @@ fun ShowCard(show: Show, bitmap: Bitmap?, navController: NavController)  {
 
 
 @Composable
-fun LoadingSpinner() {
+fun LoadingSpinner(size: Int = 50) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(
             color = Color.White,
-            strokeWidth = 2.dp
+            strokeWidth = 2.dp,
+            modifier = Modifier.size(size.dp)
         )
     }
 }
