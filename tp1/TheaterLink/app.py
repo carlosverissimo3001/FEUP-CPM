@@ -21,6 +21,9 @@ app.register_blueprint(cafeteria.construct_blueprint(dbConn))
 def index():
     return 'Welcome to the Ticketing Server!'
 
+@app.route('/ping')
+def ping():
+    return 'pong', 200
 
 if __name__ == '__main__':
     app.run(debug=True)

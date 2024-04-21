@@ -4,13 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.OkHttpClient
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.feup.carlosverissimo3001.theaterpal.api.isUserRegistered
+import org.feup.carlosverissimo3001.theaterpal.api.pingServer
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
 import org.feup.carlosverissimo3001.theaterpal.file.deleteCache
-import org.json.JSONObject
 
 class LauncherActivity : AppCompatActivity() {
     // This activity is just a launcher activity
@@ -20,65 +17,85 @@ class LauncherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val context = this
 
-        // Check if the user has authenticated before
-        val rsaPairExists = Authentication(this).doesRSAKeyPairExist()
+        // Ping the server to check if it is up
+        var serverPinged = false
 
-        // If the userid exists in the phone, check if it exists on the server
-        var serverACK = false
-        var serverVerified = false
+        // Launch the ping request asynchronously
+        pingServer { isUp ->
+            // Update the UI on the main thread
+            runOnUiThread {
+                // Server is down
+                if (!isUp) {
+                    // Start the ServerDown activity
+                    val intent = Intent(context, ServerDownActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                } else {
+                    // Server is up
 
-        // Read the userid from the local storage
-        val userId = Authentication(this).getUserID()
+                    // Check if the user has authenticated before
+                    val rsaPairExists = Authentication(this).doesRSAKeyPairExist()
 
-        // Use the userId to check if the user is registered on the server
-        if (userId != "")
-            isUserRegistered(userId) {
-                serverACK = it
-                serverVerified = true
-            }
+                    // If the userid exists in the phone, check if it exists on the server
+                    var serverACK = false
+                    var serverVerified = false
 
-        while (!serverVerified)
-            Thread.sleep(100)
+                    // Read the userid from the local storage
+                    val userId = Authentication(this).getUserID()
 
-        // next activity
-        var intent = Intent(this, RegisterActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    // Use the userId to check if the user is registered on the server
+                    if (userId != "")
+                        isUserRegistered(userId) {
+                            serverACK = it
+                            serverVerified = true
+                        }
 
-        if (rsaPairExists && serverACK) {
-            // already authenticated, instead of RegisterActivity, start MainActivity
-            intent = Intent(this, MainActivity::class.java)
+                    while (!serverVerified)
+                        Thread.sleep(100)
 
-            // start the MainActivity
-            startActivity(intent)
+                    // next activity
+                    var intent = Intent(this, RegisterActivity::class.java)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
-            // finish the current activity
-            finish()
-        }
+                    if (rsaPairExists && serverACK) {
+                        // already authenticated, instead of RegisterActivity, start MainActivity
+                        intent = Intent(this, MainActivity::class.java)
 
-        // Not authenticated, start RegisterActivity
-        else {
-            // clear cache
-            // Why? Because if the server deletes the user, the app will still have the user's data (tickets, etc)
-            // And, even with a new user id, the app will still have the old user's data
-            var isCacheDeleted = false
-            deleteCache(applicationContext){
-                if (!it){
-                    Log.e("LauncherActivity", "Failed to delete cache")
+                        // start the MainActivity
+                        startActivity(intent)
+
+                        // finish the current activity
+                        finish()
+                    }
+
+                    // Not authenticated, start RegisterActivity
+                    else {
+                        // clear cache
+                        // Why? Because if the server deletes the user, the app will still have the user's data (tickets, etc)
+                        // And, even with a new user id, the app will still have the old user's data
+                        var isCacheDeleted = false
+                        deleteCache(applicationContext){
+                            if (!it){
+                                Log.e("LauncherActivity", "Failed to delete cache")
+                            }
+                            else {
+                                isCacheDeleted = true
+                            }
+                        }
+
+                        while (!isCacheDeleted)
+                            Thread.sleep(100)
+
+                        // Start the RegisterActivity
+                        startActivity(intent)
+
+                        // finish the current activity
+                        finish()
+                    }
                 }
-                else {
-                    isCacheDeleted = true
-                }
             }
-            
-            while (!isCacheDeleted)
-                Thread.sleep(100)
-
-            // Start the RegisterActivity
-            startActivity(intent)
-
-            // finish the current activity
-            finish()
         }
     }
 }
