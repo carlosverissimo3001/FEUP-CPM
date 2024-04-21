@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Fastfood
 import androidx.compose.material.icons.outlined.TheaterComedy
 import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
@@ -127,8 +128,8 @@ fun BottomNavigationBar(navController: NavHostController) {
                     },
                     colors = NavigationBarItemColors(
                         selectedIconColor = Color.White,
-                        selectedTextColor = MyColors.tertiaryColor,
-                        selectedIndicatorColor = MyColors.tertiaryColor,
+                        selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        selectedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
                         unselectedIconColor = MyColors.bottomNavBarUnselectedItemColor,
                         unselectedTextColor = MyColors.bottomNavBarUnselectedItemColor,
                         disabledIconColor = Color.Black,
