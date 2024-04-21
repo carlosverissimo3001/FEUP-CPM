@@ -167,23 +167,66 @@ fun OrderConfirmationScreen(
                 textAlign = TextAlign.Center
             )
 
-            Text(
-                text = "Thank you for your purchase!",
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                    fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.Bold
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 20.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = user.name,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+                Text(
+                    text = ", thank you for your purchase!",
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontFamily = poppinsFontFamily,
+                    ),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(top = 2.dp)
+            ) {
+                Text(
+                    text = "Your NIF is: ",
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontFamily = poppinsFontFamily,
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = user.nif,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        fontFamily = poppinsFontFamily,
+                    ),
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(bottom = 25.dp, start = 20.dp, end = 20.dp).align(Alignment.BottomCenter)
+            modifier = Modifier
+                .padding(bottom = 25.dp, start = 20.dp, end = 20.dp)
+                .align(Alignment.BottomCenter)
         ){
             Text(
                 text = "Returning to the main screen in ",
@@ -263,7 +306,9 @@ fun OrderDetails(products: List<Product>) {
                     imageVector = itemIcons[it.name]!!,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.padding(end = 10.dp).size(25.dp)
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .size(25.dp)
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
