@@ -20,9 +20,17 @@ The systems is comprised by 4 main components:
 
 ### TheaterLink
 
-<!-- TODO: Describe the backend service -->
-
 - To unclutter the main application, [app.py](../TheaterLink/app.py), endpoints were separated into different files. Each file is responsible for a different set of endpoints.
+
+All state changing requests are signed by the user's private key. The signature is then verified either by the server or by the other apps. This is done to ensure the integrity of the data and to prevent unauthorized access.
+
+For example, the request `purchase_tickets` (POST), is signed by the user's private key. The server then verifies the signature using the user's public key. If the signature is valid, the request is processed. If not, the request is rejected, and an error is returned.
+
+> This is the only POST request in which the main app directly interacts with the server and not with the other apps. All other POST requests have either the TheaterValid8 or TheaterBite apps as the intermediary.
+
+The requests `submit_order` and `validate_tickets` are handled by the TheaterBite and TheaterValid8 apps, respectively. The signature is verified by these apps, after the user taps their phone on the terminal.
+
+> The data sent over NFC is signed by the user's private key.
 
 #### User Endpoints
 
@@ -33,10 +41,16 @@ The systems is comprised by 4 main components:
   - `GET /get_user` - Get user information given an ID
   - `GET /users` - Get all users (unused//debugging purposes)
 
+#### Show Endpoints
+
 [shows.py](../TheaterLink/routes/shows.py) contains the endpoints for show management. It allows the retrieval of all shows that were previously added to the database (during creation).
+
+#### Ticket Endpoints
 
 - API endpoints:
   - `GET /shows` - Get all shows
+    - The argument `images` can be passed to the query string to include the base64 encoded image of the show in the response. This is useful for displaying the image in the frontend.
+    - The frontend only asks for the shows once, and then caches them.
 
 [tickets.py](../TheaterLink/routes/tickets.py) contains the endpoints for ticket management. It allows the creation of new tickets, retrieval of all tickets, and ticket validation.
 
@@ -46,9 +60,12 @@ The systems is comprised by 4 main components:
 
       ```json
       {
-        "show_date_id": "int",
-        "user_id": "string",
-        "num_tickets": "int",
+        "data:" {
+          "show_date_id": "int",
+          "user_id": "string",
+          "num_tickets": "int",
+        },
+        "signature": "string"
       }
       ```
 
@@ -84,20 +101,37 @@ The systems is comprised by 4 main components:
       ```
 
     - Voucher type are either "free popcorn" or "free coffee", chosen randomly. A 5% voucher discount is also generated if the total price of the tickets is greater than 200.
-
   - `GET /tickets` - Get all tickets
   - `POST /validate_ticket` - Validate a ticket
+    - This endpoint is called by the TheaterValid8 app to validate a ticket.
+    - Request body:
+
+      ```json
+      {
+        "ticketids": ["string"],
+        "userid": "string"
+      }
+      ```
+
+    -
   - `POST /set_ticket_as_used` - Set a ticket as used
+    - Receives a ticket ID and sets it as used. This is used when a ticket is validated by the TheaterValid8 app.
+
+#### Voucher Endpoints
 
 [vouchers.py](../TheaterLink/routes/vouchers.py) contains the endpoints for voucher management.
 
 - API endpoints:
   - `GET /vouchers` - Get all vouchers for a user
 
+#### Transaction Endpoints
+
 [transactions.py](../TheaterLink/routes/transactions.py) contains the endpoints for transaction management. It allows the retrieval of all transactions and other transaction-related operations.
 
+As per the specifications, when the user consults all transctions, the server should also return the vouchers and tickets that are still not used by the user. This allows the customer to recover some voucher transmitted by mistake in a previous order, or not yet transmitted, and get rid of used ones, if they are still there.
+
 - API endpoints:
-  - `GET /transactions` - Get all transactions
+  - `GET /transactions` - Get all transactions for a given user
     - The response will contain the transactions in the following format:
 
       ```json
@@ -105,17 +139,11 @@ The systems is comprised by 4 main components:
         "transactions": [
           {
             "timestamp": "timestamp",
-            "transactionid": "string",
-            "transactiontype": "string",
+            "transaction_id": "string",
+            "transaction_type": "string",
             "total": "double",
-            "vouchers_generated": [
-                {
-                    "voucherid": "string",
-                    "vouchertype": "string",
-                    "userid": "string",
-                    "isuused": "bool"
-                }
-            ],
+            "vouchers_used" : ["Voucher"],
+            "vouchers_generated": ["Voucher"],
             "items" : [
                 // IF TYPE IS TICKET PURCHASE
                 {
@@ -126,17 +154,61 @@ The systems is comprised by 4 main components:
                 },
                 // IF TYPE IS FOOD PURCHASE
                 {
-                    "foodname": "string",
+                    "itemname": "string",
                     "price": "double",
+                    "quantity": "int",
                 }
-                {}
             ]
-            ]
+          }
+        ],
+        "tickets": [
+          {
+            "ticketid": "string",
+            "userid": "string",
+            "date": "string",
+            "price": "int",
+            "seat": "string",
+            "showname": "string"
+          }
+        ],
+        "vouchers": [
+          {
+            "voucherid": "string",
+            "vouchertype": "string",
+            "userid": "string",
+            "isUsed": "bool"
           }
         ]
       }
       ```
 
+#### Cafeteria Endpoints
+
+[cafeteria.py](../TheaterLink/routes/cafeteria.py) contains the endpoints for cafeteria management. It allows the creation of new orders, retrieval of all orders, and other.
+
+- API endpoints:
+  - `POST submit_order`
+    - Endpoint used by the TheaterBite app to submit an order when the user taps their phone on the terminal (NFC).
+    - Request body:
+
+      ```json
+      {
+        "vouchers_used": ["string"],
+        "user_id": "string",
+        "order": {
+          "items": [
+            {
+              "itemname": "string",
+              "price": "double",
+              "quantity": "int"
+            }
+          ]
+        }
+        "total": "double",
+      }
+      ```
+
+  - `GET /orders` - Get all orders
 
 ### TheaterPal
 
@@ -287,6 +359,49 @@ Contains the information of the items that were purcased in an order.
 | `Quantity` | INT | The quantity of the item | |
 
 ## Features
+
+### Register
+
+The first time a customer uses the system, they must register. This is done by providing their name, NIF, and credit card information. The credit card information is used to make the payments for the tickets and cafeteria orders.
+
+The image below shows the registration screen:
+
+<p align="center">
+  <img src="../images/TheaterPal/register_activity.png" alt="Register Activity" width="300">
+</p>
+
+After the user registers, an RSA key pair is generated. The public key is sent to the server and stored in the database. The private key is stored in the user's device.
+
+This step is only done once, and the user can then use the system without having to register again.
+
+### Consult Shows
+
+The customer, after registering, is presented with a list of shows that are available for purchase. The shows are retrieved from the server and displayed in the app.
+
+The image below shows the list of shows:
+
+<p align="center">
+  <img src="../images/TheaterPaL/shows_fragment.png" alt="Shows Fragment" width="300">
+</p>
+
+
+### Purchase Tickets
+
+By clicking on a show card, the user is presented with more information about the show, such as the description, price, and duration:
+
+<p align="center">
+  <img src="../images/TheaterPal/show_details_activity.png" alt="Show Details Activity" width="300">
+</p>
+
+From here, the user can select from a list of available dates and purchase tickets for the show (maximum of 4 tickets per purchase).
+
+### Biometric Authentication
+
+Before submitting the order, the user must authenticate using biometrics. This is done to ensure that the user is the one making the purchase.
+
+> Note: As some phones don't provide either a fingerprint sensor or facial recognition, we also provide the option to authenticate using a PIN or pattern.
+
+The authentication screen is shown below:
 
 ## Navigation Map
 
