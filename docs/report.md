@@ -162,6 +162,8 @@ The database diagram is as follows:
   <img src="../images/db-diagram.png" alt="Database Diagram" width="800">
 </p>
 
+For a more in-depth view of the database schema, visit [this link](https://drawsql.app/teams/carlos-verissimos-team/diagrams/theaterdb)
+
 It is composed by 9 tables:
 
 ### Users
