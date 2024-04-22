@@ -92,14 +92,14 @@ fun Wallet(ctx: Context, navController: NavController) {
             // filter out used tickets
             filteredTickets = tickets.filter { !it.isUsed }
 
-            if (ticketsState.isNotEmpty()) {
+            /*if (ticketsState.isNotEmpty()) {*/
                 // Save to cache
                 saveTicketsToCache(tickets, context) { isSuccess ->
                     if (!isSuccess) {
                         Log.e("Wallet", "Failed to save tickets to cache")
                     }
                 }
-            }
+            /*}*/
         }
     }
 
