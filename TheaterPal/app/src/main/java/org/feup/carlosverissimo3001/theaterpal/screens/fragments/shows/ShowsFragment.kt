@@ -70,6 +70,14 @@ fun Shows(ctx: Context, navController: NavController) {
         }
 
         getShows(ctx) { shows ->
+            if (shows.isEmpty()){
+                // avoid an infinite loading spinner
+                showsState.value = emptyList()
+
+                Log.e("ShowsFragment", "Failed to get shows from server")
+                return@getShows
+            }
+
             showsState.value = shows
 
             // Save shows to cache

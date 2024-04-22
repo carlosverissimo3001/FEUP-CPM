@@ -3,6 +3,7 @@ package org.feup.carlosverissimo3001.theaterpal.api
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import kotlinx.parcelize.Parcelize
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -433,12 +434,18 @@ fun getUserTransactions(userId: String, callback: (JSONObject) -> Unit) {
 /**** GET REQUESTS ****/
 
 
+enum class PingResponse {
+    NO_INTERNET,
+    SERVER_DOWN,
+    PONG
+}
+
 /**** PING REQUESTS ****/
 /**
  * Checks if the server is up
  * @param callback callback function to handle the response
  */
-fun pingServer(callback: (Boolean) -> Unit){
+fun pingServer(callback: (PingResponse) -> Unit){
     val request = okhttp3.Request.Builder()
         .url("${Constants.URL}/ping")
         .get()
@@ -449,16 +456,16 @@ fun pingServer(callback: (Boolean) -> Unit){
     client.newCall(request).enqueue(object : okhttp3.Callback {
         override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
             e.printStackTrace()
-            callback(false)
+            callback(PingResponse.NO_INTERNET)
         }
 
         override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
             when (response.code) {
                 200 -> {
-                    callback(true)
+                    callback(PingResponse.PONG)
                 }
                 else -> {
-                    callback(false)
+                    callback(PingResponse.SERVER_DOWN)
                 }
             }
         }

@@ -1,13 +1,24 @@
 package org.feup.carlosverissimo3001.theaterpal
 
 import android.content.Intent
-import androidx.compose.ui.graphics.Color
 import android.graphics.Color.parseColor
 import android.os.Bundle
+import android.os.Handler
+import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -20,13 +31,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 class ServerDownActivity : AppCompatActivity() {
+    private lateinit var reason : String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        reason = intent.getStringExtra("reason")!!
 
         setContent {
             BottomBarTheme {
@@ -35,6 +51,7 @@ class ServerDownActivity : AppCompatActivity() {
                         onTryAgainClick = {
                             val intent = Intent(this, LauncherActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            intent.putExtra("skipPing", true)
                             startActivity(intent)
                         }
                     )
@@ -52,10 +69,14 @@ class ServerDownActivity : AppCompatActivity() {
             contentAlignment = Alignment.TopCenter
         ){
             Column(
-                modifier = Modifier.align(Alignment.Center).fillMaxWidth(0.9f).background(
-                    color = Color(parseColor("#36363e")),
-                    shape = RoundedCornerShape(16.dp)
-                ).padding(16.dp),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth(0.9f)
+                    .background(
+                        color = Color(parseColor("#36363e")),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -80,15 +101,30 @@ class ServerDownActivity : AppCompatActivity() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "The server is currently down.",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                        color = Color.White,
-                        fontFamily = marcherFontFamily
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Text(
+                        text = "Reason: ",
+                        style = TextStyle(
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                            color = Color.White,
+                            fontFamily = marcherFontFamily
+                        )
                     )
-                )
+                    Text(
+                        text = reason,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                            color = Color.White,
+                            fontFamily = marcherFontFamily
+                        )
+                    )
+                }
+
+
 
                 Button(
                     onClick = onTryAgainClick,
@@ -99,7 +135,7 @@ class ServerDownActivity : AppCompatActivity() {
                     )
                 ) {
                     Text(
-                        text = "Try Again",
+                        text = "Proceed anyway",
                         style = TextStyle(
                             fontWeight = FontWeight.Bold,
                             fontSize = MaterialTheme.typography.bodyLarge.fontSize,

@@ -65,6 +65,11 @@ fun TransactionsFragment(
 
     LaunchedEffect(Unit) {
         getUserTransactions(Authentication(ctx).getUserID()) { data ->
+            if (data.length() == 0) {
+                areTransactionsLoaded = true
+                return@getUserTransactions
+            }
+
             val transactionsArr = data.getJSONArray("transactions")
             val ticketsArr = data.getJSONArray("tickets")
             val vouchersArr = data.getJSONArray("vouchers")
