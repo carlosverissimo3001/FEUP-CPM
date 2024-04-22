@@ -1,5 +1,12 @@
 # Ticket and Cafeteria Ordering System
 
+## Group Composition
+
+| Name | Email | GitHub |
+| --- | --- | --- |
+| Carlos Veríssimo | up201907716@up.pt | [carlosverissimo3001](https://github.com/carlosverissimo3001)
+| Nuno Jesus | up201905477@up.pt | [Nuno-Jesus](https://github.com/Nuno-Jesus)
+
 The systems is comprised by 4 main components:
 
 ## Architecture of the system
@@ -23,7 +30,7 @@ The systems is comprised by 4 main components:
 
 - API endpoints:
   - `POST /register` - Register a new user
-  - `GET /get_user` - Get user information given an ID 
+  - `GET /get_user` - Get user information given an ID
   - `GET /users` - Get all users (unused//debugging purposes)
 
 [shows.py](../TheaterLink/routes/shows.py) contains the endpoints for show management. It allows the retrieval of all shows that were previously added to the database (during creation).
@@ -74,10 +81,10 @@ The systems is comprised by 4 main components:
           }
         ]
       }
-      ``` 
+      ```
 
     - Voucher type are either "free popcorn" or "free coffee", chosen randomly. A 5% voucher discount is also generated if the total price of the tickets is greater than 200.
-  
+
   - `GET /tickets` - Get all tickets
   - `POST /validate_ticket` - Validate a ticket
   - `POST /set_ticket_as_used` - Set a ticket as used

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import org.feup.carlosverissimo3001.theaterpal.api.PingResponse
 import org.feup.carlosverissimo3001.theaterpal.api.isUserRegistered
 import org.feup.carlosverissimo3001.theaterpal.api.pingServer
 import org.feup.carlosverissimo3001.theaterpal.auth.Authentication
@@ -15,25 +16,28 @@ class LauncherActivity : AppCompatActivity() {
     // If it exists, it will start the MainActivity
     // If it doesn't, it will start the RegisterActivity
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // The boolean is set when the user clicks the "Proceed Anyway" button on the ServerDownActivity
+        val skipPing = intent.getBooleanExtra("skipPing", false)
+
         val context = this
 
-        // Ping the server to check if it is up
-        var serverPinged = false
-
         // Launch the ping request asynchronously
-        pingServer { isUp ->
+        pingServer { reason ->
             // Update the UI on the main thread
             runOnUiThread {
-                // Server is down
-                if (!isUp) {
-                    // Start the ServerDown activity
+                /*// Server is down
+                if (reason == PingResponse.SERVER_DOWN || reason == PingResponse.NO_INTERNET && !skipPing) {
+                   // Start the ServerDown activity
                     val intent = Intent(context, ServerDownActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    intent.putExtra("reason", reason.name)
                     startActivity(intent)
-                } else {
-                    // Server is up
+                } else {*/
+                    // Server is up or the user skipped the ping
 
                     // Check if the user has authenticated before
                     val rsaPairExists = Authentication(this).doesRSAKeyPairExist()
@@ -45,7 +49,9 @@ class LauncherActivity : AppCompatActivity() {
                     // Read the userid from the local storage
                     val userId = Authentication(this).getUserID()
 
-                    // Use the userId to check if the user is registered on the server
+                    serverACK = userId != ""
+
+                    /*// Use the userId to check if the user is registered on the server
                     if (userId != "")
                         isUserRegistered(userId) {
                             serverACK = it
@@ -53,7 +59,7 @@ class LauncherActivity : AppCompatActivity() {
                         }
 
                     while (!serverVerified)
-                        Thread.sleep(100)
+                        Thread.sleep(100)*/
 
                     // next activity
                     var intent = Intent(this, RegisterActivity::class.java)
@@ -94,7 +100,7 @@ class LauncherActivity : AppCompatActivity() {
                         // finish the current activity
                         finish()
                     }
-                }
+                /*}*/
             }
         }
     }
