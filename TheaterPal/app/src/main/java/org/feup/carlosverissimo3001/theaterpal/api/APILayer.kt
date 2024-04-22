@@ -234,6 +234,7 @@ fun getUserTickets(userId: String, callback: (List<Ticket>) -> Unit){
                 }
                 else -> {
                     print("Error getting tickets")
+                    callback(emptyList())
                 }
             }
         }
@@ -388,6 +389,7 @@ fun getUserOrders(userId: String, callback: (List<OrderRcv>) -> Unit) {
                 }
                 else -> {
                     print("Error getting orders")
+                    callback(emptyList())
                 }
             }
         }

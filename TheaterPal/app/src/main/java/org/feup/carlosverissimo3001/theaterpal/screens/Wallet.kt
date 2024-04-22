@@ -63,8 +63,6 @@ fun Wallet(ctx: Context, navController: NavController) {
     val context = LocalContext.current
     val areTicketsCached = areTicketsStoredInCache(context)
 
-    println("Are tickets cached: $areTicketsCached")
-
     LaunchedEffect(Unit) {
         // Get user orders
         getUserOrders(userId = Authentication(ctx).getUserID()) { fetchedOrders ->
