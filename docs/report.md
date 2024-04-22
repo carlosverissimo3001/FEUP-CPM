@@ -43,6 +43,7 @@
 - [Scenario Tests](#scenario-tests)
   - [Offline Ticket Validation](#offline-ticket-validation)
   - [Offline Cafeteria Ordering](#offline-cafeteria-ordering)
+  - [User Authentication](#user-authentication)
 - [How to Use](#how-to-use)
   - [TheaterLink](#theaterlink-1)
   - [TheaterPal](#theaterpal-1)
@@ -610,6 +611,14 @@ Clicking on a transaction will show a receipt-like screen with all the details o
 
 ## Scenario Tests
 
+An internet connection is only needed for three main operations:
+
+1. Registering for the first time
+2. Purchasing tickets
+3. Consult all transactions
+
+There are some operations that can be done offline, and only require an NFC equipped phone:
+
 ### Offline Ticket Validation
 
 One of the main features of the system is the ability to validate tickets using NFC, even if the phone has no internet connection.
@@ -620,7 +629,9 @@ The scenario test is as follows:
 2. The server response contains the tickets and vouchers. The app caches the tickets and vouchers.
 3. The user loses internet connection but still has the tickets and vouchers cached.
 4. The user goes to the theater and tries to validate the tickets using NFC.
-5. The validation is successful, and the user is allowed to enter the theater, even without internet connection (the validation terminal needs internet connection to verify the tickets with the server).
+5. The validation is successful, and the user is allowed to enter the theater, even without internet connection 
+
+> the validation terminal needs internet connection to verify the tickets with the server.
 
 ### Offline Cafeteria Ordering
 
@@ -632,7 +643,25 @@ The scenario test is as follows:
 2. They can add up to 2 vouchers to the order, even without internet connection, as they were cached when the user purhcased the tickets.
 3. The user submits the order using NFC.
 4. The order is successfully submitted, and the user is given an order number to look for in the cafeteria.
-(the cafeteria terminal needs internet connection to submit the order to the server)
+
+> The cafeteria terminal needs internet connection to submit the order to the server.
+
+### User Authentication
+
+Another scenario test is the user authentication. The user needs to authenticate using biometrics before purchasing tickets, as this is the only way to ensure that the user is the one making the purchase.
+
+> To make a cafeeteria order, this is not needed as the user needs to go up to the terminal to submit the order.
+
+In order to support as many devices as possible, we also provide the option to authenticate using a PIN or pattern.
+
+Thus, the authentication types are a Class 2 biometric `BIOMETRIC_WEAK`, that allows for both facial recognition and fingerprint, and a `DEVICE_CREDENTIAL` type that allows for PIN, pattern or password.
+
+> If the uses has not defined an authentication method, the app will prompt the user to do so and won't allow the user to proceed without it.
+
+The authentication screen is shown below:
+
+<p align="center">
+  <img src="../images/TheaterPal/biometric_auth.jpg" alt="Biometric Authentication" width="300">
 
 ## How to Use
 
