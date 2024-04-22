@@ -1,4 +1,52 @@
-# Ticket and Cafeteria Ordering System
+<h1> Ticket and Cafeteria Ordering System </h1>
+
+<h2> Table of Contents </h2>
+
+- [Group Composition](#group-composition)
+- [Architecture of the system](#architecture-of-the-system)
+  - [TheaterLink](#theaterlink)
+    - [User Endpoints](#user-endpoints)
+    - [Show Endpoints](#show-endpoints)
+    - [Ticket Endpoints](#ticket-endpoints)
+    - [Voucher Endpoints](#voucher-endpoints)
+    - [Transaction Endpoints](#transaction-endpoints)
+    - [Cafeteria Endpoints](#cafeteria-endpoints)
+  - [TheaterPal](#theaterpal)
+  - [TheaterValid8](#theatervalid8)
+  - [TheaterBite](#theaterbite)
+- [Database and Data Schemes](#database-and-data-schemes)
+  - [Users](#users)
+  - [Shows](#shows)
+  - [ShowDates](#showdates)
+  - [Transactions](#transactions)
+  - [Tickets](#tickets)
+  - [Vouchers](#vouchers)
+  - [TicketTransactions](#tickettransactions)
+  - [CafeteriaTransactions](#cafeteriatransactions)
+  - [CafeteriaOrderItem](#cafeteriaorderitem)
+- [Features](#features)
+  - [Register](#register)
+  - [Consult Shows](#consult-shows)
+  - [Purchase Tickets](#purchase-tickets)
+  - [Biometric Authentication](#biometric-authentication)
+  - [Consult Tickets](#consult-tickets)
+  - [Check items in the Cafeteria](#check-items-in-the-cafeteria)
+  - [Consult Available Vouchers](#consult-available-vouchers)
+  - [Order Food](#order-food)
+    - [Choosing Products](#choosing-products)
+    - [Select Vouchers](#select-vouchers)
+    - [Validate Order](#validate-order)
+  - [Consult Orders](#consult-orders)
+  - [Validate Tickets](#validate-tickets)
+  - [Consult Transactions](#consult-transactions)
+- [Navigation Map](#navigation-map)
+- [Scenario Tests](#scenario-tests)
+- [How to Use](#how-to-use)
+  - [TheaterLink](#theaterlink-1)
+  - [TheaterPal](#theaterpal-1)
+  - [TheaterValid8](#theatervalid8-1)
+  - [TheaterBite](#theaterbite-1)
+
 
 ## Group Composition
 
@@ -402,6 +450,133 @@ Before submitting the order, the user must authenticate using biometrics. This i
 > Note: As some phones don't provide either a fingerprint sensor or facial recognition, we also provide the option to authenticate using a PIN or pattern.
 
 The authentication screen is shown below:
+
+<p align="center">
+  <img src="../images/TheaterPal/biometric_auth.jpg" alt="Biometric Authentication" width="300">
+</p>
+
+After the user authenticates, the order is submitted to the server, and the tickets are generated.
+
+### Consult Tickets
+
+The user can consult all the tickets they have purchased. This is done by clicking on the "Wallet" icon in the bottom navigation bar.
+
+The image below shows the wallet screen:
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment.png" alt="Wallet Fragment" width="300">
+</p>
+
+The user can also filter the tickets to show only the ones that are still valid.
+
+The wallet screen has two tabs: one for the tickets and other for orders made in the cafeteria.
+
+### Check items in the Cafeteria
+
+The user can also check the items available in the cafeteria. This is done by clicking on the "Cafeteria" icon in the bottom navigation bar.
+
+The image below shows the cafeteria screen:
+
+<p align="center">
+  <img src="../images/TheaterPal/cafeteria_fragment_products.png" alt="Cafeteria Fragment" width="300">
+</p>
+
+
+### Consult Available Vouchers
+
+By swiping to the "Vouchers" tab in the cafeteria screen, the user can consult all the vouchers they have available:
+
+<p align="center">
+  <img src="../images/TheaterPal/cafeteria_fragment_vouchers.png" alt="Cafeteria Fragment" width="300">
+</p>
+
+The user can also filter the vouchers to show only the ones that are still valid.
+
+### Order Food
+
+To make an order in the cafeteria, the user first selects from the list of products:
+
+#### Choosing Products
+
+<p align="center">
+  <img src="../images/TheaterPal/cafeteria_fragment_choosing_product.png" alt="Cafeteria Fragment" width="300">
+</p>
+
+Note that the button to submit the order is disabled until the user selects at least one item.
+At any moment, the user can see the total price of the order.
+
+#### Select Vouchers
+
+After clicking on the "Next Step" button, the user is presented with a screen to select the vouchers they want to use:
+
+<p align="center">
+  <img src="../images/TheaterPal/cafeteria_fragment_choosing_vouchers.png" alt="Cafeteria Fragment" width="300">
+</p>
+
+There are some restriction in place:
+
+- The user can only select up to 2 vouchers.
+- If available, the user can select only one 5% discount voucher.
+
+#### Validate Order
+
+After selecting the vouchers, the user can click on the "Submit Order" button to generate the order and, go to the cafeteria validation screen.
+
+<p align="center">
+  <img src="../images/TheaterPal/cafeteria_NFC_validating_order.png" alt="Cafeteria Fragment" width="300">
+</p>
+
+At this point, NFC should be enabled. If it isn't, the user is prompted to enable it before proceeding.
+
+### Consult Orders
+
+After the order is submitted, the user can consult all the orders they have made in the cafeteria. This is done by clicking on the "Wallet" icon in the bottom navigation bar and swiping to the "Orders" tab.
+
+<!-- TODO: Take a screenshot of the tab with some orders  -->
+
+### Validate Tickets
+
+The user can also validate the tickets they have purchased. In the "Wallet" screen, the user can swipe to the "Tickets" tab and, by selecting a ticket, they can validate it.
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_choose_tickets.png" alt="Ticket Validation" width="300">
+</p>
+
+When the user selects a ticket, a button to validate it appears. At this stage, the user can chosoe up to 4 tickets to validate, at each time.
+
+After clicking on the "Validate" button, the user is presented with a screen to tap their phone on the NFC terminal.
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_NFC_validating_tickets.png" alt="Ticket Validation" width="300">
+</p>
+
+### Consult Transactions
+
+At any given moment, the user can consult all the transactions they have made. To do this, go to the "Wallet" screen and click on the `Click here to see consult transactions` text.
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment.png" alt="Transaction Consult" width="300">
+</p>
+
+Per the specifications, consulting the transctions will fetch the vouchers and tickets that are still not used by the customer. In this way used tickets and vouchers are deleted from the customer app, allowing the customer to recover some voucher transmitted by mistake in a previous order, or not yet transmitted, and get rid of used ones, if they are still there.
+
+As this is a potentially heavy operation, the user is prompted to confirm if they want to fetch the transactions.
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_consult_transactions.png" alt="Transaction Consult" width="300">
+</p>
+
+If the users chooses to proceed, the transactions are fetched and displayed in a list:
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_transactions.png" alt="Transaction Consult" width="300">
+</p>
+
+Clicking on a transaction will show a receipt-like screen with all the details of the transaction:
+
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_receipt.png" alt="Transaction Details" width="300">
+</p>
 
 ## Navigation Map
 
