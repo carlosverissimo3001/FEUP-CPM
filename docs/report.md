@@ -528,11 +528,21 @@ After selecting the vouchers, the user can click on the "Submit Order" button to
 
 At this point, NFC should be enabled. If it isn't, the user is prompted to enable it before proceeding.
 
+After the validation is done, the user is presented with a screen that shows the result of the validation. It will show the order number that the customer should look for in the cafeteria.
+
+<p align="center">
+  <img src="../images/TheaterBite/confirmation_screen_2.jpg" alt="Order Validation" width="300">
+</p>
+
+The terminal will show the items in the order and the total price, as well as the vouchers that were used.
+
 ### Consult Orders
 
 After the order is submitted, the user can consult all the orders they have made in the cafeteria. This is done by clicking on the "Wallet" icon in the bottom navigation bar and swiping to the "Orders" tab.
 
-<!-- TODO: Take a screenshot of the tab with some orders  -->
+<p align="center">
+  <img src="../images/TheaterPal/wallet_fragment_orders.jpg" alt="Order Consult" width="300">
+</p
 
 ### Validate Tickets
 
@@ -548,6 +558,22 @@ After clicking on the "Validate" button, the user is presented with a screen to 
 
 <p align="center">
   <img src="../images/TheaterPal/wallet_fragment_NFC_validating_tickets.png" alt="Ticket Validation" width="300">
+</p>
+
+After the validation is done, the user is presented with a screen that shows the result of the validation.
+
+This is what a successful validation looks like:
+
+<p align="center">
+  <img src="../images/TheaterValid8/5_validation_success.jpg" alt="Ticket Validation" width="300"
+>
+
+Keep in mind that the user can send up to 4 tickets at the same time, including different shows and dates.
+
+The validation terminal is only set to accept tickets for a certain show and date. If the ticket is not valid, the user is presented with an error message.
+
+<p align="center">
+  <img src="../images/TheaterValid8/6_validation_failure.jpg" alt="Ticket Validation" width="300">
 </p>
 
 ### Consult Transactions
