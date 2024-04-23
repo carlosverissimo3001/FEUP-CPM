@@ -4,16 +4,13 @@
 
 - [Group Composition](#group-composition)
 - [Architecture of the system](#architecture-of-the-system)
-  - [TheaterLink](#theaterlink)
+  - [TheaterLink / Backend Service](#theaterlink--backend-service)
     - [User Endpoints](#user-endpoints)
     - [Show Endpoints](#show-endpoints)
     - [Ticket Endpoints](#ticket-endpoints)
     - [Voucher Endpoints](#voucher-endpoints)
     - [Transaction Endpoints](#transaction-endpoints)
     - [Cafeteria Endpoints](#cafeteria-endpoints)
-  - [TheaterPal](#theaterpal)
-  - [TheaterValid8](#theatervalid8)
-  - [TheaterBite](#theaterbite)
 - [Database and Data Schemes](#database-and-data-schemes)
   - [Users](#users)
   - [Shows](#shows)
@@ -24,7 +21,7 @@
   - [TicketTransactions](#tickettransactions)
   - [CafeteriaTransactions](#cafeteriatransactions)
   - [CafeteriaOrderItem](#cafeteriaorderitem)
-- [Features](#features)
+- [Features / How To Use](#features--how-to-use)
   - [Register](#register)
   - [Consult Shows](#consult-shows)
   - [Purchase Tickets](#purchase-tickets)
@@ -38,17 +35,18 @@
     - [Validate Order](#validate-order)
   - [Consult Orders](#consult-orders)
   - [Validate Tickets](#validate-tickets)
+    - [Prepare Terminal (Server / Terminal)](#prepare-terminal-server--terminal)
+    - [Present Tickets (Client / Customer)](#present-tickets-client--customer)
+    - [Validation Result](#validation-result)
   - [Consult Transactions](#consult-transactions)
-- [Navigation Map](#navigation-map)
 - [Scenario Tests](#scenario-tests)
   - [Offline Ticket Validation](#offline-ticket-validation)
   - [Offline Cafeteria Ordering](#offline-cafeteria-ordering)
   - [User Authentication](#user-authentication)
-- [How to Use](#how-to-use)
-  - [TheaterLink](#theaterlink-1)
-  - [TheaterPal](#theaterpal-1)
-  - [TheaterValid8](#theatervalid8-1)
-  - [TheaterBite](#theaterbite-1)
+- [Navigation Maps](#navigation-maps)
+  - [TheaterPal](#theaterpal)
+  - [TheaterValid8](#theatervalid8)
+  - [TheaterBite](#theaterbite)
 
 
 ## Group Composition
@@ -69,7 +67,13 @@ The systems is comprised by 4 main components:
 | **TheaterValid8** | The validation app for the tickets. Reads tickets using NFC from the customers and validates them. Developed with Kotlin |
 | **TheaterBite** | The cafeteria terminal app that receives orders from the customers also using NFC. Developed with Kotlin |
 
-### TheaterLink
+The following image describes the schema of the system:
+
+<p align="center">
+  <img src="../images/architecture_scheme.png" width="800">
+</p>
+
+### TheaterLink / Backend Service
 
 - To unclutter the main application, [app.py](../TheaterLink/app.py), endpoints were separated into different files. Each file is responsible for a different set of endpoints.
 
@@ -261,17 +265,7 @@ As per the specifications, when the user consults all transctions, the server sh
 
   - `GET /orders` - Get all orders
 
-### TheaterPal
 
-<!-- TODO: Describe the frontend application -->
-
-### TheaterValid8
-
-<!-- TODO: Describe the ticket validation app -->
-
-### TheaterBite
-
-<!-- TODO: Describe the cafeteria terminal app -->
 
 ## Database and Data Schemes
 
@@ -409,7 +403,7 @@ Contains the information of the items that were purcased in an order.
 | `Price` | DOUBLE | The price of the item | |
 | `Quantity` | INT | The quantity of the item | |
 
-## Features
+## Features / How To Use
 
 ### Register
 
@@ -531,7 +525,7 @@ After selecting the vouchers, the user can click on the "Submit Order" button to
 
 At this point, NFC should be enabled. If it isn't, the user is prompted to enable it before proceeding.
 
-After the validation is done, the user is presented with a screen that shows the result of the validation. It will show the order number that the customer should look for in the cafeteria.
+After the validation is done, the user will see in the cafeteria terminal a screen that shows the result of the validation. It will show the order number that the customer should look for in the cafeteria.
 
 <p align="center">
   <img src="../images/TheaterBite/nfc_result.png" alt="Cafeteria Fragment" width="300">
@@ -545,9 +539,37 @@ After the order is submitted, the user can consult all the orders they have made
 
 <p align="center">
   <img src="../images/TheaterPal/wallet_fragment_orders.png" alt="Order Consult" width="300">
-</p
+</p>
 
 ### Validate Tickets
+
+#### Prepare Terminal (Server / Terminal)
+
+In order to validate tickets, the terminal app should be set to accept tickets for a given show at a given date. The following screen is the first thing that the validator is presented with when opening the `TheaterValid8` app.
+
+<p align="center">
+  <img src="../images/TheaterValid8/1_main_activity.png" alt="Main Activity" width="300">
+</p>
+
+After selecting the show and date, the validator confirms the selection:
+
+<p align="center">
+  <img src="../images/TheaterValid8/2_main_activity_after_selection.png" alt="Main Activity" width="300">
+</p>
+
+And then the following screen is presented in the terminal, as has some information about the show.
+
+<p align="center">
+  <img src="../images/TheaterValid8/3_validator_activity.png" alt="Validator Activity" width="300">
+</p>
+
+To validate tickets, just click on the "Scan" button and the terminal is ready to receive the tickets.
+
+<p align="center">
+  <img src="../images/TheaterValid8/4_scanning_activity.png" alt="Scanning Activity" width="300">
+</p>
+
+#### Present Tickets (Client / Customer)
 
 The user can also validate the tickets they have purchased. In the "Wallet" screen, the user can swipe to the "Tickets" tab and, by selecting a ticket, they can validate it.
 
@@ -563,13 +585,12 @@ After clicking on the "Validate" button, the user is presented with a screen to 
   <img src="../images/TheaterPal/wallet_fragment_NFC_validating_tickets.png" alt="Ticket Validation" width="300">
 </p>
 
-After the validation is done, the user is presented with a screen that shows the result of the validation.
+#### Validation Result
 
-This is what a successful validation looks like:
+After receving a tap from the customer, the terminal will show the result of the validation.
 
 <p align="center">
-  <img src="../images/TheaterValid8/5_validation_success.png" alt="Ticket Validation" width="300"
->
+  <img src="../images/TheaterValid8/5_validation_success.png" alt="Validation Success" width="300">
 
 Keep in mind that the user can send up to 4 tickets at the same time, including different shows and dates.
 
@@ -595,7 +616,7 @@ As this is a potentially heavy operation, the user is prompted to confirm if the
   <img src="../images/TheaterPal/wallet_fragment_consult_transactions.png" alt="Transaction Consult" width="300">
 </p>
 
-If the users chooses to proceed, the transactions are fetched and displayed in a list:
+If the user chooses to proceed, the transactions are fetched and displayed in a list:
 
 <p align="center">
   <img src="../images/TheaterPal/wallet_fragment_transactions.png" alt="Transaction Consult" width="300">
@@ -606,8 +627,6 @@ Clicking on a transaction will show a receipt-like screen with all the details o
 <p align="center">
   <img src="../images/TheaterPal/wallet_fragment_receipt.png" alt="Transaction Details" width="300">
 </p>
-
-## Navigation Map
 
 ## Scenario Tests
 
@@ -650,13 +669,13 @@ The scenario test is as follows:
 
 Another scenario test is the user authentication. The user needs to authenticate using biometrics before purchasing tickets, as this is the only way to ensure that the user is the one making the purchase.
 
-> To make a cafeeteria order, this is not needed as the user needs to go up to the terminal to submit the order.
+> To make a cafeteria order, this is not needed as the user needs to go up to the terminal to submit the order.
 
 In order to support as many devices as possible, we also provide the option to authenticate using a PIN or pattern.
 
 Thus, the authentication types are a Class 2 biometric `BIOMETRIC_WEAK`, that allows for both facial recognition and fingerprint, and a `DEVICE_CREDENTIAL` type that allows for PIN, pattern or password.
 
-> If the uses has not defined an authentication method, the app will prompt the user to do so and won't allow the user to proceed without it.
+> If the user has not defined an authentication method, the app will prompt the user to do so and won't allow the user to proceed without it.
 
 The authentication screen is shown below:
 
@@ -666,12 +685,22 @@ The authentication screen is shown below:
 
 More info about biomtric authentication can be found [here](https://developer.android.com/training/sign-in/biometric-auth)
 
-## How to Use
-
-### TheaterLink
+## Navigation Maps
 
 ### TheaterPal
 
+<p align="center">
+  <img src="../images/activity_diagram_pal.png" alt="Activity Diagram" width="800">
+</p>
+
 ### TheaterValid8
 
+<p align="center">
+  <img src="../images/activity_diagram_valid8.png" alt="Activity Diagram" width="800">
+</p>
+
 ### TheaterBite
+
+<p align="center">
+  <img src="../images/activity_diagram_bite.png" alt="Activity Diagram" width="800">
+</p>
