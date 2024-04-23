@@ -534,7 +534,7 @@ At this point, NFC should be enabled. If it isn't, the user is prompted to enabl
 After the validation is done, the user is presented with a screen that shows the result of the validation. It will show the order number that the customer should look for in the cafeteria.
 
 <p align="center">
-  <img src="../images/TheaterBite/confirmation_screen_2.jpg" alt="Order Validation" width="300">
+  <img src="../images/TheaterBite/nfc_result.png" alt="Cafeteria Fragment" width="300">
 </p>
 
 The terminal will show the items in the order and the total price, as well as the vouchers that were used.
@@ -544,7 +544,7 @@ The terminal will show the items in the order and the total price, as well as th
 After the order is submitted, the user can consult all the orders they have made in the cafeteria. This is done by clicking on the "Wallet" icon in the bottom navigation bar and swiping to the "Orders" tab.
 
 <p align="center">
-  <img src="../images/TheaterPal/wallet_fragment_orders.jpg" alt="Order Consult" width="300">
+  <img src="../images/TheaterPal/wallet_fragment_orders.png" alt="Order Consult" width="300">
 </p
 
 ### Validate Tickets
@@ -568,7 +568,7 @@ After the validation is done, the user is presented with a screen that shows the
 This is what a successful validation looks like:
 
 <p align="center">
-  <img src="../images/TheaterValid8/5_validation_success.jpg" alt="Ticket Validation" width="300"
+  <img src="../images/TheaterValid8/5_validation_success.png" alt="Ticket Validation" width="300"
 >
 
 Keep in mind that the user can send up to 4 tickets at the same time, including different shows and dates.
@@ -662,6 +662,9 @@ The authentication screen is shown below:
 
 <p align="center">
   <img src="../images/TheaterPal/biometric_auth.jpg" alt="Biometric Authentication" width="300">
+</p>
+
+More info about biomtric authentication can be found [here](https://developer.android.com/training/sign-in/biometric-auth)
 
 ## How to Use
 
