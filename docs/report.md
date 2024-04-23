@@ -426,7 +426,7 @@ The customer, after registering, is presented with a list of shows that are avai
 The image below shows the list of shows:
 
 <p align="center">
-  <img src="../images/TheaterPaL/shows_fragment.png" alt="Shows Fragment" width="300">
+  <img src="/images/TheaterPaL/shows_fragment.png" alt="Shows Fragment" width="300">
 </p>
 
 
@@ -648,7 +648,7 @@ The scenario test is as follows:
 2. The server response contains the tickets and vouchers. The app caches the tickets and vouchers.
 3. The user loses internet connection but still has the tickets and vouchers cached.
 4. The user goes to the theater and tries to validate the tickets using NFC.
-5. The validation is successful, and the user is allowed to enter the theater, even without internet connection 
+5. The validation is successful, and the user is allowed to enter the theater, even without internet connection
 
 > the validation terminal needs internet connection to verify the tickets with the server.
 
