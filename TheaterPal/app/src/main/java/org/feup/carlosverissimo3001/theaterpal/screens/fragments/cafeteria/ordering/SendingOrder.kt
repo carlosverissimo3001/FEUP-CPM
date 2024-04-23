@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import org.feup.carlosverissimo3001.theaterpal.R
 import org.feup.carlosverissimo3001.theaterpal.formatPrice
 import org.feup.carlosverissimo3001.theaterpal.marcherFontFamily
+import org.feup.carlosverissimo3001.theaterpal.models.Auxiliary.itemEmojis
 import org.feup.carlosverissimo3001.theaterpal.models.Parser.parseVoucherType
 import org.feup.carlosverissimo3001.theaterpal.models.order.Order
 
@@ -64,7 +65,8 @@ fun SendingOrderFragment(
                     Color(android.graphics.Color.parseColor("#302c2c")),
                     RoundedCornerShape(15.dp)
                 )
-                .fillMaxSize().pointerInput(Unit) {
+                .fillMaxSize()
+                .pointerInput(Unit) {
                     // draw down == go back
                     detectDragGestures { _, dragAmount ->
                         if (dragAmount.y > 50) {
@@ -76,7 +78,9 @@ fun SendingOrderFragment(
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize().padding(10.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -120,7 +124,7 @@ fun SendingOrderFragment(
 
                     order?.barOrder?.items?.forEach {
                         Text(
-                            text = "· ${it.key.name} x ${it.value}",
+                            text = "${itemEmojis[it.key.name]} ${it.key.name} x ${it.value}",
                             style = TextStyle(
                                 fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                                 fontFamily = marcherFontFamily,

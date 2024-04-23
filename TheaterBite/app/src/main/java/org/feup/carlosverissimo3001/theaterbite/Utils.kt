@@ -207,3 +207,12 @@ fun parseVoucherType (type: String) : String {
         else -> "5% Discount"
     }
 }
+
+var itemEmojis = mapOf(
+    "Popcorn" to "\uD83C\uDF7F",
+    "Soda" to "\uD83E\uDD64",
+    "Coffee" to "☕",
+    "Sandwich" to "\uD83C\uDF54",
+    "Free Popcorn" to "\uD83C\uDF7F",
+    "Free Coffee" to "☕",
+)
