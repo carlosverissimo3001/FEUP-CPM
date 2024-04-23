@@ -426,7 +426,7 @@ The customer, after registering, is presented with a list of shows that are avai
 The image below shows the list of shows:
 
 <p align="center">
-  <img src="/images/TheaterPaL/shows_fragment.png" alt="Shows Fragment" width="300">
+  <img src="../images/TheaterPal/shows_fragment.png" alt="Shows Fragment" width="300">
 </p>
 
 
