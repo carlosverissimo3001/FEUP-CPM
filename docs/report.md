@@ -47,7 +47,9 @@
   - [TheaterPal](#theaterpal)
   - [TheaterValid8](#theatervalid8)
   - [TheaterBite](#theaterbite)
-
+- [How to Run](#how-to-run)
+  - [Server](#server)
+  - [Port Forwarding](#port-forwarding)
 
 ## Group Composition
 
@@ -704,3 +706,70 @@ More info about biomtric authentication can be found [here](https://developer.an
 <p align="center">
   <img src="../images/activity_diagram_bite.png" alt="Activity Diagram" width="800">
 </p>
+
+## How to Run
+
+### Server
+
+To run the backend service, you need to have Python installed.
+
+After that, we recommend creating a virtual environment to install the dependencies.
+
+To do this, run the following commands:
+
+```bash
+cd TheaterLink
+python3 -m venv venv
+```
+
+Activate the virtual environment:
+
+```bash
+source venv/bin/activate
+```
+
+(In Windows, the command is `venv\Scripts\activate`)
+
+Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+After this step, simply run the following command to start the server:
+
+```bash	
+python -m app
+```
+
+### Port Forwarding
+
+As the server is running on your local machine, you need to expose it to the internet so that the apps can communicate with it.
+
+We used ngrok, and will provide a brief guide on how to use it. However, if you want to use another service, feel free to do so.
+
+To set up an ngrok tunnel, follow these steps:
+
+1. Download ngrok from [here](https://ngrok.com/download) after creating an account.
+2. Follow the installation instructions for your OS
+3. Add your authtoken by running the following command:
+
+```bash
+ngrok config add-authtoken <YOUR_AUTHTOKEN>
+```
+
+> More instructions [here](https://dashboard.ngrok.com/get-started/your-authtoken)
+
+4.Set up your domain by heading to the [ngrok dashboard](https://dashboard.ngrok.com/cloud-edge/domains) and adding a (free) domain.
+
+5. Then, just update the `URL` constant in the `Constants.kt` file.
+
+The file can be found [here](../TheaterPal/app/src/main/java/org/feup/carlosverissimo3001/theaterpal/Constants.kt)
+
+> There's also a `Constants.kt` file in the `TheaterValid8` and `TheaterBite` apps that you need to update too if you want to check the validation and cafeteria ordering apps.
+
+6. Finally, run the following command to start the tunnel:
+
+```bash
+ngrok http --domain=<YOUR_DOMAIN> 5000
+```
