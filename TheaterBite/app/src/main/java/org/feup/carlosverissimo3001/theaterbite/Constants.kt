@@ -16,15 +16,6 @@ object Constants {
     const val SIGN_ALGO = "SHA256WithRSA"
 }
 
-var itemIcons = mapOf(
-    "Popcorn" to Icons.Outlined.Fastfood,
-    "Soda" to Icons.Outlined.Fastfood,
-    "Coffee" to Icons.Outlined.Coffee,
-    "Sandwich" to Icons.Outlined.Fastfood,
-    "Free Coffee" to Icons.Outlined.Coffee,
-    "Free Popcorn" to Icons.Outlined.Fastfood
-)
-
 val poppinsFontFamily = androidx.compose.ui.text.font.FontFamily(
     Font(R.font.poppins_light, FontWeight.W300),
     Font(R.font.poppins_regular, FontWeight.W400),

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.*
 import org.feup.carlosverissimo3001.theaterbite.formatPrice
-import org.feup.carlosverissimo3001.theaterbite.itemIcons
+import org.feup.carlosverissimo3001.theaterbite.itemEmojis
 import org.feup.carlosverissimo3001.theaterbite.models.*
 import org.feup.carlosverissimo3001.theaterbite.parseVoucherType
 import org.feup.carlosverissimo3001.theaterbite.poppinsFontFamily
@@ -302,27 +302,14 @@ fun OrderDetails(products: List<Product>) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = itemIcons[it.name]!!,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .padding(end = 10.dp)
-                        .size(25.dp)
+                Text(
+                    text = "${itemEmojis[it.name]} ${it.quantity}x ${it.name}",/* - ",*/
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontFamily = poppinsFontFamily,
+                    ),
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "${it.quantity}x ${it.name}",/* - ",*/
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontFamily = poppinsFontFamily,
-                        ),
-                    )
-                }
             }
         }
     }
